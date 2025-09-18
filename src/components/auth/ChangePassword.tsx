@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { authApiPath } from '@/app/utils/api';
 import axios from 'axios';
@@ -9,15 +9,29 @@ import { ToastContainer, toast } from 'react-toastify';
 
 export default function ChangePasswordPage() {
     const [error, setError] = useState("");
-    const autoPartsUserData: any = localStorage.getItem("autoPartsUserData")
-    const loggedInUser = JSON.parse(autoPartsUserData);
+    const [loggedInUser, setLoggedInUser] = useState<any>(null);
 
     const [formData, setFormData] = useState({
-        email: loggedInUser?.user?.email,
+        email: '',
         old_password: '',
         new_password: '',
         confirm_new_password: ''
     });
+
+     // 🧠 Load user from localStorage only on client
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const autoPartsUserData = localStorage.getItem("autoPartsUserData");
+            if (autoPartsUserData) {
+                const parsedUser = JSON.parse(autoPartsUserData);
+                setLoggedInUser(parsedUser);
+                setFormData(prev => ({
+                    ...prev,
+                    email: parsedUser?.user?.email || ''
+                }));
+            }
+        }
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
