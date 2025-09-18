@@ -1,0 +1,12 @@
+import ResetPasswordPage from "@/components/auth/ResetPassword";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Next.js Reset password Page | TailAdmin - Next.js Dashboard Template",
+  description: "This is Next.js SignUp Page TailAdmin Dashboard Template",
+  // other metadata
+};
+
+export default function ResetPassword() {
+  return <ResetPasswordPage />;
+}
