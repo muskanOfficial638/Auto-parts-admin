@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
-export const authApiPath = "http://192.168.1.4:8000/v1";
-export const adminApiPath = "http://192.168.1.4:8001/v1/admin";
-export const vehicleApiPath = "http://192.168.1.4:8003/v1/vehicle";
+export const authApiPath = "http://192.168.1.3:8000/v1";
+export const adminApiPath = "http://192.168.1.3:8001/v1/admin";
+export const vehicleApiPath = "http://192.168.1.3:8003/v1/vehicle";
 
 // user profiles
 export async function fetchUsers(role:string, token:string) {
@@ -61,6 +61,7 @@ export async function deleteUser(token:string, userId:string) {
   });
 }
 
+
 // Admin logs
 export async function fetchAdminLogs(token:string) {
   const res = await fetch(`${adminApiPath}/logs`, {
@@ -74,8 +75,42 @@ export async function fetchAdminLogs(token:string) {
   return res.json();
 }
 
+// delete user
+export async function deleteAdminLogs(token:string, logId:string) {
+   return axios.delete(
+    `${adminApiPath}/logs/${logId}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+  .then((response) => {
+    console.log("delete log",response)
+    return response;
+  })
+  .catch((error) => {
+    console.error("unable to delete user", error);
+    throw error;
+  });
+}
+
+// Get Vehicle makes
+export async function viewVehicleMake() {
+  const res = await fetch(`${vehicleApiPath}/view`, {
+    cache: "no-store",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) throw new Error("Failed to vehicle makes");
+  return res.json();
+}
+
 // Vehicle model by make name
-export async function fetchVehicleMake(makeName:string) {
+export async function fetchVehicleModelByMake(makeName:string) {
   const res = await fetch(`${vehicleApiPath}/model/${makeName}`, {
     cache: "no-store",
     method: "GET",

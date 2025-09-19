@@ -33,7 +33,8 @@
     "react-toastify": "^11.0.5",
     "simple-datatables": "^10.0.0",
     "swiper": "^11.2.0",
-    "tailwind-merge": "^2.6.0"
+    "tailwind-merge": "^2.6.0",
+    "vercel": "^48.0.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

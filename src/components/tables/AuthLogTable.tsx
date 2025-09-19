@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -9,9 +10,10 @@ import {
 } from "../ui/table";
 
 import Badge from "../ui/badge/Badge";
-import { fetchAdminLogs } from "@/app/utils/api";
+import { deleteAdminLogs, fetchAdminLogs } from "@/app/utils/api";
 import { DataTable } from "simple-datatables";
 import "simple-datatables/dist/style.css";
+import { toast } from "react-toastify";
 
 interface Order {
     id: string;
@@ -36,33 +38,61 @@ export default function AuthLogTable() {
         const loggedInUser = JSON.parse(autoPartsUserData || "{}");
 
         if (loggedInUser?.access_token) {
-             fetchAdminLogs(loggedInUser.access_token).then((data) => {
+            fetchAdminLogs(loggedInUser.access_token).then((data) => {
                 setLogData(data?.items);
             });
         }
     }, []);
 
-     useEffect(() => {
-    if (logData && adminRef.current) {
-      // Delay to ensure DOM is updated
-      setTimeout(() => {
-        try {
-          new DataTable(adminRef.current!, {
-            paging: true,
-            perPage: 5,
-            perPageSelect: [5, 10, 20, 40],
-            firstLast: true,
-            nextPrev: true,
-            searchable: true,
-          });
-        } catch (error) {
-          console.error("DataTable init failed:", error);
+    useEffect(() => {
+        if (logData && adminRef.current) {
+            // Delay to ensure DOM is updated
+            setTimeout(() => {
+                try {
+                    new DataTable(adminRef.current!, {
+                        paging: true,
+                        perPage: 5,
+                        perPageSelect: [5, 10, 20, 40],
+                        firstLast: true,
+                        nextPrev: true,
+                        searchable: true,
+                    });
+                } catch (error) {
+                    console.error("DataTable init failed:", error);
+                }
+            }, 0);
         }
-      }, 0);
-    }
-  }, [logData]);
+    }, [logData]);
 
     if (!logData) return <div>Loading...</div>;
+
+    async function handleDeleteLog(logId: string) {
+        console.log("handle delete log", logId);
+        const autoPartsUserData = localStorage.getItem("autoPartsUserData");
+        const loggedInUser = JSON.parse(autoPartsUserData || "{}");
+        try {
+            const response = await deleteAdminLogs(loggedInUser?.access_token, logId)
+            console.log("Delete log:", response);
+            if (response?.status === 200) {
+                toast("Log deleted successfully");
+            }
+        } catch (err: any) {
+            // Handle errors more gracefully
+            if (err.response) {
+                // Server responded with a status other than 2xx
+                console.error("Server error:", err.response.data);
+                toast(err.response.data.detail || "log not found");
+            } else if (err.request) {
+                // Request was made but no response received
+                console.error("No response:", err.request);
+                toast("No response from server");
+            } else {
+                // Something else happened
+                console.error("Error:", err.message);
+                toast("Unexpected error occurred");
+            }
+        }
+    }
 
     return (
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -101,6 +131,12 @@ export default function AuthLogTable() {
                                     className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                                 >
                                     IP
+                                </TableCell>
+                                <TableCell
+                                    isHeader
+                                    className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                >
+                                    Action
                                 </TableCell>
                             </TableRow>
                         </TableHeader>
@@ -150,9 +186,7 @@ export default function AuthLogTable() {
                                                 <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
                                                     {order.action}
                                                 </span>
-                                                {/* <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                          {order.user.role}
-                        </span> */}
+
                                             </div>
                                         </div>
                                     </TableCell>
@@ -177,9 +211,24 @@ export default function AuthLogTable() {
                                             {order?.level}
                                         </Badge>
                                     </TableCell>
-                                    
+
                                     <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
                                         {order.ip}
+                                    </TableCell>
+                                    <TableCell className="px-4 py-4 font-normal text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
+                                        <div className="flex items-center w-full gap-2">
+                                            {/* Delete Button */}
+                                            <button onClick={() => handleDeleteLog(order?.id)} className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none">
+                                                    <path
+                                                        fill="currentColor"
+                                                        fillRule="evenodd"
+                                                        d="M6.541 3.792a2.25 2.25 0 0 1 2.25-2.25h2.417a2.25 2.25 0 0 1 2.25 2.25v.25h3.208a.75.75 0 0 1 0 1.5h-.29v10.666a2.25 2.25 0 0 1-2.25 2.25h-8.25a2.25 2.25 0 0 1-2.25-2.25V5.541h-.292a.75.75 0 1 1 0-1.5H6.54zm8.334 9.454V5.541h-9.75v10.667c0 .414.336.75.75.75h8.25a.75.75 0 0 0 .75-.75zM8.041 4.041h3.917v-.25a.75.75 0 0 0-.75-.75H8.791a.75.75 0 0 0-.75.75zM8.334 8a.75.75 0 0 1 .75.75v5a.75.75 0 1 1-1.5 0v-5a.75.75 0 0 1 .75-.75m4.083.75a.75.75 0 0 0-1.5 0v5a.75.75 0 1 0 1.5 0z"
+                                                        clipRule="evenodd"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))}

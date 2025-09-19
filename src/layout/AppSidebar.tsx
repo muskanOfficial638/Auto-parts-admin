@@ -47,8 +47,7 @@ const navItems: NavItem[] = [
     name: "Vehicle",
     icon: <PageIcon />,
     subItems: [
-      { name: "Vehicle Make", path: "/vehicle-make", pro: false },
-      { name: "Vehicle Model", path: "/error-404", pro: false },
+      { name: "Vehicle Make", path: "/vehicle-make", pro: false }
     ],
   },
   {
@@ -66,14 +65,14 @@ const navItems: NavItem[] = [
     icon: <ListIcon />,
     subItems: [{ name: "Form Elements", path: "/form-elements", pro: false }],
   },
-  // {
-  //   name: "Pages",
-  //   icon: <PageIcon />,
-  //   subItems: [
-  //     { name: "Blank Page", path: "/blank", pro: false },
-  //     { name: "404 Error", path: "/error-404", pro: false },
-  //   ],
-  // },
+  {
+    name: "Pages",
+    icon: <PageIcon />,
+    subItems: [
+      { name: "Blank Page", path: "/blank", pro: false },
+      { name: "404 Error", path: "/error-404", pro: false },
+    ],
+  },
 ];
 
 const othersItems: NavItem[] = [

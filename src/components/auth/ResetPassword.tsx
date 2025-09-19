@@ -48,7 +48,7 @@ export default function ResetPasswordPage() {
             <div className="w-full max-w-md pt-10 mx-auto">
                 <Link
                     className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-                    href="/"
+                    href="/signin"
                 >
                     <svg
                         className="stroke-current"
@@ -66,7 +66,7 @@ export default function ResetPasswordPage() {
                             strokeLinejoin="round"
                         />
                     </svg>
-                    Back to dashboard
+                    Back to Sign In
                 </Link>
             </div>
 

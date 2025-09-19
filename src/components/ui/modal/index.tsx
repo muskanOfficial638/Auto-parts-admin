@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React, { useRef, useEffect } from "react";
 
 interface ModalProps {
-  isOpen: boolean;
+  isOpen: boolean | any;
   onClose: () => void;
   className?: string;
   children: React.ReactNode;
