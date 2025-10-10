@@ -13,7 +13,7 @@ import Badge from "../ui/badge/Badge";
 import { deleteAdminLogs, fetchAdminLogs } from "@/app/utils/api";
 import { DataTable } from "simple-datatables";
 import "simple-datatables/dist/style.css";
-import { toast } from "react-toastify";
+import { toast , ToastContainer} from "react-toastify";
 
 interface Order {
     id: string;
@@ -96,6 +96,7 @@ export default function AuthLogTable() {
 
     return (
         <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+            <ToastContainer/>
             <div className="max-w-full overflow-x-auto">
                 <div className="min-w-full">
                     <Table ref={adminRef}>

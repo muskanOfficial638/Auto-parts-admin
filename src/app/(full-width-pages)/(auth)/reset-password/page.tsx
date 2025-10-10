@@ -6,7 +6,11 @@ export const metadata: Metadata = {
   description: "This is Next.js SignUp Page TailAdmin Dashboard Template",
   // other metadata
 };
+interface ResetPasswordProps {
+  searchParams: { [key: string]: string | string[] | undefined };
+} 
 
-export default function ResetPassword() {
-  return <ResetPasswordPage />;
+export default function ResetPassword({ searchParams }: ResetPasswordProps) {
+  const token = typeof searchParams.token === 'string' ? searchParams.token : undefined;
+  return <ResetPasswordPage token={token || null} />;
 }

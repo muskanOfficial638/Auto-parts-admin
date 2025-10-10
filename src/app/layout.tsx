@@ -6,7 +6,7 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import Script from 'next/script';
 
 const outfit = Outfit({
-  subsets: ["latin"],
+  subsets: ['latin'],
 });
 
 export default function RootLayout({
@@ -16,10 +16,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <Script src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"></Script>
-      </head>
       <body className={`${outfit.className} dark:bg-gray-900`}>
+        {/* Load external scripts client-side only */}
+        <Script
+          src="https://cdn.jsdelivr.net/npm/simple-datatables@9.0.3"
+          strategy="afterInteractive"
+        />
+
         <ThemeProvider>
           <SidebarProvider>{children}</SidebarProvider>
         </ThemeProvider>

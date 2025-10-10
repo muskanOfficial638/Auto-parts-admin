@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
-export const authApiPath = "http://192.168.1.3:8000/v1";
-export const adminApiPath = "http://192.168.1.3:8001/v1/admin";
-export const vehicleApiPath = "http://192.168.1.3:8003/v1/vehicle";
+export const authApiPath = "http://192.168.1.6:8001/v1";
+export const adminApiPath = "http://192.168.1.6:8000/v1/admin";
+export const vehicleApiPath = "http://192.168.1.6:8006/v1/vehicle";
 
 // user profiles
 export async function fetchUsers(role:string, token:string) {
@@ -14,7 +14,6 @@ export async function fetchUsers(role:string, token:string) {
       "Authorization": `Bearer ${token}`,
     },
   });
-  console.log("Response=>",res);
   if (!res.ok) throw new Error("Failed to fetch profiles");
   return res.json();
 }
@@ -52,11 +51,52 @@ export async function deleteUser(token:string, userId:string) {
     }
   )
   .then((response) => {
-    console.log("delete response",response)
+    // console.log("delete response",response)
     return response;
   })
   .catch((error) => {
     console.error("unable to delete user", error);
+    throw error;
+  });
+}
+
+//verify-email
+export async function verifyEmail(token:string) {
+  return axios.get(
+    "/v1/auth/verify-email", 
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+  .then((response) => {
+    console.log("Verification success:", response.data);
+    return response.data;
+  })
+  .catch((error) => {
+    console.error("Verification failed:", error);
+    throw error;
+  });
+}
+
+// resend Verifiaction
+export async function sendVerification(email:string) {
+   return axios.post(
+    `${authApiPath}/auth/resend-verification?email=${email}`, 
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+  .then((response) => {
+    console.log("Verification success:", response.data);
+    return response.data;
+  })
+  .catch((error) => {
+    console.error("Verification failed:", error);
     throw error;
   });
 }
@@ -98,7 +138,7 @@ export async function deleteAdminLogs(token:string, logId:string) {
 
 // Get Vehicle makes
 export async function viewVehicleMake() {
-  const res = await fetch(`${vehicleApiPath}/view`, {
+  const res = await fetch(`${vehicleApiPath}/view/`, {
     cache: "no-store",
     method: "GET",
     headers: {
@@ -107,6 +147,25 @@ export async function viewVehicleMake() {
   });
   if (!res.ok) throw new Error("Failed to vehicle makes");
   return res.json();
+}
+
+// Delete Vehicle make
+export async function deleteVehicleMake(makeId:string) {
+   return axios.delete(
+    `${vehicleApiPath}/${makeId}`,
+    {
+      headers: {
+        "Content-Type": "application/json"
+      },
+    }
+  )
+  .then((response) => {
+    return response;
+  })
+  .catch((error) => {
+    console.error("unable to delete user", error);
+    throw error;
+  });
 }
 
 // Vehicle model by make name
@@ -122,44 +181,4 @@ export async function fetchVehicleModelByMake(makeName:string) {
   return res.json();
 }
 
-//verify-email
-export async function verifyEmail(token:string) {
-  return axios.get(
-    "/v1/auth/verify-email", 
-    {
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-    }
-  )
-  .then((response) => {
-    console.log("Verification success:", response.data);
-    return response.data;
-  })
-  .catch((error) => {
-    console.error("Verification failed:", error);
-    throw error;
-  });
-}
-
-// user profiles
-export async function sendVerification(email:string) {
-   return axios.post(
-    `${authApiPath}/auth/resend-verification?email=${email}`, 
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  )
-  .then((response) => {
-    console.log("Verification success:", response.data);
-    return response.data;
-  })
-  .catch((error) => {
-    console.error("Verification failed:", error);
-    throw error;
-  });
-}
 

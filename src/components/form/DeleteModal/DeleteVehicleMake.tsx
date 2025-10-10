@@ -5,40 +5,35 @@ import ComponentCard from "../../common/ComponentCard";
 import Button from "../../ui/button/Button";
 import { Modal } from "../../ui/modal";
 import { toast, ToastContainer } from "react-toastify";
-import { deleteUser } from "@/app/utils/api";
+import { deleteVehicleMake } from "@/app/utils/api";
 
-export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModal, userData }: any) {
-    const autoPartsUserData: any = localStorage.getItem("autoPartsUserData")
-    const loggedInUser = JSON.parse(autoPartsUserData);
+export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModal, makeData }: any) {
     const [error, setError] = useState('')
 
     const handleClose = () => {
         setIsOpenDeleteModal(!isOpenDeleteModel);
     }
 
-    async function handleDelete(e: React.FormEvent) {
+    async function handleDeleteMake(e: React.FormEvent) {
         e.preventDefault();
         try {
-            const response = await deleteUser(loggedInUser?.access_token, userData?.id)
-            // console.log("Delete:", response);
+            const response = await deleteVehicleMake(makeData?.id)
+            // console.log("make delete res", response);
             if (response?.status === 200) {
-                toast("User Deleted successfully");
-                setTimeout(() => {
-                    setIsOpenDeleteModal(false);
-                }, 3000)
+                console.log("hello 200")
+                toast.success("Make Deleted successfully");
             }
+            setTimeout(() => {
+                handleClose();
+            }, 3000)
         } catch (err: any) {
-            // Handle errors more gracefully
             if (err.response) {
-                // Server responded with a status other than 2xx
                 console.error("Server error:", err.response.data);
-                setError(err.response.data.detail || "User not found");
+                setError(err.response.data.detail || "Vehicle make not found");
             } else if (err.request) {
-                // Request was made but no response received
                 console.error("No response:", err.request);
                 setError("No response from server");
             } else {
-                // Something else happened
                 console.error("Error:", err.message);
                 setError("Unexpected error occurred");
             }
@@ -49,14 +44,14 @@ export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModa
         <ComponentCard title="Delete user">
             <Modal
                 isOpen={isOpenDeleteModel}
-                onClose={() => { setIsOpenDeleteModal(false); handleClose() }}
+                onClose={() => handleClose()}
                 showCloseButton={false}
                 className="max-w-[507px] p-6 lg:p-10"
             >
-          <ToastContainer/>
-                <form className="text-center" onSubmit={handleDelete}>
+                <ToastContainer />
+                <form className="text-center" onSubmit={handleDeleteMake}>
                     <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90 sm:text-title-sm">
-                        Delete user !!
+                        Delete Vehicle Make !!
                     </h4>
                     <p className="text-sm leading-6 text-gray-500 dark:text-gray-400">
                         Are you sure?
@@ -66,7 +61,7 @@ export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModa
                         <Button size="sm" type="submit">
                             Yes
                         </Button>
-                        <Button size="sm" variant="outline" onClick={() => { setIsOpenDeleteModal(false); handleClose() }}>
+                        <Button size="sm" variant="outline" onClick={() => handleClose()}>
                             No
                         </Button>
                     </div>

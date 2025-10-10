@@ -6,22 +6,34 @@ import Link from 'next/link';
 import { authApiPath } from '@/app/utils/api';
 import axios from 'axios';
 import { ToastContainer, toast } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
-export default function ResetPasswordPage() {
+export default function ResetPasswordPage(token: any) {
+    const router = useRouter();
     const [email, setEmail] = useState('');
+    const [newPassword, setNewPassword] = useState('');
     const [error, setError] = useState("");
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
         try {
-            const response = await axios.post(`${authApiPath}/auth/forgot-password`, {
+            const response = token?.token ? await axios.post(`${authApiPath}/auth/reset-password`, {
+                token: token?.token,
+                new_password: newPassword
+            }) : await axios.post(`${authApiPath}/auth/forgot-password`, {
                 email,
             });
-            console.log("forgot:", response.data);
+            console.log("forgot/reset:", response.data);
 
             if (response?.data && response.data.message == "Password reset link sent to email") {
                 toast("Password reset link sent to email")
+            }
+            if (token?.token && response?.data) {
+                toast("Password updated successfully")
+                setTimeout(() => {
+                    router.push('/signin');
+                }, 2000)
             }
 
         } catch (err: any) {
@@ -73,16 +85,33 @@ export default function ResetPasswordPage() {
             <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
                 <div className="mb-5 sm:mb-8">
                     <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-                        Forgot Your Password?
+                        {token?.token ? 'Type a new password' : 'Forgot Your Password?'}
                     </h1>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {!token?.token && (<p className="text-sm text-gray-500 dark:text-gray-400">
                         Enter the email address linked to your account, and we’ll send you a link to reset your password.
-                    </p>
+                    </p>)}
+
                 </div>
 
                 <form onSubmit={handleSubmit}>
                     <div className="space-y-5">
-                        <div>
+                        {token?.token ? (<div>
+                            <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                New password<span className="text-error-500">*</span>
+                            </label>
+                            <div className="relative">
+                                <input
+                                    id="new_password"
+                                    name="new_password"
+                                    type="password"
+                                    placeholder="Enter new password"
+                                    className="h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:border-gray-700 dark:focus:border-brand-800"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    required
+                                />
+                            </div>
+                        </div>) : (<div>
                             <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                                 Email<span className="text-error-500">*</span>
                             </label>
@@ -98,14 +127,14 @@ export default function ResetPasswordPage() {
                                     required
                                 />
                             </div>
-                        </div>
+                        </div>)}
 
                         <div>
                             <button
                                 type="submit"
                                 className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600"
                             >
-                                Send Reset Link
+                                {token?.token ? 'Set New Password' : 'Send Reset Link'}
                             </button>
                         </div>
                     </div>

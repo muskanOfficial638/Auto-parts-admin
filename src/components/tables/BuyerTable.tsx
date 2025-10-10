@@ -13,6 +13,8 @@ import { fetchUsers } from "@/app/utils/api";
 // import Image from "next/image";
 import { DataTable } from "simple-datatables";
 import "simple-datatables/dist/style.css";
+import UpdateUserModal from "../form/EditForm/UpdateUser";
+import DeleteUserModal from "../form/DeleteModal/DeleteUser";
 
 interface Buyer {
   id: number;
@@ -26,7 +28,11 @@ interface Buyer {
 
 export default function BuyerTable() {
   const tableRef = useRef<HTMLTableElement | null>(null);
+  const dataTableRef = useRef<DataTable | null>(null);
   const [buyerData, setBuyersData] = useState<Buyer[]>();
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
+  const [selectedBuyer, setSelectedBuyer] = useState<Buyer | null>();
 
   useEffect(() => {
     const autoPartsUserData = localStorage.getItem("autoPartsUserData");
@@ -58,6 +64,32 @@ export default function BuyerTable() {
       }, 0);
     }
   }, [buyerData]);
+
+  const handleUserUpdate = () => {
+    const autoPartsUserData = localStorage.getItem("autoPartsUserData");
+    const loggedInUser = JSON.parse(autoPartsUserData || "{}");
+    fetchUsers("buyer", loggedInUser.access_token);
+    const table = tableRef.current;
+    if (table) {
+      if (dataTableRef.current) {
+        dataTableRef.current.destroy();
+      }
+      dataTableRef.current = new DataTable(tableRef.current!, {
+        paging: true,
+        perPage: 5,
+        perPageSelect: [5, 10, 20, 40],
+        firstLast: true,
+        nextPrev: true,
+        searchable: true
+      });
+    }
+
+  };
+
+  const handleUpdateModalOpen = (buyer:Buyer)=>{
+    setIsOpenUpdateModal(true)
+    setSelectedBuyer(buyer)
+  }
 
   if (!buyerData) return <div>Loading...</div>;
 
@@ -110,8 +142,8 @@ export default function BuyerTable() {
 
             {/* Table Body */}
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {buyerData?.map((order) => (
-                <TableRow key={order.id}>
+              {buyerData?.map((buyer) => (
+                <TableRow key={buyer.id}>
                   <TableCell className="px-5 py-4 sm:px-6 text-start">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 overflow-hidden rounded-full">
@@ -156,7 +188,7 @@ export default function BuyerTable() {
                       </div>
                       <div>
                         <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                          {order.buyer_name}
+                          {buyer.buyer_name}
                         </span>
                         {/* <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
                           {order.user.role}
@@ -165,35 +197,35 @@ export default function BuyerTable() {
                     </div>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {order.company_name}
+                    {buyer.company_name}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     <div className="flex -space-x-2">
-                      {order.email}
+                      {buyer.email}
                     </div>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     <Badge
                       size="sm"
                       color={
-                        order?.is_active
+                        buyer?.is_active
                           ? "success"
-                          : !order?.is_active
+                          : !buyer?.is_active
                             ? "error"
                             : "warning"
                       }
                     >
-                      {order?.is_active
+                      {buyer?.is_active
                         ? "Active" : "Inactive"}
                     </Badge>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {order.vat_number}
+                    {buyer.vat_number}
                   </TableCell>
                   <TableCell className="px-4 py-4 font-normal text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
                     <div className="flex items-center w-full gap-2">
                       {/* Delete Button */}
-                      <button className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500">
+                      <button onClick={() =>setIsOpenDeleteModal(true)} className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none">
                           <path
                             fill="currentColor"
@@ -205,7 +237,7 @@ export default function BuyerTable() {
                       </button>
 
                       {/* Edit Button */}
-                      <button className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white/90">
+                      <button onClick={()=>handleUpdateModalOpen(buyer)} className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white/90">
                         <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="none">
                           <path
                             fill="currentColor"
@@ -216,6 +248,14 @@ export default function BuyerTable() {
                         </svg>
                       </button>
                     </div>
+                    {isOpenUpdateModal && (
+                      <UpdateUserModal isOpenModel={isOpenUpdateModal}
+                        setIsOpenModel={setIsOpenUpdateModal} userData={selectedBuyer} onUserUpdate={handleUserUpdate} />
+                    )}
+                    {isOpenDeleteModal && (
+                      <DeleteUserModal isOpenDeleteModel={isOpenDeleteModal}
+                        setIsOpenDeleteModal={setIsOpenDeleteModal} userData={selectedBuyer} />
+                    )}
                   </TableCell>
 
                 </TableRow>

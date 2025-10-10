@@ -1,4 +1,5 @@
 import React, { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 // Props for Table
 interface TableProps {
@@ -53,6 +54,20 @@ const TableRow: React.FC<TableRowProps> = ({ children, className }) => {
   return <tr className={className}>{children}</tr>;
 };
 
+const TableHead = React.forwardRef<HTMLTableCellElement, React.ThHTMLAttributes<HTMLTableCellElement>>(
+  ({ className, ...props }, ref) => (
+    <th
+      ref={ref}
+      className={cn(
+        "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+        className,
+      )}
+      {...props}
+    />
+  ),
+);
+TableHead.displayName = "TableHead"
+
 // TableCell Component
 const TableCell: React.FC<TableCellProps> = ({
   children,
@@ -63,4 +78,11 @@ const TableCell: React.FC<TableCellProps> = ({
   return <CellTag className={` ${className}`}>{children}</CellTag>;
 };
 
-export { Table, TableHeader, TableBody, TableRow, TableCell };
+const TableCell1 = React.forwardRef<HTMLTableCellElement, React.TdHTMLAttributes<HTMLTableCellElement>>(
+  ({ className, ...props }, ref) => (
+    <td ref={ref} className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)} {...props} />
+  ),
+);
+TableCell1.displayName = "TableCell";
+
+export { Table, TableHeader, TableBody, TableRow, TableHead, TableCell, TableCell1};
