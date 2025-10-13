@@ -91,6 +91,11 @@ export default function BuyerTable() {
     setSelectedBuyer(buyer)
   }
 
+  const handleDeleteModalOpen = (buyer:Buyer)=>{
+    setIsOpenDeleteModal(true)
+    setSelectedBuyer(buyer)
+  }
+
   if (!buyerData) return <div>Loading...</div>;
 
   return (
@@ -225,7 +230,7 @@ export default function BuyerTable() {
                   <TableCell className="px-4 py-4 font-normal text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
                     <div className="flex items-center w-full gap-2">
                       {/* Delete Button */}
-                      <button onClick={() =>setIsOpenDeleteModal(true)} className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500">
+                      <button onClick={() =>handleDeleteModalOpen(buyer)} className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500">
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none">
                           <path
                             fill="currentColor"

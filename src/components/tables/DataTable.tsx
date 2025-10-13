@@ -20,7 +20,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Loader } from "lucide-react";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -112,9 +112,9 @@ export function DataTable<TData, TValue>({
                             <TableRow>
                                 <TableCell1
                                     colSpan={columns.length}
-                                    className="h-24 text-center"
+                                    className="h-24"
                                 >
-                                    No results.
+                                    <div className="flex flex-row text-center items-center justify-center">No results.<Loader/></div>
                                 </TableCell1>
                             </TableRow>
                         )}

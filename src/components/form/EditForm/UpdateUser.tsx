@@ -2,26 +2,29 @@
 'use client';
 
 import React, { useState } from 'react';
-import Radio from '../input/Radio';
 import { updateUser } from '@/app/utils/api';
 import { toast, ToastContainer } from 'react-toastify';
+import { ChevronDownIcon } from 'lucide-react';
+import Select from '../Select';
 
 interface User {
     id: string;
-    supplier_name: string;
+    supplier_name?: string;
+    buyer_name?: string;
     company_name: string;
     email: string,
-    kyc_status: string;
-    is_active?: boolean;
-    role?: string;
+    kyc_status?: string;
+    is_active: boolean;
+    role: string;
+    vat_number?: string;
 }
 
 const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }: any) => {
     const [formData, setFormData] = useState<User>(userData);
     const [error, setError] = useState('');
+    const [status, setStatus] = useState(userData?.is_active ? 'Active' : 'Inactive');
     const autoPartsUserData: any = localStorage.getItem("autoPartsUserData")
     const loggedInUser = JSON.parse(autoPartsUserData);
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData((prev) => ({ ...prev, [name]: value }));
@@ -29,10 +32,21 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
 
     const handleClose = () => setIsOpenModel(false);
 
+    const selectOptions = [
+        { value: "Active", label: "Active" },
+        { value: "Incative", label: "Incative" },
+    ];
+
+    const handleSelectChange = (value: string) => {
+        console.log("Selected value:", value);
+        setStatus(value)
+    };
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
 
         try {
+            formData.is_active = status === 'Active';
             const response = await updateUser('supplier', loggedInUser?.access_token, formData)
             // console.log("update:", response);
 
@@ -42,7 +56,8 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
                     handleClose();
                     // Call the callback function from the parent
                     onUserUpdate();
-                }, 3000)
+                     window.location.reload();
+                }, 2000)
             }
         } catch (err: any) {
             // Handle errors more gracefully
@@ -61,11 +76,6 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
             }
         }
     }
-
-    const handleRadioChange = (value: boolean) => {
-        setFormData((prev) => ({ ...prev, is_active: value }));
-        // console.log("value", value)
-    };
 
     if (!isOpenModel) return null;
 
@@ -101,34 +111,6 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
 
                     <form className="flex flex-col" onSubmit={handleSubmit}>
                         <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
-                            {/* Social Links */}
-                            {/* <div>
-                <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                  Social Links
-                </h5>
-                <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
-                  {[
-                    { label: 'Facebook', name: 'facebook' },
-                    { label: 'X.com', name: 'x' },
-                    { label: 'Linkedin', name: 'linkedin' },
-                    { label: 'Instagram', name: 'instagram' },
-                  ].map(({ label, name }) => (
-                    <div key={name}>
-                      <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                        {label}
-                      </label>
-                      <input
-                        type="text"
-                        name={name}
-                        value={(formData as any)[name]}
-                        onChange={handleChange}
-                        className="h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:border-gray-700 dark:focus:border-brand-800"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div> */}
-
                             {/* Personal Information */}
                             <div className="mt-7">
                                 <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
@@ -136,7 +118,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
                                 </h5>
                                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                                     {[
-                                        { label: 'Name', name: 'supplier_name' },
+                                        { label: 'Name', name: userData?.role === 'buyer' ? 'buyer_name' : 'supplier_name' },
                                         { label: 'Company Name', name: 'company_name' },
                                         { label: 'Email Address', name: 'email' },
                                         { label: 'Role', name: 'role' },
@@ -155,40 +137,47 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
                                         </div>
                                     ))}
 
-                                    <div className="col-span-2">
+                                    {userData?.role === 'buyer' ? (<div className="col-span-2">
+                                        <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                                            VAT Number
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="vat_number"
+                                            value={formData.vat_number}
+                                            onChange={handleChange}
+                                            className="h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:border-gray-700 dark:focus:border-brand-800"
+                                        />
+                                    </div>
+                                    ) : (<div className="col-span-2">
                                         <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                                             KYC Status
                                         </label>
                                         <input
                                             type="text"
-                                            name="bio"
+                                            name="kyc_status"
                                             value={formData.kyc_status}
                                             onChange={handleChange}
                                             className="h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:border-gray-700 dark:focus:border-brand-800"
                                         />
-                                    </div>
+                                    </div>)}
                                     <div className="flex flex-wrap items-center gap-8">
                                         <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                                             User Status -
                                         </label>
+                                        <div className="relative">
+                                            <Select
+                                                options={selectOptions}
+                                                placeholder="Select model"
+                                                onChange={handleSelectChange}
+                                                className="dark:bg-dark-900"
+                                                value={status}
+                                            />
+                                            <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
+                                                <ChevronDownIcon />
+                                            </span>
+                                        </div>
 
-                                        <Radio
-                                            id="radio1"
-                                            name="is_active"
-                                            value="true"
-                                            checked={formData.is_active === true}
-                                            onChange={(value) => handleRadioChange(value === "true")}
-                                            label="Active"
-                                        />
-
-                                        <Radio
-                                            id="radio2"
-                                            name="is_active"
-                                            value="false"
-                                            checked={formData.is_active === false}
-                                            onChange={(value) => handleRadioChange(value === "false")}
-                                            label="Inactive"
-                                        />
                                     </div>
                                 </div>
                             </div>

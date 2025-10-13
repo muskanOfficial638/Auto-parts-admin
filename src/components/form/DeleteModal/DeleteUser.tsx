@@ -25,7 +25,8 @@ export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModa
                 toast("User Deleted successfully");
                 setTimeout(() => {
                     setIsOpenDeleteModal(false);
-                }, 3000)
+                    window.location.reload();
+                }, 2000)
             }
         } catch (err: any) {
             // Handle errors more gracefully

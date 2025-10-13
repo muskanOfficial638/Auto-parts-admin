@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 
 interface SaveOrUpdateParamsForMake {
   e: React.FormEvent;
@@ -126,9 +126,9 @@ export async function handleSaveOrUpdateTrim({
 
     console.log("Response=>", response);
 
-    toast(
-      isUpdate ? "Trim updated successfully" : "Trim added successfully"
-    );
+    // toast(
+    //   isUpdate ? "Trim updated successfully" : "Trim added successfully"
+    // );
 
     onSuccess();
   } catch (err: any) {

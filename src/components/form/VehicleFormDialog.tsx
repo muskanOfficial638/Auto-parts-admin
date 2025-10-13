@@ -23,7 +23,7 @@ interface VehicleFormDialogProps {
     title: string;
     description: string;
     initialValue?: string;
-    levelData: Model | Trim;
+    levelData: Model | Trim | any;
     editId?: string;
     onSave: (value: string) => void;
 }
@@ -47,7 +47,7 @@ interface Model {
     name: string;
     make_id: string;
     trims: Trim[];
-    model_id? :string;
+    model_id?: string;
 }
 
 export const VehicleFormDialog = ({
@@ -68,8 +68,6 @@ export const VehicleFormDialog = ({
     const [selectModelOptions, setSelectModelOptions] = useState([]);
     const [selectedMake, setSelectedMake] = useState<VehicleMake | any>(null);
     const [selectedModel, setSelectedModel] = useState<Model | any>(null);
-    const [makeName, setMakeName] = useState('');
-    // const [modelName, setModelName] = useState('');
     const [yearFrom, setYearFrom] = useState(0);
     const [yearTo, setYearTo] = useState(0);
 
@@ -77,6 +75,8 @@ export const VehicleFormDialog = ({
         const fetchData = async () => {
             setValue(initialValue);
             setData(levelData);
+            setYearTo(levelData?.year_to)
+            setYearFrom(levelData?.year_from)
             if (level === "model" || level === "trim") {
                 try {
                     const vehicleMakeData = await viewVehicleMake();
@@ -86,9 +86,10 @@ export const VehicleFormDialog = ({
                         label: item.name,
                     })));
                     if (selectedMake) {
+
                         setSelectedMake(selectedMake);
-                        const selectedModel = selectedMake?.models.find((model: Model) => model.id === levelData?.model_id)
-                        // console.log("selectedModel11",selectedModel)
+                        // const selectedModel = selectedMake?.models.find((model: Model) => model.id === levelData?.model_id)
+                        const selectedModel = selectedMake?.models.find((model: Model) => model.id)
                         setSelectedModel(selectedModel)
                     } else {
                         console.warn("Make not found for ID:", levelData?.make_id);
@@ -122,7 +123,8 @@ export const VehicleFormDialog = ({
         const selectedMake = vehicleMakeData.find((make: VehicleMake) => make.make_id === selectedId);
         if (selectedMake) {
             setSelectedMake(selectedMake);
-            setMakeName(selectedMake.make_name); // Ensure the name updates when the make is selected
+            const selectedModel = selectedMake?.models.find((model: Model) => model.id)
+            setSelectedModel(selectedModel)
         } else {
             console.warn("Make not found for ID:", selectedId);
         }
@@ -135,7 +137,8 @@ export const VehicleFormDialog = ({
     };
 
     const handleSelectModelChange = async (option: string) => {
-        setSelectedModel(option)
+        const selectedModel = selectedMake?.models.find((model: Model) => model.id === option)
+        setSelectedModel(selectedModel)
     };
 
     const handleSaveAndUpdate = (e: React.FormEvent) => {
@@ -153,15 +156,16 @@ export const VehicleFormDialog = ({
                 model_id: modelId,
                 year_from: yearFrom,
                 year_to: yearTo,
-                id:editId,
+                id: editId,
                 isUpdate: !!editId,
                 endpoint,
                 onSuccess: async () => {
                     setError("");
                     onSave(value.trim());
-                    setValue("");
                     setTimeout(() => {
                         setValue("");
+                        // setSelectMakeOptions([])
+                        // setSelectModelOptions([])
                         onOpenChange(false);
                     }, 1000);
                 },
@@ -197,10 +201,6 @@ export const VehicleFormDialog = ({
         }
     };
 
-    // console.log("selected make", selectedMake)
-    // console.log("selected model", selectedModel)
-    // console.log("data",data);
-
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="w-full bg-white">
@@ -227,24 +227,24 @@ export const VehicleFormDialog = ({
                         </div>
                     )}
 
-                     {level === 'trim' && makeName || selectModelOptions&& (
-                        <div className="grid gap-2">
-                            <Label>Select Vehicle Model</Label>
-                            <div className="relative">
-                                <Select
-                                    options={selectModelOptions}
-                                    placeholder="Select model"
-                                    onChange={handleSelectModelChange}
-                                    className="dark:bg-dark-900"
-                                    // defaultValue={modelName}
-                                    value={selectedModel?.id || data?.model_id}
-                                />
-                                <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
-                                    <ChevronDownIcon />
-                                </span>
+                    {level === 'trim' &&
+                        (selectModelOptions?.length ? (
+                            <div className="grid gap-2">
+                                <Label>Select Vehicle Model</Label>
+                                <div className="relative">
+                                    <Select
+                                        options={selectModelOptions}
+                                        placeholder="Select model"
+                                        onChange={handleSelectModelChange}
+                                        className="dark:bg-dark-900"
+                                        value={selectedModel?.id || data?.model_id}
+                                    />
+                                    <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
+                                        <ChevronDownIcon />
+                                    </span>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        ) : 'No model found for this make')}
 
                     <div className="grid gap-2">
                         <Label htmlFor="name">Name</Label>
@@ -265,10 +265,9 @@ export const VehicleFormDialog = ({
                                 <Input
                                     id="year_from"
                                     name="year_from"
-                                    value={data?.year_from}
+                                    value={yearFrom}
                                     type="number"
                                     onChange={(e: any) => setYearFrom(e.target.value)}
-                                    // onKeyDown={handleKeyDown}
                                     placeholder={`Year From`}
                                     autoFocus
                                 />
@@ -280,8 +279,7 @@ export const VehicleFormDialog = ({
                                     name="year_to"
                                     type="number"
                                     onChange={(e: any) => setYearTo(e.target.value)}
-                                    // onKeyDown={handleKeyDown}
-                                    value={data?.year_to}
+                                    value={yearTo}
                                     placeholder={`Year To`}
                                     autoFocus
                                 />

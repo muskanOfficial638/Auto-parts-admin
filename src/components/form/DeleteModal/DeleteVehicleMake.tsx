@@ -5,7 +5,7 @@ import ComponentCard from "../../common/ComponentCard";
 import Button from "../../ui/button/Button";
 import { Modal } from "../../ui/modal";
 import { toast, ToastContainer } from "react-toastify";
-import { deleteVehicleMake } from "@/app/utils/api";
+import { deleteVehicle } from "@/app/utils/api";
 
 export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModal, makeData }: any) {
     const [error, setError] = useState('')
@@ -17,7 +17,7 @@ export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModa
     async function handleDeleteMake(e: React.FormEvent) {
         e.preventDefault();
         try {
-            const response = await deleteVehicleMake(makeData?.id)
+            const response = await deleteVehicle('make',makeData?.id)
             // console.log("make delete res", response);
             if (response?.status === 200) {
                 console.log("hello 200")

@@ -3,7 +3,7 @@ import { ThemeToggleButton } from "@/components/common/ThemeToggleButton";
 import NotificationDropdown from "@/components/header/NotificationDropdown";
 import UserDropdown from "@/components/header/UserDropdown";
 import { useSidebar } from "@/context/SidebarContext";
-import Image from "next/image";
+// import Image from "next/image";
 import Link from "next/link";
 import React, { useState ,useEffect,useRef} from "react";
 
@@ -84,7 +84,7 @@ const AppHeader: React.FC = () => {
           </button>
 
           <Link href="/" className="lg:hidden">
-            <Image
+            {/* <Image
               width={154}
               height={32}
               className="dark:hidden"
@@ -97,7 +97,8 @@ const AppHeader: React.FC = () => {
               className="hidden dark:block"
               src="./images/logo/logo-dark.svg"
               alt="Logo"
-            />
+            /> */}
+            <h1 className="text-center text-brand-600 dark:text-white/60 text-2xl mb-4 font-bold">AutoPartXchange Admin</h1>
           </Link>
 
           <button

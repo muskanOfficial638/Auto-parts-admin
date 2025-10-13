@@ -2,7 +2,7 @@
 "use client";
 import { useState, useMemo, useEffect } from "react";
 import { VehicleFormDialog } from "@/components/form/VehicleFormDialog";
-import { toast, ToastContainer} from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 interface Trim {
     id: string;
@@ -39,7 +39,7 @@ import { Plus } from "lucide-react";
 import { MakesTable, MakeRow } from "@/components/tables/MakesTable";
 import { ModelsTable, ModelRow } from "@/components/tables/ModelsTable";
 import { TrimsTable, TrimRow } from "@/components/tables/TrimsTable";
-import { viewVehicleMake } from "@/app/utils/api";
+import { deleteVehicle, viewVehicleMake } from "@/app/utils/api";
 
 const VehicleManagement = () => {
     const [data, setData] = useState<Make[]>([]);
@@ -51,7 +51,7 @@ const VehicleManagement = () => {
         parentIds?: any;
         editId?: string;
         initialValue?: string;
-        levelData? : Model | Trim | any;
+        levelData?: Model | Trim | any;
     }>({
         level: "",
         title: "",
@@ -108,7 +108,7 @@ const VehicleManagement = () => {
 
     const handleEdit = (level: string, id: string, parentIds?: any) => {
         let currentValue = "";
-        let levelData:Model | Trim | any = {};
+        let levelData: Model | Trim | any = {};
 
         if (level === "make") {
             const make = data.find((m) => m.make_id === id);
@@ -133,7 +133,7 @@ const VehicleManagement = () => {
             parentIds,
             editId: id,
             initialValue: currentValue,
-            levelData:levelData
+            levelData: levelData
         });
         setDialogOpen(true);
     };
@@ -143,8 +143,9 @@ const VehicleManagement = () => {
         setDeleteDialogOpen(true);
     };
 
-    const confirmDelete = () => {
+    const confirmDelete = async () => {
         const { level, id, parentIds } = deleteConfig;
+        await deleteVehicle(level, id)
 
         setData((prevData) => {
             const newData = [...prevData];
@@ -276,7 +277,7 @@ const VehicleManagement = () => {
 
     return (
         <div className="min-h-screen bg-background">
-             <ToastContainer />
+            <ToastContainer />
             <div className="border-b bg-card">
                 <div className="container mx-auto px-6 py-8">
                     <h1 className="text-3xl font-bold text-foreground mb-2">
