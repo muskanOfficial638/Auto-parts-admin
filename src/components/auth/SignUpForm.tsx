@@ -30,12 +30,73 @@ export default function SignUpForm() {
   const [vat_number, setVATNumber] = useState("");
   const [company_name, setCompanyName] = useState("");
   const [role, setRole] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
 
+  // Email Validation
+  const validateEmail = (value: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!value) {
+      setEmailError("Email is required");
+    } else if (!emailRegex.test(value)) {
+      setEmailError("Please enter a valid email address");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    setError("");
+    validateEmail(value);
+  };
+
+  //Password
+  const validatePassword = (value: string) => {
+    const errors: string[] = [];
+
+    if (value.length < 6) errors.push("Minimum length 6 characters");
+    if (!/[A-Z]/.test(value)) errors.push("Must contain at least one uppercase letter");
+    if (!/[a-z]/.test(value)) errors.push("Must contain at least one lowercase letter");
+    if (!/[0-9]/.test(value)) errors.push("Must contain at least one number");
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(value))
+      errors.push("Must contain at least one special character");
+    setPasswordErrors(errors);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+    setError("");
+    validatePassword(value);
+  };
+
+  const handleSelectChange = (value: string) => {
+    // console.log("value",value)
+    setRole(value);
+    setError('');
+  };
 
   async function handleRegister(e: React.FormEvent) {
     e.preventDefault();
 
     try {
+      if (!name || !role || !email || !password) {
+        if (!name) { setError('Name is required'); toast.error('Name is required'); }
+        if (!role) { setError('Role is required'); toast.error('Role is required'); }
+        if (!password) { setError('Password is required'); toast.error('Password is required'); }
+        return
+      }
+      // 🔒 Validate fields before submit
+      validateEmail(email);
+      validatePassword(password);
+
+      if (!email || emailError || passwordErrors.length > 0) {
+        setError("Please fix the errors before submitting");
+        return;
+      }
+      
       const response = await axios.post(`${authApiPath}/auth/register`, {
         email,
         password,
@@ -61,23 +122,21 @@ export default function SignUpForm() {
       if (err.response) {
         // Server responded with a status other than 2xx
         console.error("Server error:", err.response.data);
-        setError(err.response.data.message || "Signup failed");
+        toast.error(err.response.data?.detail[0]?.msg || "Signup failed");
+        setError(err.response.data?.detail[0]?.msg || "Signup failed");
       } else if (err.request) {
         // Request was made but no response received
         console.error("No response:", err.request);
+        toast.error("No response from server");
         setError("No response from server");
       } else {
         // Something else happened
         console.error("Error:", err.message);
+        toast.error("No response from server");
         setError("Unexpected error occurred");
       }
     }
   }
-
-  const handleSelectChange = (value: string) => {
-    console.log("value", value)
-    setRole(value);
-  };
 
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full overflow-y-auto no-scrollbar">
@@ -112,9 +171,6 @@ export default function SignUpForm() {
 
             <form onSubmit={handleRegister}>
               <div className="space-y-5">
-                {/* <div className="grid grid-cols-1 gap-5 sm:grid-cols-2"> */}
-
-                {/* <!-- Last Name --> */}
                 <div className="sm:col-span-1">
                   <Label>
                     Name<span className="text-error-500">*</span>
@@ -124,12 +180,12 @@ export default function SignUpForm() {
                     id="name"
                     name="name"
                     placeholder="Enter your full name"
-                    onChange={(e) => setName(e.target.value)}
+                    onChange={(e) => { setName(e.target.value); setError('') }}
                   />
                 </div>
                 <div className="sm:col-span-1">
                   <Label>
-                    Company Name<span className="text-error-500">*</span>
+                    Company Name
                   </Label>
                   <Input
                     type="text"
@@ -140,13 +196,14 @@ export default function SignUpForm() {
                   />
                 </div>
                 <div>
-                  <Label>Select Role</Label>
+                  <Label>Select Role<span className="text-error-500">*</span></Label>
                   <div className="relative">
                     <Select
                       options={options}
                       placeholder="Select a role"
                       onChange={handleSelectChange}
                       className="dark:bg-dark-900"
+                      value={role}
                     />
                     <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
                       <ChevronDownIcon />
@@ -155,18 +212,17 @@ export default function SignUpForm() {
                 </div>
                 {role === "buyer" && (<div className="sm:col-span-1">
                   <Label>
-                    VAT Number<span className="text-error-500">*</span>
+                    VAT Number
                   </Label>
                   <Input
                     type="text"
                     id="vat_number"
                     name="vat_number"
                     placeholder="Enter VAT number"
-                    onChange={(e) => setVATNumber(e.target.value)}
+                    onChange={(e) => { setVATNumber(e.target.value); setError('') }}
                   />
                 </div>)}
 
-                {/* </div> */}
                 {/* <!-- Email --> */}
                 <div>
                   <Label>
@@ -177,12 +233,13 @@ export default function SignUpForm() {
                     id="email"
                     name="email"
                     placeholder="Enter your email"
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={email}
+                    onChange={handleEmailChange}
                   />
                 </div>
-                {/* <!-- Password -->   Password must contain at least one uppercase letter,
-                  Password must contain at least one lowercase letter
-                  Password must contain at least one special character*/}
+
+                {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+
                 <div>
                   <Label>
                     Password<span className="text-error-500">*</span>
@@ -192,7 +249,7 @@ export default function SignUpForm() {
                       placeholder="Enter your password"
                       type={showPassword ? "text" : "password"}
                       name="password"
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={handlePasswordChange}
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -206,6 +263,32 @@ export default function SignUpForm() {
                     </span>
                   </div>
                 </div>
+                {/* ✅ Live password validation feedback */}
+                {password && (
+                  <ul className="mt-2 text-sm">
+                    <li className={password.length >= 6 ? "text-green-600" : "text-red-500"}>
+                      Minimum length 6 characters
+                    </li>
+                    <li className={/[A-Z]/.test(password) ? "text-green-600" : "text-red-500"}>
+                      At least one uppercase letter
+                    </li>
+                    <li className={/[a-z]/.test(password) ? "text-green-600" : "text-red-500"}>
+                      At least one lowercase letter
+                    </li>
+                    <li className={/[0-9]/.test(password) ? "text-green-600" : "text-red-500"}>
+                      At least one number
+                    </li>
+                    <li
+                      className={
+                        /[!@#$%^&*(),.?":{}|<>]/.test(password)
+                          ? "text-green-600"
+                          : "text-red-500"
+                      }
+                    >
+                      At least one special character
+                    </li>
+                  </ul>
+                )}
                 {/* <!-- Checkbox --> */}
                 <div className="flex items-center gap-3">
                   <Checkbox
@@ -224,15 +307,16 @@ export default function SignUpForm() {
                     </span>
                   </p>
                 </div>
+                {error && (<span className="text-error-500">{error}</span>)}
                 {/* <!-- Button --> */}
                 <div>
+                  {/* we can disable button till disabled={passwordErrors.length > 0} */}
                   <button className="flex items-center justify-center w-full px-4 py-3 text-sm font-medium text-white transition rounded-lg bg-brand-500 shadow-theme-xs hover:bg-brand-600">
                     Sign Up
                   </button>
                 </div>
               </div>
             </form>
-            {error && (<span className="text-error-500">{error}</span>)}
             <div className="mt-5">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                 Already have an account?

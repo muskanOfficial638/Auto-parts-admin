@@ -10,6 +10,7 @@ import Link from "next/link";
 import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
 
 export default function SignInForm() {
   const router = useRouter();
@@ -18,9 +19,59 @@ export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+
+  // Email Validation
+  const validateEmail = (value: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!value) {
+      setEmailError("Email is required");
+    } else if (!emailRegex.test(value)) {
+      setEmailError("Please enter a valid email address");
+    } else {
+      setEmailError("");
+    }
+  };
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setEmail(value);
+    validateEmail(value);
+  };
+
+  //Password
+  const validatePassword = (value: string) => {
+    const errors: string[] = [];
+    if (!value) {
+      setError("Password is required");
+    }
+    if (value.length < 6) errors.push("Minimum length 6 characters");
+    if (!/[A-Z]/.test(value)) errors.push("Must contain at least one uppercase letter");
+    if (!/[a-z]/.test(value)) errors.push("Must contain at least one lowercase letter");
+    if (!/[0-9]/.test(value)) errors.push("Must contain at least one number");
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(value))
+      errors.push("Must contain at least one special character");
+    setPasswordErrors(errors);
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+    setError("");
+    validatePassword(value);
+  };
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
+    // 🔒 Validate fields before submit
+    validateEmail(email);
+    validatePassword(password);
+
+    if (!email || emailError || passwordErrors.length > 0 || !password) {
+      toast.error("Please fix the errors before submitting")
+      return;
+    }
 
     try {
       const response = await axios.post(`${authApiPath}/auth/login`, {
@@ -39,21 +90,22 @@ export default function SignInForm() {
       if (err.response) {
         // Server responded with a status other than 2xx
         console.error("Server error:", err.response.data);
-        setError(err.response.data.message || "Login failed");
+        toast.error(err.response.data.message || "Login failed");
       } else if (err.request) {
         // Request was made but no response received
         console.error("No response:", err.request);
-        setError("No response from server");
+        toast.error("No response from server");
       } else {
         // Something else happened
         console.error("Error:", err.message);
-        setError("Unexpected error occurred");
+        toast.error("Unexpected error occurred");
       }
     }
   }
 
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">
+      <ToastContainer/>
       <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
         <div
           className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
@@ -89,9 +141,10 @@ export default function SignInForm() {
                   </Label>
                   <Input placeholder="info@gmail.com" type="email"
                     name="email"
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleEmailChange}
                   />
                 </div>
+                {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
                 <div>
                   <Label>
                     Password <span className="text-error-500">*</span>{" "}
@@ -101,7 +154,7 @@ export default function SignInForm() {
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
                       name="password"
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={handlePasswordChange}
                     />
                     <span
                       onClick={() => setShowPassword(!showPassword)}
@@ -114,6 +167,31 @@ export default function SignInForm() {
                       )}
                     </span>
                   </div>
+                  {password ? (
+                    <ul className="mt-2 text-sm">
+                      <li className={password.length >= 6 ? "text-green-600" : "text-red-500"}>
+                        Minimum length 6 characters
+                      </li>
+                      <li className={/[A-Z]/.test(password) ? "text-green-600" : "text-red-500"}>
+                        At least one uppercase letter
+                      </li>
+                      <li className={/[a-z]/.test(password) ? "text-green-600" : "text-red-500"}>
+                        At least one lowercase letter
+                      </li>
+                      <li className={/[0-9]/.test(password) ? "text-green-600" : "text-red-500"}>
+                        At least one number
+                      </li>
+                      <li
+                        className={
+                          /[!@#$%^&*(),.?":{}|<>]/.test(password)
+                            ? "text-green-600"
+                            : "text-red-500"
+                        }
+                      >
+                        At least one special character
+                      </li>
+                    </ul>
+                  ) : error && <p className="text-red-500 text-sm mt-1">{error}</p> }
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -136,7 +214,7 @@ export default function SignInForm() {
                 </div>
               </div>
             </form>
-            {error && (<span className="text-error-500">{error}</span>)}
+            {/* {error && (<span className="text-error-500">{error}</span>)} */}
             <div className="mt-5">
               <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                 Don&apos;t have an account? {""}
