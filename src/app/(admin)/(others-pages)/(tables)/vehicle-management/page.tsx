@@ -172,63 +172,67 @@ const VehicleManagement = () => {
         setDeleteDialogOpen(false);
     };
 
-    const handleSave = async (value: string) => {
-        const { level, parentIds, editId } = dialogConfig;
-        //  console.log("level",level);
-        if (editId) {
-            // Edit existing
-            setData((prevData) => {
-                const newData = [...prevData];
-
-                if (level === "make") {
-                    const make = newData.find((m) => m.make_id === editId);
-                    if (make) make.make_name = value;
-                } else if (level === "model" && parentIds) {
-                    const make = newData.find((m) => m.make_id === parentIds.makeId);
-                    const model = make?.models.find((m) => m.id === editId);
-                    if (model) model.name = value;
-                } else if (level === "trim" && parentIds) {
-                    const make = newData.find((m) => m.make_id === parentIds.makeId);
-                    const model = make?.models.find((m) => m.id === parentIds.modelId);
-                    const trim = model?.trims.find((t) => t.id === editId);
-                    if (trim) trim.trim = value;
-                }
-
-                return newData;
-            });
-            toast.success(`${level.charAt(0).toUpperCase() + level.slice(1)} updated successfully`);
-        } else {
-            const Data1 = await viewVehicleMake()
-            // Add new
-            // setData((prevData) => {
-            //     const newData = [...prevData];
-            //     if (level === "make") {
-            //         newData.push({ id: generateId(), make_name: value, models: [] });
-
-            //     } else if (level === "model" && parentIds) {
-            //         const make = newData.find((m) => m.id === parentIds.makeId);
-            //         if (make) {
-            //             make.models.push({ id: generateId(), name: value, trims: [] });
-            //         }
-            //     } else if (level === "trim" && parentIds) {
-            //         const make = newData.find((m) => m.id === parentIds.makeId);
-            //         const model = make?.models.find((m) => m.id === parentIds.modelId);
-            //         if (model) {
-            //             model.trims.push({
-            //                 id: generateId(),
-            //                 trim: value,
-            //                 year_from: 2024,
-            //                 year_to: 2024
-            //             });
-            //         }
-            //     }
-
-            //     return newData;
-            // });
-            setData(Data1);
-            toast.success(`${level.charAt(0).toUpperCase() + level.slice(1)} added successfully`);
-        }
+    const handleSave = async () => {
+        const { level, editId } = dialogConfig;
+        const makeData = await viewVehicleMake()
+        setData(makeData);
+        if (editId) { toast.success(`${level.charAt(0).toUpperCase() + level.slice(1)} updated successfully`) }
+        else { toast.success(`${level.charAt(0).toUpperCase() + level.slice(1)} added successfully`) }
     };
+
+    // const handleSave = async (value: string) => {
+    //     const { level, parentIds, editId } = dialogConfig;
+    //     if (editId) {
+    //         // Edit existing
+    //         setData((prevData) => {
+    //             const newData = [...prevData];
+    //             if (level === "make") {
+    //                 const make = newData.find((m) => m.make_id === editId);
+    //                 if (make) make.make_name = value;
+    //             } else if (level === "model" && parentIds) {
+    //                 const make = newData.find((m) => m.make_id === parentIds.makeId);
+    //                 const model = make?.models.find((m) => m.id === editId);
+    //                 if (model) model.name = value;
+    //             } else if (level === "trim" && parentIds) {
+    //                 const make = newData.find((m) => m.make_id === parentIds.makeId);
+    //                 const model = make?.models.find((m) => m.id === parentIds.modelId);
+    //                 const trim = model?.trims.find((t) => t.id === editId);
+    //                 if (trim) trim.trim = value;
+    //             }
+
+    //             return newData;
+    //         });
+    //         toast.success(`${level.charAt(0).toUpperCase() + level.slice(1)} updated successfully`);
+    //     } else {
+    //         // Add new
+    //         setData((prevData) => {
+    //             const newData = [...prevData];
+    //             if (level === "make") {
+    //                 newData.push({ id: generateId(), make_name: value, models: [] });
+
+    //             } else if (level === "model" && parentIds) {
+    //                 const make = newData.find((m) => m.id === parentIds.makeId);
+    //                 if (make) {
+    //                     make.models.push({ id: generateId(), name: value, trims: [] });
+    //                 }
+    //             } else if (level === "trim" && parentIds) {
+    //                 const make = newData.find((m) => m.id === parentIds.makeId);
+    //                 const model = make?.models.find((m) => m.id === parentIds.modelId);
+    //                 if (model) {
+    //                     model.trims.push({
+    //                         id: generateId(),
+    //                         trim: value,
+    //                         year_from: 2024,
+    //                         year_to: 2024
+    //                     });
+    //                 }
+    //             }
+
+    //             return newData;
+    //         });
+    //         toast.success(`${level.charAt(0).toUpperCase() + level.slice(1)} added successfully`);
+    //     }
+    // };
 
     const makesData = useMemo((): MakeRow[] => {
         return data.map((make) => ({

@@ -20,6 +20,7 @@ export async function fetchUsers(role: string, token: string) {
 
 // update user
 export async function updateUser(role: string, token: string, userData: any) {
+  console.log("role",role)
   return axios.patch(
     `${adminApiPath}/manage-users/${role}/${userData?.id}`,
     { ...userData },

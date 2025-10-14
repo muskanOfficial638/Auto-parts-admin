@@ -47,7 +47,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
 
         try {
             formData.is_active = status === 'Active';
-            const response = await updateUser('supplier', loggedInUser?.access_token, formData)
+            const response = await updateUser(formData?.role, loggedInUser?.access_token, formData)
             // console.log("update:", response);
 
             if (response?.status === 200) {

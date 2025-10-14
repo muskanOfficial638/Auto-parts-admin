@@ -103,7 +103,6 @@ export async function handleSaveOrUpdateTrim({
   onError,
 }: SaveOrUpdateParamsForTrim) {
   e.preventDefault();
-   console.log("model id" , model_id );
   if (!trim.trim()) {
     onError("Trim Name cannot be empty");
     return;

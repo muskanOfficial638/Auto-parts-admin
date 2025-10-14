@@ -104,7 +104,6 @@ export const VehicleFormDialog = ({
         fetchData();
     }, [initialValue, open, levelData, level]);
 
-
     useEffect(() => {
         viewVehicleMake().then((data) => {
             // Convert API data to select options
@@ -164,8 +163,6 @@ export const VehicleFormDialog = ({
                     onSave(value.trim());
                     setTimeout(() => {
                         setValue("");
-                        // setSelectMakeOptions([])
-                        // setSelectModelOptions([])
                         onOpenChange(false);
                     }, 1000);
                 },
@@ -183,7 +180,6 @@ export const VehicleFormDialog = ({
                 onSuccess: async () => {
                     setError("");
                     onSave(value.trim());
-                    setValue("");
                     setTimeout(() => {
                         setValue("");
                         onOpenChange(false);
