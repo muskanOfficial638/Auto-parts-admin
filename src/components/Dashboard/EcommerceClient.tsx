@@ -75,8 +75,8 @@ export default function EcommerceClient() {
                 <div className="col-span-12">
                     <div className="mx-auto max-w-7xl space-y-6">
                         <div className="space-y-2">
-                            <h1 className="text-4xl font-bold tracking-tight">Auto Parts Requests</h1>
-                            <p className="text-lg text-muted-foreground">
+                            <h1 className="text-4xl font-bold tracking-tight dark:text-gray-400">Auto Parts Requests</h1>
+                            <p className="text-lg text-muted-foreground dark:text-white/90">
                                 Manage and track all vehicle part requests in one place
                             </p>
                         </div>

@@ -46,6 +46,7 @@ export default function AuthLogTable() {
 
     // Fetch logs
     useEffect(() => {
+         if (typeof window !== 'undefined') {
         const raw = localStorage.getItem("autoPartsUserData");
         const loggedInUser = JSON.parse(raw || "{}");
         if (loggedInUser?.access_token) {
@@ -53,6 +54,7 @@ export default function AuthLogTable() {
                 if (data?.items) setLogs(data.items);
             });
         }
+    }
     }, []);
 
     async function handleDeleteLog(logId: string) {

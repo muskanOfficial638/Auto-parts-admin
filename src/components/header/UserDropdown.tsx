@@ -13,9 +13,11 @@ export default function UserDropdown() {
   const [autoPartsUserData, setAutoPartsUserData] = useState<string | null | any>(null);
 
   useEffect(() => {
+     if (typeof window !== 'undefined') {
     const data: any = localStorage.getItem("autoPartsUserData");
     setAutoPartsUserData(JSON.parse(data));
     // console.log("autoPartsUserData", JSON.parse(data));
+     }
   }, []);
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {

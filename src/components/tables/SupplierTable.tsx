@@ -34,6 +34,7 @@ export default function SupplierTable() {
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>();
 
   useEffect(() => {
+     if (typeof window !== 'undefined') {
     const autoPartsUserData = localStorage.getItem("autoPartsUserData");
     const loggedInUser = JSON.parse(autoPartsUserData || "{}");
 
@@ -42,6 +43,7 @@ export default function SupplierTable() {
         setSuppliersData(data);
       });
     }
+  }
   }, []);
 
   useEffect(() => {

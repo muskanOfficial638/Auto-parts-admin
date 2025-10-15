@@ -35,6 +35,7 @@ export default function BuyerTable() {
   const [selectedBuyer, setSelectedBuyer] = useState<Buyer | null>();
 
   useEffect(() => {
+     if (typeof window !== 'undefined') {
     const autoPartsUserData = localStorage.getItem("autoPartsUserData");
     const loggedInUser = JSON.parse(autoPartsUserData || "{}");
 
@@ -43,6 +44,7 @@ export default function BuyerTable() {
         setBuyersData(data);
       });
     }
+  }
   }, []);
 
   useEffect(() => {

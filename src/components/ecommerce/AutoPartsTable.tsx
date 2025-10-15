@@ -208,7 +208,7 @@ export function AutoPartsTable({ data }: AutoPartsTableProps) {
         <div className="space-y-4">
             <div className="flex items-center gap-2">
                 <div className="relative flex-1">
-                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 light:text-muted-foreground dark:text-white" />
                     <Input
                         placeholder="Search all columns..."
                         value={globalFilter ?? ""}
@@ -218,14 +218,14 @@ export function AutoPartsTable({ data }: AutoPartsTableProps) {
                 </div>
             </div>
 
-            <div className="rounded-lg border bg-white overflow-auto">
+            <div className="rounded-lg border bg-white overflow-auto dark:border-gray-800 dark:bg-white/[0.03]">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id} className="border">
                                 {headerGroup.headers.map((header) => {
                                     return (
-                                        <TableHead key={header.id}>
+                                        <TableHead key={header.id} className="dark:text-gray-400">
                                             {header.isPlaceholder
                                                 ? null
                                                 : flexRender(
@@ -247,7 +247,7 @@ export function AutoPartsTable({ data }: AutoPartsTableProps) {
                                     className="hover:bg-muted/50 transition-colors border"
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="p-4">
+                                        <TableCell key={cell.id} className="p-4 dark:text-gray-400">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
@@ -272,7 +272,7 @@ export function AutoPartsTable({ data }: AutoPartsTableProps) {
 
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                    <p className="text-sm text-muted-foreground">Rows per page</p>
+                    <p className="text-sm text-muted-foreground dark:text-gray-400">Rows per page</p>
                     <Select
                         value={`${table.getState().pagination.pageSize}`}
                         onValueChange={(value) => {
@@ -293,7 +293,7 @@ export function AutoPartsTable({ data }: AutoPartsTableProps) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-muted-foreground dark:text-gray-400">
                         Page {table.getState().pagination.pageIndex + 1} of{" "}
                         {table.getPageCount()}
                     </div>
