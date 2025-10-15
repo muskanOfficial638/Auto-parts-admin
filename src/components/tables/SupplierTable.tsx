@@ -29,7 +29,7 @@ interface Supplier {
 export default function SupplierTable() {
   const supplierRef = useRef<HTMLTableElement | null>(null);
   const dataTableRef = useRef<DataTable | null>(null);
-  const [supplierData, setBuyersData] = useState<Supplier[]>();
+  const [supplierData, setSuppliersData] = useState<Supplier[]>();
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>();
 
@@ -39,7 +39,7 @@ export default function SupplierTable() {
 
     if (loggedInUser?.access_token) {
       fetchUsers("supplier", loggedInUser.access_token).then((data) => {
-        setBuyersData(data);
+        setSuppliersData(data);
       });
     }
   }, []);

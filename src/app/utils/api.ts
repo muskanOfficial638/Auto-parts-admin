@@ -4,6 +4,7 @@ import axios from "axios";
 export const authApiPath = "http://192.168.1.4:8001/v1";
 export const adminApiPath = "http://192.168.1.4:8000/v1/admin";
 export const vehicleApiPath = "http://192.168.1.4:8006/v1/vehicle";
+export const partRequestPath = "http://192.168.1.4:8005/v1/supplier";
 
 // user profiles
 export async function fetchUsers(role: string, token: string) {
@@ -20,7 +21,7 @@ export async function fetchUsers(role: string, token: string) {
 
 // update user
 export async function updateUser(role: string, token: string, userData: any) {
-  console.log("role",role)
+  console.log("role", role)
   return axios.patch(
     `${adminApiPath}/manage-users/${role}/${userData?.id}`,
     { ...userData },
@@ -178,6 +179,18 @@ export async function fetchVehicleModelByMake(makeName: string) {
     },
   });
   if (!res.ok) throw new Error("Failed to vehicle model by make name");
+  return res.json();
+}
+
+//all part requests
+export async function fetchAllPartRequests() {
+  const res = await fetch(`${partRequestPath}/all/part-request/`, {
+    cache: "no-store",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch profiles");
   return res.json();
 }
 

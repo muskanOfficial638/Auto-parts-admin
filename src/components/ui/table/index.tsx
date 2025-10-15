@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 interface TableProps {
   children: ReactNode; // Table content (thead, tbody, etc.)
   className?: string; // Optional className for styling
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ref?:any;
 }
 
