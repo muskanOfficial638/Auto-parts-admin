@@ -115,6 +115,49 @@ export const VehicleFormDialog = ({
         });
     }, []);
 
+    const handleValueChange = (e: any) => {
+        setValue(e.target.value);
+        if (e.target.value?.length < 2) {
+            setError('Name can not be less than 2 character short');
+        }
+        else if (e.target.value?.length > 25) {
+            setError('Name can not be nore than 25 characters long');
+        }
+        else {
+            setError('');
+        }
+    };
+
+    const handleYearFromChange = (value: any) => {
+        setYearFrom(value);
+
+        const yearRegex = /^\d{4}$/;
+        const currentYear = new Date().getFullYear();
+
+        if (!yearRegex.test(value)) {
+            setError('Please enter a valid 4-digit year (e.g., 2020)');
+        } else if (parseInt(value) > currentYear) {
+            setError(`Year From cannot be in the future (max: ${currentYear})`);
+        } else {
+            setError('');
+        }
+    };
+
+    const handleYearToChange = (value: any) => {
+        setYearTo(value);
+
+        const yearRegex = /^\d{4}$/;
+        const currentYear = new Date().getFullYear();
+        if (!yearRegex.test(value)) {
+            setError('Please enter a valid 4-digit year (e.g., 2020)');
+        } else if (parseInt(value) > currentYear) {
+            setError(`Year To cannot be in the future (max: ${currentYear})`);
+        } else {
+            setError('');
+        }
+    };
+
+
     const handleSelectMakeChange = async (option: string) => {
         const selectedId = option;
         const vehicleMakeData = await viewVehicleMake()
@@ -145,8 +188,24 @@ export const VehicleFormDialog = ({
         // If there's no selectedMake but we're in vehicle mode, use the editId for the make_id
         const makeId = selectedMake ? selectedMake.make_id : editId;
         const modelId = selectedModel ? selectedModel.id : editId;
+        if (level !== 'make' && !makeId) {
+            setError("Make is required!")
+            return
+        }
 
+        if (error) {
+            return
+        }
         if (level === 'trim') {
+            const currentYear = new Date().getFullYear();
+            if(yearTo > currentYear || yearFrom > currentYear){
+                setError(`Year cannot be in the future (max: ${currentYear})`);
+                return
+            }
+            if(yearFrom >= yearTo){
+                setError(`Year From value cannot be more than or equal to Year To value!`);
+                return
+            }
             handleSaveOrUpdateTrim({
                 e,
                 level: level,
@@ -198,11 +257,11 @@ export const VehicleFormDialog = ({
     };
 
     return (
-        <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-full bg-white">
+        <Dialog open={open} onOpenChange={() => { onOpenChange(!open); setError(''); setSelectedMake(null); setSelectedModel(null) }}>
+            <DialogContent className="w-full bg-white dark:bg-gray-900">
                 <DialogHeader>
-                    <DialogTitle>{title}</DialogTitle>
-                    <DialogDescription>{description}</DialogDescription>
+                    <DialogTitle className="dark:text-gray-400">{title}</DialogTitle>
+                    <DialogDescription className="dark:text-gray-400">{description}</DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     {level !== 'make' && (
@@ -224,7 +283,7 @@ export const VehicleFormDialog = ({
                     )}
 
                     {level === 'trim' &&
-                        (selectModelOptions?.length ? (
+                        (selectMakeOptions && selectModelOptions?.length ? (
                             <div className="grid gap-2">
                                 <Label>Select Vehicle Model</Label>
                                 <div className="relative">
@@ -240,17 +299,18 @@ export const VehicleFormDialog = ({
                                     </span>
                                 </div>
                             </div>
-                        ) : 'No model found for this make')}
+                        ) : <span className="text-error-500">No model found for this make</span>)}
 
                     <div className="grid gap-2">
                         <Label htmlFor="name">Name</Label>
                         <Input
                             id="name"
                             value={value}
-                            onChange={(e: any) => setValue(e.target.value)}
+                            onChange={(e: any) => handleValueChange(e)}
                             onKeyDown={handleKeyDown}
                             placeholder={`Enter ${level} name`}
                             autoFocus
+                            max="4"
                         />
                     </div>
 
@@ -263,7 +323,7 @@ export const VehicleFormDialog = ({
                                     name="year_from"
                                     value={yearFrom}
                                     type="number"
-                                    onChange={(e: any) => setYearFrom(e.target.value)}
+                                    onChange={(e: any) => handleYearFromChange(e.target.value)}
                                     placeholder={`Year From`}
                                     autoFocus
                                 />
@@ -274,7 +334,7 @@ export const VehicleFormDialog = ({
                                     id="year_to"
                                     name="year_to"
                                     type="number"
-                                    onChange={(e: any) => setYearTo(e.target.value)}
+                                    onChange={(e: any) => handleYearToChange(e.target.value)}
                                     value={yearTo}
                                     placeholder={`Year To`}
                                     autoFocus
@@ -285,10 +345,10 @@ export const VehicleFormDialog = ({
                 </div>
                 {error && (<span className="text-error-500">{error}</span>)}
                 <DialogFooter>
-                    <Button variant="outline" onClick={() => onOpenChange(false)}>
+                    <Button variant="outline" onClick={() => { onOpenChange(false); setError('') }} className="dark:text-gray-400">
                         Cancel
                     </Button>
-                    <Button onClick={handleSaveAndUpdate} disabled={!value.trim()}>
+                    <Button onClick={handleSaveAndUpdate} disabled={!value.trim()} className="dark:text-gray-400">
                         {!editId ? 'Save' : 'Update'}
                     </Button>
                 </DialogFooter>

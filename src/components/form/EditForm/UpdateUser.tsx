@@ -25,8 +25,15 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
     const [status, setStatus] = useState(userData?.is_active ? 'Active' : 'Inactive');
     const autoPartsUserData: any = localStorage.getItem("autoPartsUserData")
     const loggedInUser = JSON.parse(autoPartsUserData);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
+        if (!value) {
+            setError(`${name} is required`);
+        }
+        else {
+            setError('')
+        };
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
@@ -44,7 +51,9 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-
+        if(error){
+            return;
+        }
         try {
             formData.is_active = status === 'Active';
             const response = await updateUser(formData?.role, loggedInUser?.access_token, formData)
@@ -56,7 +65,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
                     handleClose();
                     // Call the callback function from the parent
                     onUserUpdate();
-                     window.location.reload();
+                    window.location.reload();
                 }, 2000)
             }
         } catch (err: any) {
@@ -133,7 +142,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
                                                 value={(formData as any)[name]}
                                                 onChange={handleChange}
                                                 className="h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:border-gray-700 dark:focus:border-brand-800"
-                                                disabled={name==='role'}
+                                                disabled={name === 'role' || name === 'email'}
                                             />
                                         </div>
                                     ))}
@@ -183,6 +192,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
                                 </div>
                             </div>
                         </div>
+                        {error && (<span className="text-error-500 font-semibold">{error}</span>)}
 
                         {/* Buttons */}
                         <div className="flex items-center gap-3 px-2 mt-6 lg:justify-end">
@@ -201,7 +211,6 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
                             </button>
                         </div>
                     </form>
-                    {error && (<span className="text-error-500">{error}</span>)}
                 </div>
             </div>
         </div>

@@ -159,7 +159,7 @@ export default function AuthLogTable() {
         <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
             <ToastContainer />
             {/* Search */}
-            <div className="flex flex-col sm:flex-row justify-between items-center p-4 gap-4">
+            <div className="flex flex-col sm:flex-row justify-between items-center p-4 gap-4 dark:text-gray-400">
                 <input
                     type="text"
                     placeholder="Search logs..."
@@ -197,7 +197,7 @@ export default function AuthLogTable() {
                                         key={header.id}
                                         isHeader
                                         onClick={header.column.getToggleSortingHandler()}
-                                        className="cursor-pointer select-none text-theme-xs"
+                                        className="cursor-pointer select-none text-theme-xs dark:text-gray-400"
                                     >
                                         {flexRender(
                                             header.column.columnDef.header,
@@ -218,7 +218,7 @@ export default function AuthLogTable() {
                     <TableBody>
                         {table.getRowModel().rows.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={columns.length} className="text-center">
+                                <TableCell colSpan={columns.length} className="text-center dark:text-gray-400">
                                     No logs found.
                                 </TableCell>
                             </TableRow>
@@ -226,7 +226,7 @@ export default function AuthLogTable() {
                             table.getRowModel().rows.map((row) => (
                                 <TableRow key={row.id}>
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="border border-1 p-4">
+                                        <TableCell key={cell.id} className="border border-1 p-4 dark:text-gray-400">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
@@ -246,34 +246,34 @@ export default function AuthLogTable() {
                     <button
                         onClick={() => table.setPageIndex(0)}
                         disabled={!table.getCanPreviousPage()}
-                        className="px-2 py-1 border rounded disabled:opacity-50"
+                        className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
                     >
                         {"<<"}
                     </button>
                     <button
                         onClick={() => table.previousPage()}
                         disabled={!table.getCanPreviousPage()}
-                        className="px-2 py-1 border rounded disabled:opacity-50"
+                        className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
                     >
                         {"<"}
                     </button>
                     <button
                         onClick={() => table.nextPage()}
                         disabled={!table.getCanNextPage()}
-                        className="px-2 py-1 border rounded disabled:opacity-50"
+                        className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
                     >
                         {">"}
                     </button>
                     <button
                         onClick={() => table.setPageIndex(table.getPageCount() - 1)}
                         disabled={!table.getCanNextPage()}
-                        className="px-2 py-1 border rounded disabled:opacity-50"
+                        className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
                     >
                         {">>"}
                     </button>
                 </div>
 
-                <div>
+                <div className="dark:text-gray-400">
                     Showing{" "}
                     <strong>
                         {table.getRowModel().rows.length} / {logs.length}

@@ -86,6 +86,8 @@ export default function SignUpForm() {
         if (!name) { setError('Name is required'); toast.error('Name is required'); }
         if (!role) { setError('Role is required'); toast.error('Role is required'); }
         if (!password) { setError('Password is required'); toast.error('Password is required'); }
+        if (name?.length >25) { setError('Name cannot be more than 25 character long'); }
+        if (name?.length <2) { setError('Name cannot be less than 2 character short'); }
         return
       }
       // 🔒 Validate fields before submit

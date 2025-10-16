@@ -284,10 +284,10 @@ const VehicleManagement = () => {
             <ToastContainer />
             <div className="border-b bg-card">
                 <div className="container mx-auto px-6 py-8">
-                    <h1 className="text-3xl font-bold text-foreground mb-2">
+                    <h1 className="text-3xl font-bold text-foreground mb-2 dark:text-gray-400">
                         Vehicle Management
                     </h1>
-                    <p className="text-muted-foreground">
+                    <p className="text-muted-foreground dark:text-white/90">
                         Manage your vehicle part exchange marketplace inventory
                     </p>
                 </div>
@@ -297,15 +297,15 @@ const VehicleManagement = () => {
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                     <div className="flex justify-between items-center mb-6">
                         <TabsList>
-                            <TabsTrigger value="makes">Makes</TabsTrigger>
-                            <TabsTrigger value="models">Models</TabsTrigger>
-                            <TabsTrigger value="trims">Trims</TabsTrigger>
+                            <TabsTrigger value="makes" className="dark:text-white/90">Makes</TabsTrigger>
+                            <TabsTrigger value="models" className="dark:text-white/90">Models</TabsTrigger>
+                            <TabsTrigger value="trims" className="dark:text-white/90">Trims</TabsTrigger>
                         </TabsList>
 
                         <div className="flex gap-2">
                             {activeTab === "makes" && (
-                                <Button onClick={handleAddMake}>
-                                    <Plus className="h-4 w-4 mr-2" />
+                                <Button onClick={handleAddMake} className="dark:text-gray-400">
+                                    <Plus className="h-4 w-4 mr-2 dark:text-gray-400" />
                                     Add Make
                                 </Button>
                             )}
@@ -314,8 +314,9 @@ const VehicleManagement = () => {
                                     onClick={() =>
                                         handleAddModel(data[0]?.make_id || "")
                                     }
+                                    className="dark:text-gray-400"
                                 >
-                                    <Plus className="h-4 w-4 mr-2" />
+                                    <Plus className="h-4 w-4 mr-2 dark:text-gray-400" />
                                     Add Model
                                 </Button>
                             )}
@@ -327,8 +328,9 @@ const VehicleManagement = () => {
                                             data[0]?.models[0]?.id || ""
                                         )
                                     }
+                                    className="dark:text-gray-400"
                                 >
-                                    <Plus className="h-4 w-4 mr-2" />
+                                    <Plus className="h-4 w-4 mr-2 dark:text-gray-400" />
                                     Add Trim
                                 </Button>
                             )}

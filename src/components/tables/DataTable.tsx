@@ -65,7 +65,7 @@ export function DataTable<TData, TValue>({
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id} className="border">
                                 {headerGroup.headers.map((header) => (
-                                    <TableHead key={header.id}>
+                                    <TableHead key={header.id} className="dark:text-gray-400">
                                         {header.isPlaceholder ? null : (
                                             <div
                                                 className={
@@ -99,7 +99,7 @@ export function DataTable<TData, TValue>({
                                     className="border"
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="p-4">
+                                        <TableCell key={cell.id} className="p-4 dark:text-gray-400">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
@@ -114,7 +114,7 @@ export function DataTable<TData, TValue>({
                                     colSpan={columns.length}
                                     className="h-24"
                                 >
-                                    <div className="flex flex-row text-center items-center justify-center">No results.<Loader/></div>
+                                    <div className="flex flex-row text-center items-center justify-center dark:text-gray-400">No results.<Loader/></div>
                                 </TableCell1>
                             </TableRow>
                         )}
@@ -122,7 +122,7 @@ export function DataTable<TData, TValue>({
                 </Table>
             </div>
             <div className="flex items-center justify-between">
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-muted-foreground dark:text-gray-400">
                     Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1} to{" "}
                     {Math.min(
                         (table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize,
@@ -130,7 +130,7 @@ export function DataTable<TData, TValue>({
                     )}{" "}
                     of {table.getFilteredRowModel().rows.length} results
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 dark:text-gray-400">
                     <Button
                         variant="outline"
                         size="sm"
@@ -154,9 +154,9 @@ export function DataTable<TData, TValue>({
 
             {/* Page size selector - place this right below the block above */}
             <div className="mt-2 flex items-center justify-end space-x-2">
-                <span className="text-sm">Rows per page:</span>
+                <span className="text-sm dark:text-gray-400">Rows per page:</span>
                 <select
-                    className="text-sm border rounded px-2 py-1"
+                    className="text-sm border rounded px-2 py-1 dark:text-gray-400"
                     value={table.getState().pagination.pageSize}
                     onChange={(e) => {
                         table.setPageSize(Number(e.target.value));
