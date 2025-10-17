@@ -23,7 +23,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
     const [formData, setFormData] = useState<User>(userData);
     const [error, setError] = useState('');
     const [status, setStatus] = useState(userData?.is_active ? 'Active' : 'Inactive');
-    const autoPartsUserData: any = localStorage.getItem("autoPartsUserData")
+    const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
     const loggedInUser = JSON.parse(autoPartsUserData);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,8 +31,11 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
         if (!value) {
             setError(`${name} is required`);
         }
+        else if (name === 'company_name' && value.length > 30 || (name === 'buyer_name' || name === 'supplier_name' && value.length > 25) ) {
+            setError(`${name === 'company_name' ? 'Company name can not be more than 30 characters long' : `${name} can not be more than 25 characters long`} `);
+        }
         else {
-            setError('')
+            setError('');
         };
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
@@ -45,13 +48,20 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
     ];
 
     const handleSelectChange = (value: string) => {
-        console.log("Selected value:", value);
         setStatus(value)
     };
 
     async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault();
-        if(error){
+        e.preventDefault(); 
+        if (!formData.buyer_name || !formData.vat_number) {
+            setError('You can not leave the required fields empty');
+            return
+        }
+        else if (formData?.company_name && formData?.company_name.length > 30 || formData?.buyer_name && formData?.buyer_name.length > 25) {
+            setError(`${formData?.company_name && formData?.company_name.length > 30 ? 'Company name can not be more than 30 characters long' : `Name can not be more than 25 characters long`} `);
+        return
+        }
+        if (error) {
             return;
         }
         try {
@@ -134,7 +144,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
                                     ].map(({ label, name }) => (
                                         <div key={name}>
                                             <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                                {label}
+                                                {label}<span className="text-error-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
@@ -149,7 +159,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
 
                                     {userData?.role === 'buyer' ? (<div className="col-span-2">
                                         <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                            VAT Number
+                                            VAT Number<span className="text-error-500">*</span>
                                         </label>
                                         <input
                                             type="text"
