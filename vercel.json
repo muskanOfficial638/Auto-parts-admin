@@ -9,28 +9,41 @@
             "destination": "http://3.89.93.181:8000/v1/admin/manage-users/supplier"
         },
         {
-            "source": "/api/admin/manage-users/buyer/:id",
-            "destination": "http://3.89.93.181:8000/v1/admin/manage-users/buyer/:id"
+            "source": "/api/admin/manage-users/buyer/:id?",
+            "destination": "http://3.89.93.181:8000/v1/admin/manage-users/buyer/:id?/"
         },
         {
-            "source": "/api/admin/manage-users/supplier/:id",
-            "destination": "http://3.89.93.181:8000/v1/admin/manage-users/supplier/:id"
+            "source": "/api/admin/manage-users/supplier/:id?",
+            "destination": "http://3.89.93.181:8000/v1/admin/manage-users/supplier/:id?/"
         },
         {
             "source": "/api/admin/vehicle/make/:id?",
-            "destination": "http://3.89.93.181:8006/v1/admin/vehicle/make/:id?/"
+            "destination": "http://3.89.93.181:8000/v1/admin/vehicle/make/:id?/"
         },
         {
             "source": "/api/admin/vehicle/model/:id?",
-            "destination": "http://3.89.93.181:8006/v1/admin/vehicle/model/:id?/"
+            "destination": "http://3.89.93.181:8000/v1/admin/vehicle/model/:id?/"
         },
         {
             "source": "/api/admin/vehicle/trim/:id?",
-            "destination": "http://3.89.93.181:8006/v1/admin/vehicle/trim/:id?/"
+            "destination": "http://3.89.93.181:8000/v1/admin/vehicle/trim/:id?/"
+        },
+
+        {
+            "source": "/api/vehicle/make/:id?",
+            "destination": "http://3.89.93.181:8006/v1/vehicle/make/:id?/"
+        },
+        {
+            "source": "/api/vehicle/model/:id?",
+            "destination": "http://3.89.93.181:8006/v1/vehicle/model/:id?/"
+        },
+        {
+            "source": "/api/vehicle/trim/:id?",
+            "destination": "http://3.89.93.181:8006/v1/vehicle/trim/:id?/"
         },
         {
             "source": "/api/admin/logs/:id?",
-            "destination": "http://3.89.93.181:8000/v1/admin/logs/:id?/"
+            "destination": "http://3.89.93.181:800/v1/admin/logs/:id?/"
         },
         {
             "source": "/api/auth/:path*",
