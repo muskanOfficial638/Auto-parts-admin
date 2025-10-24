@@ -1,0 +1,52 @@
+{
+    "rewrites": [
+        {
+            "source": "/api/admin/manage-users/buyer",
+            "destination": "http://3.89.93.181:8000/v1/admin/manage-users/buyer"
+        },
+        {
+            "source": "/api/admin/manage-users/supplier",
+            "destination": "http://3.89.93.181:8000/v1/admin/manage-users/supplier"
+        },
+        {
+            "source": "/api/admin/manage-users/buyer/:id",
+            "destination": "http://3.89.93.181:8000/v1/admin/manage-users/buyer/:id"
+        },
+        {
+            "source": "/api/admin/manage-users/supplier/:id",
+            "destination": "http://3.89.93.181:8000/v1/admin/manage-users/supplier/:id"
+        },
+        {
+            "source": "/api/admin/vehicle/make/:id?",
+            "destination": "http://3.89.93.181:8006/v1/admin/vehicle/make/:id?/"
+        },
+        {
+            "source": "/api/admin/vehicle/model/:id?",
+            "destination": "http://3.89.93.181:8006/v1/admin/vehicle/model/:id?/"
+        },
+        {
+            "source": "/api/admin/vehicle/trim/:id?",
+            "destination": "http://3.89.93.181:8006/v1/admin/vehicle/trim/:id?/"
+        },
+        {
+            "source": "/api/admin/logs/:id?",
+            "destination": "http://3.89.93.181:8000/v1/admin/logs/:id?/"
+        },
+        {
+            "source": "/api/auth/:path*",
+            "destination": "http://3.89.93.181:8001/v1/:path*"
+        },
+        {
+            "source": "/api/admin/:path*",
+            "destination": "http://3.89.93.181:8000/v1/admin/:path*/"
+        },
+        {
+            "source": "/api/vehicle/:path*",
+            "destination": "http://3.89.93.181:8006/v1/vehicle/:path*/"
+        },
+        {
+            "source": "/api/parts/:path*",
+            "destination": "http://3.89.93.181:8005/v1/supplier/:path*/"
+        }
+    ]
+}

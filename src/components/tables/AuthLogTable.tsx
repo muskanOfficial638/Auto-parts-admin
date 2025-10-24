@@ -90,7 +90,7 @@ export default function AuthLogTable() {
     const columns = useMemo<ColumnDef<Log>[]>(
         () => [
             {
-                header: "Action",
+                header: "Event",
                 accessorKey: "action",
             },
             {

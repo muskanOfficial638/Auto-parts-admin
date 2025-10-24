@@ -1,10 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
-export const authApiPath = "http://192.168.1.4:8001/v1";
-export const adminApiPath = "http://192.168.1.4:8000/v1/admin";
-export const vehicleApiPath = "http://192.168.1.4:8006/v1/vehicle";
-export const partRequestPath = "http://192.168.1.4:8005/v1/supplier";
+// API paths for LOCAL
+// export const authApiPath = "http://3.89.93.181:8001/v1";
+// export const adminApiPath = "http://3.89.93.181:8000/v1/admin";
+// export const vehicleApiPath = "http://3.89.93.181:8006/v1/vehicle";
+// export const partRequestPath = "http://3.89.93.181:8005/v1/supplier";
+
+// API paths for LOCAL vercel
+export const authApiPath = "/api/auth";
+export const adminApiPath = "/api/admin";
+export const vehicleApiPath = "/api/vehicle";
+export const partRequestPath = "/api/parts";
+
 
 // user profiles
 export async function fetchUsers(role: string, token: string) {

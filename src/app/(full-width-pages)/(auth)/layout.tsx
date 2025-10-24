@@ -31,7 +31,7 @@ export default function AuthLayout({
                 </Link> */}
                 <h1 className="text-center text-white dark:text-white/60 text-2xl mb-4">AutoPartXchange Admin</h1>
                 <p className="text-center text-gray-400 dark:text-white/60">
-                  Free and Open-Source AutoPartXchange Admin Dashboard Template
+                  Free and Open-Source AutoPartXchange Admin Dashboard
                 </p>
               </div>
             </div>

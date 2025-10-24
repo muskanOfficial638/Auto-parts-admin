@@ -22,7 +22,7 @@ interface User {
 const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }: any) => {
     const [formData, setFormData] = useState<User>(userData);
     const [error, setError] = useState('');
-    const [status, setStatus] = useState(userData?.is_active ? 'Active' : 'Inactive');
+    const [status, setStatus] = useState(userData?.is_active == true ? 'Active' : 'Inactive');
     const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
     const loggedInUser = JSON.parse(autoPartsUserData);
 
@@ -31,7 +31,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
         if (!value) {
             setError(`${name} is required`);
         }
-        else if (name === 'company_name' && value.length > 30 || (name === 'buyer_name' || name === 'supplier_name' && value.length > 25) ) {
+        else if (name === 'company_name' && value.length > 30 || (name === 'buyer_name' && value.length > 25 || name === 'supplier_name' && value.length > 25)) {
             setError(`${name === 'company_name' ? 'Company name can not be more than 30 characters long' : `${name} can not be more than 25 characters long`} `);
         }
         else {
@@ -44,7 +44,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
 
     const selectOptions = [
         { value: "Active", label: "Active" },
-        { value: "Incative", label: "Incative" },
+        { value: "Inactive", label: "Inactive" },
     ];
 
     const handleSelectChange = (value: string) => {
@@ -52,14 +52,19 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
     };
 
     async function handleSubmit(e: React.FormEvent) {
-        e.preventDefault(); 
-        if (!formData.buyer_name || !formData.vat_number) {
+        e.preventDefault();
+        if (
+            (formData?.role === "supplier" && !formData?.supplier_name) ||
+            (formData?.role === "buyer" && !formData?.buyer_name) ||
+            (formData?.role === "buyer" && !formData?.vat_number)
+        ) {
             setError('You can not leave the required fields empty');
-            return
+            return;
         }
+
         else if (formData?.company_name && formData?.company_name.length > 30 || formData?.buyer_name && formData?.buyer_name.length > 25) {
             setError(`${formData?.company_name && formData?.company_name.length > 30 ? 'Company name can not be more than 30 characters long' : `Name can not be more than 25 characters long`} `);
-        return
+            return
         }
         if (error) {
             return;
@@ -152,7 +157,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
                                                 value={(formData as any)[name]}
                                                 onChange={handleChange}
                                                 className="h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:border-gray-700 dark:focus:border-brand-800"
-                                                disabled={name === 'role' || name === 'email'}
+                                                // disabled={name === 'role' || name === 'email'}
                                             />
                                         </div>
                                     ))}
