@@ -17,6 +17,10 @@
             "destination": "http://54.80.119.79:8000/v1/admin/manage-users/supplier/:id?/"
         },
         {
+            "source": "/api/admin/manage-users/:id?",
+            "destination": "http://54.80.119.79:8000/v1/admin/manage-users/:id?/"
+        },
+        {
             "source": "/api/admin/vehicle/make/:id?",
             "destination": "http://54.80.119.79:8000/v1/admin/vehicle/make/:id?/"
         },
