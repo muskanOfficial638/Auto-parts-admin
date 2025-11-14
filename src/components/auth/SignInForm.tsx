@@ -82,6 +82,8 @@ export default function SignInForm() {
       // console.log("Logged in:", response.data);
       if (response?.data && response.data.access_token) {
         localStorage.setItem("autoPartsUserData", JSON.stringify(response.data));
+        localStorage.setItem("loginTime", Date.now().toString());
+        localStorage.setItem("lastActivity", Date.now().toString());
         router.push('/');
       }
 
@@ -105,7 +107,7 @@ export default function SignInForm() {
 
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">
-      <ToastContainer/>
+      <ToastContainer />
       <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
         {/* <div
           className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
@@ -191,7 +193,7 @@ export default function SignInForm() {
                         At least one special character
                       </li>
                     </ul>
-                  ) : error && <p className="text-red-500 text-sm mt-1">{error}</p> }
+                  ) : error && <p className="text-red-500 text-sm mt-1">{error}</p>}
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
