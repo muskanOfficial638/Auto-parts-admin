@@ -11,6 +11,9 @@ export default function CheckSession() {
     const INACTIVITY_MS = 10 * 60 * 1000; // FOR TESTING: 10 minutes
 
     const logout = () => {
+      localStorage.removeItem("autoPartsUserData");
+      localStorage.removeItem("loginTime");
+      localStorage.removeItem("lastActivity");
       localStorage.clear();
       router.replace("/signin");
     };

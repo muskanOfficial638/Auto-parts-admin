@@ -32,6 +32,8 @@ export default function UserDropdown() {
   function handleLogout() {
     if (autoPartsUserData) {
       localStorage.removeItem("autoPartsUserData");
+      localStorage.removeItem("loginTime");
+      localStorage.removeItem("lastActivity");
       localStorage.clear();
       router.push('/signin');
     }
