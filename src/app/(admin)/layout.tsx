@@ -1,24 +1,55 @@
 "use client";
 
+import Loader from "@/components/common/Loader";
 import { useSidebar } from "@/context/SidebarContext";
 import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
 
-  // Dynamic class for main content margin based on sidebar state
   const mainContentMargin = isMobileOpen
     ? "ml-0"
     : isExpanded || isHovered
-    ? "lg:ml-[290px]"
-    : "lg:ml-[90px]";
+      ? "lg:ml-[290px]"
+      : "lg:ml-[90px]";
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [autoPartsUserData, setAutoPartsUserData] = useState<string | null>(null);
+
+  useEffect(() => {
+    const user = localStorage.getItem("autoPartsUserData");
+
+    // User NOT logged in → redirect
+    if (!user) {
+      router.push("/signin");
+      return; // Stop the flow
+    }
+
+    // User logged in → load normally
+    setAutoPartsUserData(user);
+    setTimeout(() => setLoading(false), 1000);
+  }, [router]);
+
+  // Show loader while checking or redirecting
+  if (loading) {
+    return (
+      <div className="h-screen">
+        <Loader />
+      </div>
+    );
+  }
+
+  // Prevent flash before router.push
+  if (!autoPartsUserData) return null;
 
   return (
     <div className="min-h-screen xl:flex">
@@ -27,7 +58,7 @@ export default function AdminLayout({
       <Backdrop />
       {/* Main Content Area */}
       <div
-        className={`flex-1 transition-all  duration-300 ease-in-out ${mainContentMargin}`}
+        className={`flex-1 transition-all duration-300 ease-in-out ${mainContentMargin}`}
       >
         {/* Header */}
         <AppHeader />
