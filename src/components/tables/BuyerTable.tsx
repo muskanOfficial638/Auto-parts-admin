@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Table,
   TableBody,
@@ -10,9 +10,17 @@ import {
 
 import Badge from "../ui/badge/Badge";
 import { fetchUsers } from "@/app/utils/api";
-// import Image from "next/image";
-import { DataTable } from "simple-datatables";
-import "simple-datatables/dist/style.css";
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  ColumnDef,
+  flexRender,
+  SortingState,
+} from "@tanstack/react-table";
+import { matchSorter } from "match-sorter";
 import UpdateUserModal from "../form/EditForm/UpdateUser";
 import DeleteUserModal from "../form/DeleteModal/DeleteUser";
 
@@ -27,73 +35,133 @@ interface Buyer {
 }
 
 export default function BuyerTable() {
-  const tableRef = useRef<HTMLTableElement | null>(null);
-  const dataTableRef = useRef<DataTable | null>(null);
   const [buyerData, setBuyersData] = useState<Buyer[]>();
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
   const [selectedBuyer, setSelectedBuyer] = useState<Buyer | null>();
+  const [sorting, setSorting] = useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = useState("");
 
   useEffect(() => {
-     if (typeof window !== 'undefined') {
-    const autoPartsUserData = localStorage.getItem("autoPartsUserData");
-    const loggedInUser = JSON.parse(autoPartsUserData || "{}");
+    if (typeof window !== 'undefined') {
+      const autoPartsUserData = localStorage.getItem("autoPartsUserData");
+      const loggedInUser = JSON.parse(autoPartsUserData || "{}");
 
-    if (loggedInUser?.access_token) {
-      fetchUsers("buyer", loggedInUser.access_token).then((data) => {
-        setBuyersData(data);
-      });
+      if (loggedInUser?.access_token) {
+        fetchUsers("buyer", loggedInUser.access_token).then((data) => {
+          setBuyersData(data);
+        });
+      }
     }
-  }
   }, []);
 
   useEffect(() => {
-    if (buyerData && tableRef.current) {
-      // Delay to ensure DOM is updated
-      setTimeout(() => {
-        try {
-          new DataTable(tableRef.current!, {
-            paging: true,
-            perPage: 5,
-            perPageSelect: [5, 10, 20, 40],
-            firstLast: true,
-            nextPrev: true,
-            searchable: true
-          });
-        } catch (error) {
-          console.error("DataTable init failed:", error);
-        }
-      }, 0);
-    }
   }, [buyerData]);
 
-  const handleUserUpdate = () => {
-    const autoPartsUserData = localStorage.getItem("autoPartsUserData");
-    const loggedInUser = JSON.parse(autoPartsUserData || "{}");
-    fetchUsers("buyer", loggedInUser.access_token);
-    const table = tableRef.current;
-    if (table) {
-      if (dataTableRef.current) {
-        dataTableRef.current.destroy();
+  // Columns for TanStack Table
+  const columns = useMemo<ColumnDef<Buyer>[]>(
+    () => [
+      {
+        header: "Name",
+        accessorKey: "buyer_name",
+      },
+      {
+        header: "Company Name",
+        accessorKey: "company_name",
+      },
+      {
+        header: "Email",
+        accessorKey: "email",
+      },
+      {
+        header: "Status",
+        accessorKey: "is_active",
+        cell: ({ row }) => {
+          const isActive = row.original.is_active;
+          return (
+            <Badge size="sm" color={isActive ? "success" : "error"}>
+              {isActive ? "Active" : "Inactive"}
+            </Badge>
+          );
+        },
+      },
+      {
+        header: "VAT Number",
+        accessorKey: "vat_number",
+
+      },
+      {
+        header: "Actions",
+        id: "actions",
+        cell: ({ row }) => {
+          const buyer = row.original;
+          return (
+            <div className="flex items-center w-full gap-2">
+              {/* Delete Button */}
+              <button
+                onClick={() => handleDeleteModalOpen(buyer)}
+                className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none">
+                  <path
+                    fill="currentColor"
+                    fillRule="evenodd"
+                    d="M6.541 3.792a2.25 2.25 0 0 1 2.25-2.25h2.417a2.25 2.25 0 0 1 2.25 2.25v.25h3.208a.75.75 0 0 1 0 1.5h-.29v10.666a2.25 2.25 0 0 1-2.25 2.25h-8.25a2.25 2.25 0 0 1-2.25-2.25V5.541h-.292a.75.75 0 1 1 0-1.5H6.54zm8.334 9.454V5.541h-9.75v10.667c0 .414.336.75.75.75h8.25a.75.75 0 0 0 .75-.75zM8.041 4.041h3.917v-.25a.75.75 0 0 0-.75-.75H8.791a.75.75 0 0 0-.75.75zM8.334 8a.75.75 0 0 1 .75.75v5a.75.75 0 1 1-1.5 0v-5a.75.75 0 0 1 .75-.75m4.083.75a.75.75 0 0 0-1.5 0v5a.75.75 0 1 0 1.5 0z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+
+              {/* Edit Button */}
+              <button
+                onClick={() => handleUpdateModalOpen(buyer)}
+                className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white/90"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="none">
+                  <path
+                    fill="currentColor"
+                    fillRule="evenodd"
+                    d="M17.091 3.532a2.25 2.25 0 0 0-3.182 0l-8.302 8.302c-.308.308-.52.7-.61 1.126l-.735 3.485a.75.75 0 0 0 .888.889l3.485-.735a2.25 2.25 0 0 0 1.127-.611l8.301-8.302a2.25 2.25 0 0 0 0-3.182zm-2.121 1.06a.75.75 0 0 1 1.06 0l.973.973a.75.75 0 0 1 0 1.06l-.899.899-2.033-2.033zm-1.96 1.96-6.342 6.342a.75.75 0 0 0-.203.376l-.498 2.358 2.358-.497a.75.75 0 0 0 .376-.204l6.343-6.342z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+          )
+
+        },
       }
-      dataTableRef.current = new DataTable(tableRef.current!, {
-        paging: true,
-        perPage: 5,
-        perPageSelect: [5, 10, 20, 40],
-        firstLast: true,
-        nextPrev: true,
-        searchable: true
-      });
-    }
 
-  };
+    ],
+    []
+  );
 
-  const handleUpdateModalOpen = (buyer:Buyer)=>{
+  // Table setup
+  const table = useReactTable({
+    data: buyerData ?? [],
+    columns,
+    state: {
+      sorting,
+      globalFilter,
+    },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: (row, columnId, filterValue) => {
+      const value = row.getValue(columnId);
+      return matchSorter([value], filterValue).length > 0;
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
+  const handleUpdateModalOpen = (buyer: Buyer) => {
     setIsOpenUpdateModal(true)
     setSelectedBuyer(buyer)
   }
 
-  const handleDeleteModalOpen = (buyer:Buyer)=>{
+  const handleDeleteModalOpen = (buyer: Buyer) => {
     setIsOpenDeleteModal(true)
     setSelectedBuyer(buyer)
   }
@@ -104,171 +172,138 @@ export default function BuyerTable() {
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="max-w-full overflow-x-auto">
         <div className="min-w-full">
-          <Table ref={tableRef}>
-            {/* Table Header */}
-            <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-              <TableRow>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Name
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Compony name
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Email
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Status
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  VAT Number
-                </TableCell>
-                <TableCell
-                  isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                >
-                  Action
-                </TableCell>
-              </TableRow>
-            </TableHeader>
+          {/* Search */}
+          <div className="flex flex-col sm:flex-row justify-between items-center p-4 gap-4 dark:text-gray-400">
+            <input
+              type="text"
+              placeholder="Search Buyers..."
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              className="w-full sm:w-64 px-3 py-2 border rounded-md dark:bg-white/[0.05]"
+            />
 
-            {/* Table Body */}
-            <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {buyerData?.map((buyer) => (
-                <TableRow key={buyer.id}>
-                  <TableCell className="px-5 py-4 sm:px-6 text-start">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 overflow-hidden rounded-full">
-                        {/* <Image
-                          width={40}
-                          height={40}
-                          src={order.user.image}
-                          alt={order.user.name}
-                        /> */}
-                        <svg className="fill-gray-500 dark:fill-gray-400" fill="" height="40px" width="40px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink"
-                          viewBox="0 0 496 496" xmlSpace="preserve">
-                          <g>
-                            <g>
-                              <path d="M424,352c0-11.912-5.336-22.504-13.624-29.84c3.528-5.128,5.624-11.328,5.624-18.008v-4.28
-			c0-3.432-0.552-6.816-1.64-10.072l-34.008-102.04C371.624,161.584,347.224,144,319.64,144h-26.48
-			C309.504,130.792,320,110.608,320,88V62.032C320,27.824,292.168,0,257.968,0h-19.936C203.824,0,176,27.824,176,62.032V88
-			c0,22.608,10.496,42.792,26.84,56h-26.48c-27.584,0-51.984,17.584-60.712,43.76L81.64,289.792
-			c-1.088,3.256-1.64,6.648-1.64,10.072v4.28c0,6.688,2.088,12.888,5.624,18.016C77.336,329.496,72,340.088,72,352H40v128h128v16h72
-			h8h80v-16h128V352H424z M408,352h-48c0-7.96,3.944-14.984,9.928-19.352c4.32,2.152,9.152,3.352,14.224,3.352
-			c5.016,0,9.704-1.272,13.928-3.344C404.064,337.024,408,344.04,408,352z M399.184,294.864c0.544,1.616,0.816,3.304,0.816,5v4.28
-			c0,3.808-1.408,7.264-3.656,10C392.432,312.872,388.336,312,384,312c-4.28,0-8.32,0.856-12.192,2.104
-			c-0.968-1.208-1.776-2.568-2.376-4.064l-29.936-74.84l34.12-17.056L399.184,294.864z M357.84,321.984
-			C349.432,329.32,344,339.992,344,352h-16V249.552l26.568,66.432C355.432,318.144,356.576,320.112,357.84,321.984z M192,62.024
-			C192,36.648,212.648,16,238.032,16h19.936C283.352,16,304,36.648,304,62.032v3.096c-4.344-3.664-8.248-7.92-11.536-12.856
-			C287.344,44.584,278.784,40,269.544,40h-43.096c-9.232,0-17.8,4.584-23.184,12.68c-3.128,4.696-6.968,8.856-11.264,12.464V62.024z
-			 M192,88v-3.432c9.784-5.768,18.296-13.6,24.864-23.44C219,57.92,222.584,56,226.456,56h43.096c3.864,0,7.456,1.92,9.872,5.552
-			c6.312,9.464,14.8,17.256,24.576,23.016V88c0,30.872-25.128,56-56,56S192,118.872,192,88z M278.032,160
-			c-4.416,9.296-16.144,16-30.032,16s-25.616-6.704-30.032-16H248H278.032z M96,299.872c0-1.704,0.272-3.392,0.816-5.008
-			l25.568-76.72l34.12,17.064l-29.936,74.832c-0.6,1.496-1.408,2.864-2.384,4.072C120.32,312.856,116.28,312,112,312
-			c-4.336,0-8.432,0.872-12.344,2.152c-2.248-2.736-3.656-6.192-3.656-10V299.872z M97.92,332.656
-			c4.232,2.072,8.912,3.344,13.928,3.344c5.072,0,9.904-1.2,14.216-3.352C132.056,337.016,136,344.04,136,352H88
-			C88,344.04,91.936,337.024,97.92,332.656z M168,464H56v-96h16v16h16v-16h48v16h16v-16h16V464z M168,352h-16
-			c0-12.016-5.432-22.68-13.848-30.016c1.264-1.872,2.408-3.84,3.28-6.008L168,249.544V352z M240,480h-56v-16h56V480z M312,480h-56
-			v-16h56V480z M312,448h-56v-88h-16v88h-56v-80.808c18.232-3.72,32-19.88,32-39.192h64c0,19.312,13.768,35.472,32,39.192V448z
-			 M184,350.528V328h16C200,338.416,193.288,347.216,184,350.528z M312,350.528c-9.296-3.312-16-12.112-16-22.528h16V350.528z
-			 M312,200v112H184V200h-16v6.456l-5.536,13.832L127.488,202.8l3.328-9.984C137.368,173.184,155.672,160,176.36,160h24.608
-			c4.456,18.232,23.848,32,47.032,32c23.184,0,42.568-13.768,47.032-32h24.608c20.688,0,38.992,13.184,45.536,32.824l3.328,9.984
-			l-34.976,17.488L328,206.456V200H312z M440,464H328v-96h16v16h16v-16h48v16h16v-16h16V464z"/>
-                            </g>
-                          </g>
-                        </svg>
-                      </div>
-                      <div>
-                        <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                          {buyer.buyer_name}
-                        </span>
-                        {/* <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                          {order.user.role}
-                        </span> */}
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {buyer.company_name}
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    <div className="flex -space-x-2">
-                      {buyer.email}
-                    </div>
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    <Badge
-                      size="sm"
-                      color={
-                        buyer?.is_active
-                          ? "success"
-                          : !buyer?.is_active
-                            ? "error"
-                            : "warning"
-                      }
-                    >
-                      {buyer?.is_active
-                        ? "Active" : "Inactive"}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {buyer.vat_number}
-                  </TableCell>
-                  <TableCell className="px-4 py-4 font-normal text-gray-800 border border-gray-100 dark:border-white/[0.05] text-theme-sm dark:text-white/90 whitespace-nowrap">
-                    <div className="flex items-center w-full gap-2">
-                      {/* Delete Button */}
-                      <button onClick={() =>handleDeleteModalOpen(buyer)} className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none">
-                          <path
-                            fill="currentColor"
-                            fillRule="evenodd"
-                            d="M6.541 3.792a2.25 2.25 0 0 1 2.25-2.25h2.417a2.25 2.25 0 0 1 2.25 2.25v.25h3.208a.75.75 0 0 1 0 1.5h-.29v10.666a2.25 2.25 0 0 1-2.25 2.25h-8.25a2.25 2.25 0 0 1-2.25-2.25V5.541h-.292a.75.75 0 1 1 0-1.5H6.54zm8.334 9.454V5.541h-9.75v10.667c0 .414.336.75.75.75h8.25a.75.75 0 0 0 .75-.75zM8.041 4.041h3.917v-.25a.75.75 0 0 0-.75-.75H8.791a.75.75 0 0 0-.75.75zM8.334 8a.75.75 0 0 1 .75.75v5a.75.75 0 1 1-1.5 0v-5a.75.75 0 0 1 .75-.75m4.083.75a.75.75 0 0 0-1.5 0v5a.75.75 0 1 0 1.5 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+              Page {table.getState().pagination.pageIndex + 1} of{" "}
+              {table.getPageCount()}
+              <select
+                className="ml-2 border rounded p-1"
+                value={table.getState().pagination.pageSize}
+                onChange={(e) => table.setPageSize(Number(e.target.value))}
+              >
+                {[5, 10, 20, 40].map((sz) => (
+                  <option key={sz} value={sz}>
+                    Show {sz}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-                      {/* Edit Button */}
-                      <button onClick={()=>handleUpdateModalOpen(buyer)} className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white/90">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="none">
-                          <path
-                            fill="currentColor"
-                            fillRule="evenodd"
-                            d="M17.091 3.532a2.25 2.25 0 0 0-3.182 0l-8.302 8.302c-.308.308-.52.7-.61 1.126l-.735 3.485a.75.75 0 0 0 .888.889l3.485-.735a2.25 2.25 0 0 0 1.127-.611l8.301-8.302a2.25 2.25 0 0 0 0-3.182zm-2.121 1.06a.75.75 0 0 1 1.06 0l.973.973a.75.75 0 0 1 0 1.06l-.899.899-2.033-2.033zm-1.96 1.96-6.342 6.342a.75.75 0 0 0-.203.376l-.498 2.358 2.358-.497a.75.75 0 0 0 .376-.204l6.343-6.342z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                    {isOpenUpdateModal && (
-                      <UpdateUserModal isOpenModel={isOpenUpdateModal}
-                        setIsOpenModel={setIsOpenUpdateModal} userData={selectedBuyer} onUserUpdate={handleUserUpdate} />
-                    )}
-                    {isOpenDeleteModal && (
-                      <DeleteUserModal isOpenDeleteModel={isOpenDeleteModal}
-                        setIsOpenDeleteModal={setIsOpenDeleteModal} userData={selectedBuyer} />
-                    )}
-                  </TableCell>
+          {/* Responsive Table Container */}
+          <div className="overflow-x-auto">
+            <Table>
+              {/* Headers */}
+              <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                {table.getHeaderGroups().map((hg) => (
+                  <TableRow key={hg.id}>
+                    {hg.headers.map((header) => (
+                      <TableCell
+                        key={header.id}
+                        isHeader
+                        onClick={header.column.getToggleSortingHandler()}
+                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                      >
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                        {header.column.getIsSorted() === "asc"
+                          ? " 🔼"
+                          : header.column.getIsSorted() === "desc"
+                            ? " 🔽"
+                            : ""}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
 
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              {/* Rows */}
+              <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                {table.getRowModel().rows.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="text-center dark:text-gray-400">
+                      No Users found.
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="px-5 py-4 sm:px-6 text-start dark:text-gray-400">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="flex justify-between items-center p-4 text-sm">
+            <div className="flex gap-2">
+              <button
+                onClick={() => table.setPageIndex(0)}
+                disabled={!table.getCanPreviousPage()}
+                className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
+              >
+                {"<<"}
+              </button>
+              <button
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
+              >
+                {"<"}
+              </button>
+              <button
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
+              >
+                {">"}
+              </button>
+              <button
+                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                disabled={!table.getCanNextPage()}
+                className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
+              >
+                {">>"}
+              </button>
+            </div>
+
+            <div className="dark:text-gray-400">
+              Showing{" "}
+              <strong>
+                {table.getRowModel().rows.length} / {buyerData.length}
+              </strong>{" "}
+              results
+            </div>
+          </div>
+
+          {isOpenUpdateModal && (
+            <UpdateUserModal isOpenModel={isOpenUpdateModal}
+              setIsOpenModel={setIsOpenUpdateModal} userData={selectedBuyer} />
+          )}
+          {isOpenDeleteModal && (
+            <DeleteUserModal isOpenDeleteModel={isOpenDeleteModal}
+              setIsOpenDeleteModal={setIsOpenDeleteModal} userData={selectedBuyer} role="buyer" />
+          )}
         </div>
       </div>
     </div>

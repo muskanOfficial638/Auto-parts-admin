@@ -50,9 +50,9 @@ export async function updateUser(role: string, token: string, userData: any) {
 }
 
 // delete user
-export async function deleteUser(token: string, userId: string) {
+export async function deleteUser(token: string, userId: string , role: string) {
   return axios.delete(
-    `${adminApiPath}/manage-users/${userId}`,
+    `${adminApiPath}/manage-users/${role}/${userId}`,
     {
       headers: {
         "Content-Type": "application/json",

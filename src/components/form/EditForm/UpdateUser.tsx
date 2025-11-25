@@ -19,7 +19,7 @@ interface User {
     vat_number?: string;
 }
 
-const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }: any) => {
+const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData }: any) => {
     const [formData, setFormData] = useState<User>(userData);
     const [error, setError] = useState('');
     const [status, setStatus] = useState(userData?.is_active == true ? 'Active' : 'Inactive');
@@ -79,7 +79,6 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
                 setTimeout(() => {
                     handleClose();
                     // Call the callback function from the parent
-                    onUserUpdate();
                     window.location.reload();
                 }, 2000)
             }
@@ -188,12 +187,12 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, onUserUpdate }
                                     </div>)}
                                     <div className="flex flex-wrap items-center gap-8">
                                         <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                            User Status -
+                                            Status:
                                         </label>
                                         <div className="relative">
                                             <Select
                                                 options={selectOptions}
-                                                placeholder="Select model"
+                                                placeholder="Select status"
                                                 onChange={handleSelectChange}
                                                 className="dark:bg-dark-900"
                                                 value={status}

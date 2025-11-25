@@ -7,7 +7,7 @@ import { Modal } from "../../ui/modal";
 import { toast, ToastContainer } from "react-toastify";
 import { deleteVehicle } from "@/app/utils/api";
 
-export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModal, makeData }: any) {
+export default function DeleteVehicleMake({ isOpenDeleteModel, setIsOpenDeleteModal, makeData }: any) {
     const [error, setError] = useState('')
 
     const handleClose = () => {

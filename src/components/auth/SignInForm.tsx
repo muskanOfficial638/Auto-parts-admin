@@ -38,6 +38,7 @@ export default function SignInForm() {
     const value = e.target.value;
     setEmail(value);
     validateEmail(value);
+    setError("")
   };
 
   //Password
@@ -69,7 +70,7 @@ export default function SignInForm() {
     validatePassword(password);
 
     if (!email || emailError || passwordErrors.length > 0 || !password) {
-      toast.error("Please fix the errors before submitting")
+      toast.error("Please fill in all required fields.")
       return;
     }
 
@@ -92,7 +93,8 @@ export default function SignInForm() {
       if (err.response) {
         // Server responded with a status other than 2xx
         console.error("Server error:", err.response.data);
-        toast.error(err.response.data.message || "Login failed");
+        setError(err.response.data.detail || "Login failed")
+        // toast.error(err.response.data.detail || "Login failed");
       } else if (err.request) {
         // Request was made but no response received
         console.error("No response:", err.request);
@@ -169,31 +171,9 @@ export default function SignInForm() {
                       )}
                     </span>
                   </div>
-                  {password ? (
-                    <ul className="mt-2 text-sm">
-                      <li className={password.length >= 6 ? "text-green-600" : "text-red-500"}>
-                        Minimum length 6 characters
-                      </li>
-                      <li className={/[A-Z]/.test(password) ? "text-green-600" : "text-red-500"}>
-                        At least one uppercase letter
-                      </li>
-                      <li className={/[a-z]/.test(password) ? "text-green-600" : "text-red-500"}>
-                        At least one lowercase letter
-                      </li>
-                      <li className={/[0-9]/.test(password) ? "text-green-600" : "text-red-500"}>
-                        At least one number
-                      </li>
-                      <li
-                        className={
-                          /[!@#$%^&*(),.?":{}|<>]/.test(password)
-                            ? "text-green-600"
-                            : "text-red-500"
-                        }
-                      >
-                        At least one special character
-                      </li>
-                    </ul>
-                  ) : error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+                  {
+                   
+                  error && <p className="text-red-500 text-sm mt-1">{error}</p>}
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -203,7 +183,7 @@ export default function SignInForm() {
                     </span>
                   </div>
                   <Link
-                    href="/reset-password"
+                    href="/forgot-password"
                     className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
                   >
                     Forgot password?

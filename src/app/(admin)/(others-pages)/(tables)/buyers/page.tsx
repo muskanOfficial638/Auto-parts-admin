@@ -18,7 +18,7 @@ export default async function BuyerPage() {
     <div>
       <PageBreadcrumb pageTitle="Manage users" />
       <div className="space-y-6">
-        <ComponentCard title="Buyers">
+        <ComponentCard title="Buyers" isButtonVisible={true}>
           <BuyerTable />
         </ComponentCard>
       </div>

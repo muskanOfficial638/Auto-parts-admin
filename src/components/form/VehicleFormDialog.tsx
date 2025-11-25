@@ -68,8 +68,17 @@ export const VehicleFormDialog = ({
     const [selectModelOptions, setSelectModelOptions] = useState([]);
     const [selectedMake, setSelectedMake] = useState<VehicleMake | any>(null);
     const [selectedModel, setSelectedModel] = useState<Model | any>(null);
+    const [accessToken, setToken] = useState('');
     const [yearFrom, setYearFrom] = useState(0);
     const [yearTo, setYearTo] = useState(0);
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+          const autoPartsUserData = localStorage.getItem("autoPartsUserData");
+          const loggedInUser = JSON.parse(autoPartsUserData || "{}");
+          setToken(loggedInUser.access_token)
+        }
+      }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -226,6 +235,7 @@ export const VehicleFormDialog = ({
                     }, 1000);
                 },
                 onError: (msg: string) => setError(msg),
+                token:accessToken
             })
         } else {
             handleSaveOrUpdateMake({
@@ -245,6 +255,7 @@ export const VehicleFormDialog = ({
                     }, 2000);
                 },
                 onError: (msg: string) => setError(msg),
+                token:accessToken
             });
         }
     };

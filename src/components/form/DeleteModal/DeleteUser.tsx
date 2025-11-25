@@ -7,7 +7,7 @@ import { Modal } from "../../ui/modal";
 import { toast, ToastContainer } from "react-toastify";
 import { deleteUser } from "@/app/utils/api";
 
-export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModal, userData }: any) {
+export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModal, userData, role }: any) {
     const autoPartsUserData: any = localStorage.getItem("autoPartsUserData")
     const loggedInUser = JSON.parse(autoPartsUserData);
     const [error, setError] = useState('')
@@ -19,7 +19,7 @@ export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModa
     async function handleDelete(e: React.FormEvent) {
         e.preventDefault();
         try {
-            const response = await deleteUser(loggedInUser?.access_token, userData?.id)
+            const response = await deleteUser(loggedInUser?.access_token, userData?.id, role)
             // console.log("Delete:", response);
             if (response?.status === 200) {
                 toast("User Deleted successfully");
