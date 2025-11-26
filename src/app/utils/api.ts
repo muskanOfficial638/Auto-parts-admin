@@ -7,6 +7,9 @@ import axios from "axios";
 // export const vehicleApiPath = "http://54.80.119.79:8006/v1/vehicle";
 // export const partRequestPath = "http://54.80.119.79:8005/v1/supplier";
 
+//image path
+export const imagePath = "http://54.80.119.79:8000/image/"
+
 // API paths for Vercel
 export const authApiPath = "/api/auth";
 export const adminApiPath = "/api/admin";
@@ -113,8 +116,8 @@ export async function sendVerification(email: string) {
 
 
 // Admin logs
-export async function fetchAdminLogs(token: string) {
-  const res = await fetch(`${adminApiPath}/logs`, {
+export async function fetchAdminLogs(token: string, pageCount: number , pageSize:number) {
+  const res = await fetch(`${adminApiPath}/logs/?page=${pageCount}&page_size=${pageSize}`, {
     cache: "no-store",
     headers: {
       "Content-Type": "application/json",

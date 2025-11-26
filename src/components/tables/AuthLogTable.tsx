@@ -50,7 +50,7 @@ export default function AuthLogTable() {
         const raw = localStorage.getItem("autoPartsUserData");
         const loggedInUser = JSON.parse(raw || "{}");
         if (loggedInUser?.access_token) {
-            fetchAdminLogs(loggedInUser.access_token).then((data) => {
+            fetchAdminLogs(loggedInUser.access_token, 1, 40).then((data) => {
                 if (data?.items) setLogs(data.items);
             });
         }
@@ -64,7 +64,7 @@ export default function AuthLogTable() {
             const response = await deleteAdminLogs(loggedInUser?.access_token, logId)
             if (response) {
                 toast("Log deleted successfully");
-                fetchAdminLogs(loggedInUser.access_token).then((data) => {
+                fetchAdminLogs(loggedInUser.access_token, 1, 40).then((data) => {
                     if (data?.items) setLogs(data.items);
                 });
             }

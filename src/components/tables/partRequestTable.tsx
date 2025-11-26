@@ -1,4 +1,6 @@
-import { useState } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -23,14 +25,14 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-// import {
-//     Select,
-//     SelectContent,
-//     SelectItem,
-//     SelectTrigger,
-//     SelectValue,
-// } from "@/components/ui/select";
-import { imagePath } from "@/app/utils/api";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { fetchAllPartRequests, imagePath } from "@/app/utils/api";
 
 const columns: ColumnDef<AutoPartRequest>[] = [
     {
@@ -150,7 +152,7 @@ const columns: ColumnDef<AutoPartRequest>[] = [
         },
         cell: ({ row }) => {
             const date = new Date(row.getValue("required_by_date"));
-            return <div>{date.toLocaleDateString()}</div>;
+            return <div>{date.toISOString().split("T")[0]}</div>;
         },
     },
     {
@@ -174,17 +176,26 @@ const columns: ColumnDef<AutoPartRequest>[] = [
     },
 ];
 
-interface AutoPartsTableProps {
-    data: AutoPartRequest[];
-}
-
-export function AutoPartsTable({ data }: AutoPartsTableProps) {
+export function PartRequestTable() {
     const [sorting, setSorting] = useState<SortingState>([]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState("");
+    const [autoPartsUserData, setAutoPartsUserData] = useState<string | null>("loading");
+    const [partRequestData, setPartRequestData] = useState<AutoPartRequest[]>();
+
+    useEffect(() => {
+        const data = localStorage.getItem("autoPartsUserData");
+        setAutoPartsUserData(data);
+        fetchAllPartRequests().then((data) => {
+            setPartRequestData(data)
+        });
+    }, []);
+
+    useEffect(() => {
+    }, [partRequestData]);
 
     const table = useReactTable({
-        data,
+        data: partRequestData ?? [],
         columns,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
@@ -204,6 +215,10 @@ export function AutoPartsTable({ data }: AutoPartsTableProps) {
             },
         },
     });
+
+    if (autoPartsUserData === "loading" || !partRequestData) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <div className="space-y-4">
@@ -241,7 +256,7 @@ export function AutoPartsTable({ data }: AutoPartsTableProps) {
                     </TableHeader>
                     <TableBody>
                         {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows.slice(0, 5).map((row) => (
+                            table.getRowModel().rows.map((row) => (
                                 <TableRow
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
@@ -271,7 +286,7 @@ export function AutoPartsTable({ data }: AutoPartsTableProps) {
                 </Table>
             </div>
 
-            {/* <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                     <p className="text-sm text-muted-foreground dark:text-gray-400">Rows per page</p>
                     <Select
@@ -317,7 +332,7 @@ export function AutoPartsTable({ data }: AutoPartsTableProps) {
                         </Button>
                     </div>
                 </div>
-            </div> */}
+            </div>
         </div>
     );
 }

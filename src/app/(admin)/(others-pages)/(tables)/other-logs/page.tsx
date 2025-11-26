@@ -1,25 +1,24 @@
 
 import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import SupplierTable from "@/components/tables/SupplierTable";
 import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Suppliers",
+  title: "Auth logs",
   description:
-    "This is Table  page for Suppliers",
+    "This is auth log page",
   // other metadata
 };
 
-export default async function SupplierPage() {
+export default async function OtherLogPage() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Manage users" />
+      <PageBreadcrumb pageTitle="Other Admin Logs" />
       <div className="space-y-6">
-        <ComponentCard title="Suppliers">
-          <SupplierTable />
+        <ComponentCard title="Other logs">
+            <div> Other Admin logs will take place here ......</div>
         </ComponentCard>
       </div>
     </div>

@@ -27,11 +27,25 @@ export default function AdminLayout({
 
   useEffect(() => {
     const user = localStorage.getItem("autoPartsUserData");
+    const loginTime = localStorage.getItem("loginTime");
 
     // User NOT logged in → redirect
-    if (!user) {
+    if (!user || !loginTime) {
       router.push("/signin");
       return; // Stop the flow
+    }
+
+    // Check if login is older than 12 hours
+    const ONE_DAY = 12 * 60 * 60 * 1000;  // currently check for 12 years
+    const isExpired = Date.now() - Number(loginTime) > ONE_DAY;
+
+    if (isExpired) {
+      // Clear old session
+      localStorage.removeItem("autoPartsUserData");
+      localStorage.removeItem("autoPartsLoginTime");
+
+      router.push("/signin");
+      return;
     }
 
     // User logged in → load normally

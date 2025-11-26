@@ -1,25 +1,24 @@
-
 import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import SupplierTable from "@/components/tables/SupplierTable";
+import { PartRequestTable } from "@/components/tables/partRequestTable";
 import { Metadata } from "next";
 import React from "react";
 
 export const metadata: Metadata = {
-  title: "Suppliers",
+  title: "Part requests",
   description:
-    "This is Table  page for Suppliers",
+    "This is part request page",
   // other metadata
 };
 
-export default async function SupplierPage() {
+export default async function PartRequestPage() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="Manage users" />
+      <PageBreadcrumb pageTitle="User Part requests" />
       <div className="space-y-6">
-        <ComponentCard title="Suppliers">
-          <SupplierTable />
+        <ComponentCard title="Part Request">
+         <PartRequestTable />
         </ComponentCard>
       </div>
     </div>

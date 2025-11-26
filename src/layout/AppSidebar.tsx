@@ -11,7 +11,7 @@ import {
   ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
-  // ListIcon,
+  ListIcon,
   PageIcon,
   PieChartIcon,
   PlugInIcon,
@@ -59,7 +59,15 @@ const navItems: NavItem[] = [
   {
     name: "Logs",
     icon: <AlertIcon />,
-    subItems: [{ name: "Authentication Failed", path: "/authentication-logs", pro: false }],
+    subItems: [
+      { name: "Auth Logs", path: "/authentication-logs", pro: false },
+      { name: "Other Logs", path: "/other-logs", pro: false },
+    ],
+  },
+  {
+    name: "Part Requests",
+    icon: <ListIcon />,
+    path: "/part-requests",
   },
   // {
   //   name: "Forms",
