@@ -5,15 +5,18 @@ import axios from "axios";
 // export const authApiPath = "http://54.80.119.79:8001/v1";
 // export const adminApiPath = "http://54.80.119.79:8000/v1/admin";
 // export const vehicleApiPath = "http://54.80.119.79:8006/v1/vehicle";
+// export const deleteVehicleApiPath = "http://54.80.119.79:8000/v1/admin/vehicle";
 // export const partRequestPath = "http://54.80.119.79:8005/v1/supplier";
 
 //image path
-export const imagePath = "http://54.80.119.79:8000/image/"
+// export const imagePath = "http://54.80.119.79:8000/image/"; 
+export const imagePath = "/api/image-proxy/" 
 
 // API paths for Vercel
 export const authApiPath = "/api/auth";
 export const adminApiPath = "/api/admin";
 export const vehicleApiPath = "/api/vehicle";
+export const deleteVehicleApiPath = "api/admin/vehicle";
 export const partRequestPath = "/api/parts";
 
 
@@ -162,12 +165,13 @@ export async function viewVehicleMake() {
 }
 
 // Delete Vehicle make
-export async function deleteVehicle(level: string, makeId: string) {
+export async function deleteVehicle(level: string, makeId: string, token:string) {
   return axios.delete(
-    `${vehicleApiPath}/${level}/${makeId}`,
+    `${deleteVehicleApiPath}/${level}/${makeId}`,
     {
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
       },
     }
   )

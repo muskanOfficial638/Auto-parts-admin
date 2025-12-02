@@ -9,6 +9,8 @@ import { deleteVehicle } from "@/app/utils/api";
 
 export default function DeleteVehicleMake({ isOpenDeleteModel, setIsOpenDeleteModal, makeData }: any) {
     const [error, setError] = useState('')
+    const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
+    const loggedInUser = JSON.parse(autoPartsUserData);
 
     const handleClose = () => {
         setIsOpenDeleteModal(!isOpenDeleteModel);
@@ -17,7 +19,7 @@ export default function DeleteVehicleMake({ isOpenDeleteModel, setIsOpenDeleteMo
     async function handleDeleteMake(e: React.FormEvent) {
         e.preventDefault();
         try {
-            const response = await deleteVehicle('make',makeData?.id)
+            const response = await deleteVehicle('make',makeData?.id, loggedInUser?.access_token)
             // console.log("make delete res", response);
             if (response?.status === 200) {
                 console.log("hello 200")

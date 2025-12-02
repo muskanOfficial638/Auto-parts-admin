@@ -10,10 +10,8 @@ import {
     flexRender,
     SortingState,
 } from "@tanstack/react-table";
-
 import { useEffect, useMemo, useState } from "react";
 import { matchSorter } from "match-sorter";
-
 import {
     Table,
     TableBody,
@@ -41,20 +39,24 @@ interface Log {
 
 export default function AuthLogTable() {
     const [logs, setLogs] = useState<Log[]>([]);
+    const [totalPage, setTotalPage] = useState(0);
+    const [logsCount, setLogsCount] = useState(0);
     const [sorting, setSorting] = useState<SortingState>([]);
     const [globalFilter, setGlobalFilter] = useState("");
 
     // Fetch logs
     useEffect(() => {
-         if (typeof window !== 'undefined') {
-        const raw = localStorage.getItem("autoPartsUserData");
-        const loggedInUser = JSON.parse(raw || "{}");
-        if (loggedInUser?.access_token) {
-            fetchAdminLogs(loggedInUser.access_token, 1, 40).then((data) => {
-                if (data?.items) setLogs(data.items);
-            });
+        if (typeof window !== 'undefined') {
+            const raw = localStorage.getItem("autoPartsUserData");
+            const loggedInUser = JSON.parse(raw || "{}");
+            if (loggedInUser?.access_token) {
+                fetchAdminLogs(loggedInUser.access_token, 1, 40).then((data) => {
+                    setLogsCount(data?.total);
+                    setTotalPage(data?.pages)
+                    if (data?.items) setLogs(data.items);
+                });
+            }
         }
-    }
     }, []);
 
     async function handleDeleteLog(logId: string) {
@@ -139,6 +141,8 @@ export default function AuthLogTable() {
     const table = useReactTable({
         data: logs,
         columns,
+        // manualPagination: true,
+        // pageCount: totalPage, 
         state: {
             sorting,
             globalFilter,
@@ -155,6 +159,42 @@ export default function AuthLogTable() {
         getPaginationRowModel: getPaginationRowModel(),
     });
 
+    const handlePageChange = async (newPageIndex: number) => {
+        const autoPartsUserData = localStorage.getItem("autoPartsUserData");
+        const loggedInUser = JSON.parse(autoPartsUserData || "{}");
+        try {
+            const data = await fetchAdminLogs(
+                loggedInUser.access_token,
+                newPageIndex + 1,              // API page starts from 1
+                table.getState().pagination.pageSize
+            );
+
+            table.setPageIndex(newPageIndex);  // update UI table
+            setLogs(data.results);             // update state
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handlePageSizeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const newSize = Number(e.target.value);
+        const autoPartsUserData = localStorage.getItem("autoPartsUserData");
+        const loggedInUser = JSON.parse(autoPartsUserData || "{}");
+        try {
+            const data = await fetchAdminLogs(
+                loggedInUser.access_token,
+                1,         // reset to page 1 when pageSize changes
+                newSize
+            );
+
+            table.setPageSize(newSize);
+            table.setPageIndex(0);
+            setLogs(data.results);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <div className="w-full overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
             <ToastContainer />
@@ -170,11 +210,13 @@ export default function AuthLogTable() {
 
                 <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                     Page {table.getState().pagination.pageIndex + 1} of{" "}
-                    {table.getPageCount()}
+                    {/* {table.getPageCount()} */}
+                    {totalPage}
                     <select
                         className="ml-2 border rounded p-1"
                         value={table.getState().pagination.pageSize}
-                        onChange={(e) => table.setPageSize(Number(e.target.value))}
+                        // onChange={(e) => table.setPageSize(Number(e.target.value))}
+                        onChange={handlePageSizeChange}
                     >
                         {[5, 10, 20, 40].map((sz) => (
                             <option key={sz} value={sz}>
@@ -244,39 +286,47 @@ export default function AuthLogTable() {
             <div className="flex justify-between items-center p-4 text-sm">
                 <div className="flex gap-2">
                     <button
-                        onClick={() => table.setPageIndex(0)}
+                        // onClick={() => table.setPageIndex(0)}
+                        onClick={() => handlePageChange(0)}
                         disabled={!table.getCanPreviousPage()}
                         className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
                     >
                         {"<<"}
                     </button>
+
                     <button
-                        onClick={() => table.previousPage()}
+                        onClick={() => handlePageChange(table.getState().pagination.pageIndex - 1)}
                         disabled={!table.getCanPreviousPage()}
                         className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
                     >
                         {"<"}
                     </button>
+
                     <button
-                        onClick={() => table.nextPage()}
+                        // onClick={() => table.nextPage()}
+                        onClick={() => handlePageChange(table.getState().pagination.pageIndex + 1)}
                         disabled={!table.getCanNextPage()}
                         className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
                     >
                         {">"}
                     </button>
+
                     <button
-                        onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                        // onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                        onClick={() => handlePageChange(table.getPageCount() - 1)}
                         disabled={!table.getCanNextPage()}
                         className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
                     >
                         {">>"}
                     </button>
+
                 </div>
 
                 <div className="dark:text-gray-400">
                     Showing{" "}
                     <strong>
-                        {table.getRowModel().rows.length} / {logs.length}
+                        {table.getRowModel().rows.length} / {logsCount}
+                        {/* {table.getRowModel().rows.length} / {logs.length} */}
                     </strong>{" "}
                     results
                 </div>

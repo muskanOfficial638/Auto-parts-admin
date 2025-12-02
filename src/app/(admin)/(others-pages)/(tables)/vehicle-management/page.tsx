@@ -42,6 +42,8 @@ import { TrimsTable, TrimRow } from "@/components/tables/TrimsTable";
 import { deleteVehicle, viewVehicleMake } from "@/app/utils/api";
 
 const VehicleManagement = () => {
+     const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
+    const loggedInUser = JSON.parse(autoPartsUserData);
     const [data, setData] = useState<Make[]>([]);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [dialogConfig, setDialogConfig] = useState<{
@@ -145,7 +147,7 @@ const VehicleManagement = () => {
 
     const confirmDelete = async () => {
         const { level, id, parentIds } = deleteConfig;
-        await deleteVehicle(level, id)
+        await deleteVehicle(level, id, loggedInUser?.access_token)
 
         setData((prevData) => {
             const newData = [...prevData];
