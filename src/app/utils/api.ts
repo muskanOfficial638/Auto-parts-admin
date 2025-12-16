@@ -9,10 +9,10 @@ import axios from "axios";
 // export const partRequestPath = "http://54.80.119.79:8005/v1/supplier";
 
 //image path
-// export const imagePath = "http://54.80.119.79:8000/image/"; 
+//export const imagePath = "http://54.80.119.79:8000/image/"; 
 export const imagePath = "/api/image-proxy/" 
 
-// API paths for Vercel
+//API paths for Vercel
 export const authApiPath = "/api/auth";
 export const adminApiPath = "/api/admin";
 export const vehicleApiPath = "/api/vehicle";
@@ -210,3 +210,132 @@ export async function fetchAllPartRequests() {
 }
 
 
+// Get Pages
+export async function getAllPages() {
+  const res = await fetch(`${adminApiPath}/cms/`, {
+    cache: "no-store",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if (!res.ok) throw new Error("Failed to vehicle makes");
+  return res.json();
+}
+
+// Delete Page
+export async function deletePage(pageId: string, token:string) {
+  return axios.delete(
+    `${adminApiPath}/cms/${pageId}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error("unable to delete page", error);
+      throw error;
+    });
+}
+
+
+export async function deleteImages(pageId: string, token:string) {
+  return axios.delete(
+    `${adminApiPath}/cms/image/${pageId}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error("unable to delete Image", error);
+      throw error;
+    });
+}
+
+export async function getPage(pageId: string, token: string) {
+  const res = await fetch(`${adminApiPath}/cms/${pageId}`, {
+    cache: "no-store",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch page details");
+  return res.json();
+}
+
+// update page
+export async function updatePage( pageId: string, token: string, userData: any) {
+
+  return axios.put(
+    `${adminApiPath}/cms/${pageId}`,
+    { ...userData },
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error("unable to update user", error);
+      throw error;
+    });
+}
+
+// add new page
+export async function addNewPage( token: string, userData: any) {
+
+  return axios.post(
+    `${adminApiPath}/cms/`,
+    { ...userData },
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error("unable to update user", error);
+      throw error;
+    });
+}
+// upload image
+export async function uploadImage( token: string, userData: any) {
+
+  return axios.post(
+    `${adminApiPath}/cms/upload-image`,
+    userData ,
+    {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.error("unable to update user", error);
+      throw error;
+    });
+}

@@ -53,12 +53,30 @@ export function DataTable<TData, TValue>({
 
     return (
         <div className="space-y-4">
-            <Input
-                placeholder={searchPlaceholder}
-                value={globalFilter ?? ""}
-                onChange={(event) => setGlobalFilter(event.target.value)}
-                className="max-w-sm"
-            />
+            <div className="flex items-center justify-between">
+                <Input
+                    placeholder={searchPlaceholder}
+                    value={globalFilter ?? ""}
+                    onChange={(event) => setGlobalFilter(event.target.value)}
+                    className="max-w-sm"
+                />
+                <div className="mt-2 flex items-center justify-end space-x-2">
+                    <span className="text-sm dark:text-gray-400">Rows per page:</span>
+                    <select
+                        className="text-sm border rounded px-2 py-1 dark:text-gray-400"
+                        value={table.getState().pagination.pageSize}
+                        onChange={(e) => {
+                            table.setPageSize(Number(e.target.value));
+                        }}
+                    >
+                        {[5, 10, 20, 50].map((pageSize) => (
+                            <option key={pageSize} value={pageSize}>
+                                {pageSize}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            </div>
             <div className="rounded-md border">
                 <Table>
                     <TableHeader>
@@ -99,7 +117,7 @@ export function DataTable<TData, TValue>({
                                     className="border"
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="p-4 dark:text-gray-400">
+                                        <TableCell key={cell.id} className="p-4 dark:text-gray-400 text-sm">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
@@ -114,7 +132,7 @@ export function DataTable<TData, TValue>({
                                     colSpan={columns.length}
                                     className="h-24"
                                 >
-                                    <div className="flex flex-row text-center items-center justify-center dark:text-gray-400">No results.<Loader/></div>
+                                    <div className="flex flex-row text-center items-center justify-center dark:text-gray-400">No results.<Loader /></div>
                                 </TableCell1>
                             </TableRow>
                         )}
@@ -153,22 +171,7 @@ export function DataTable<TData, TValue>({
             </div>
 
             {/* Page size selector - place this right below the block above */}
-            <div className="mt-2 flex items-center justify-end space-x-2">
-                <span className="text-sm dark:text-gray-400">Rows per page:</span>
-                <select
-                    className="text-sm border rounded px-2 py-1 dark:text-gray-400"
-                    value={table.getState().pagination.pageSize}
-                    onChange={(e) => {
-                        table.setPageSize(Number(e.target.value));
-                    }}
-                >
-                    {[5, 10, 20, 50].map((pageSize) => (
-                        <option key={pageSize} value={pageSize}>
-                            {pageSize}
-                        </option>
-                    ))}
-                </select>
-            </div>
+
 
         </div>
     );
