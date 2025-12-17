@@ -17,7 +17,7 @@ import {
   PlugInIcon,
   TableIcon,
   // UserCircleIcon,
-} from "../icons/index";
+} from "@/icons";
 // import SidebarWidget from "./SidebarWidget";
 
 type NavItem = {
