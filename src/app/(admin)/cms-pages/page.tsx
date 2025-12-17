@@ -87,7 +87,7 @@ console.log("data",pageUpdateValue  )
     };
 
     const confirmDelete = async () => {
-        const { level, id, parentIds } = deleteConfig;
+        const {  id } = deleteConfig;
         await deletePage(id, loggedInUser?.access_token)
         setData((prevData) => {
             const newData = [...prevData];

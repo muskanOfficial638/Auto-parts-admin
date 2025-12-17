@@ -21,9 +21,9 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { toast, ToastContainer } from 'react-toastify';
 import { 
-  Plus, Edit2, Trash2, X, Save, GripVertical, 
+  Plus, Edit2, Trash2, X, GripVertical, 
   ChevronRight, Folder, Home, Menu, ChevronDown,
-  ChevronUp, ArrowRight, FolderTree, Indent, Outdent
+  ChevronUp, FolderTree, Indent,
 } from 'lucide-react';
 
 interface MenuItem {
@@ -621,10 +621,7 @@ const MenuManager = () => {
       return;
     }
 
-    const formattedSlug = newMenu.slug.startsWith('/') || newMenu.slug.startsWith('http') 
-      ? newMenu.slug 
-      : `/${newMenu.slug}`;
-
+ 
     const newMenuItem: MenuItem = {
       ...newMenu,
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -1235,7 +1232,6 @@ const MenuForm = ({
   onChange, 
   menuGroups,
   activeGroupSlug,
-  parentId = null,
   isEdit = false 
 }: {
   menu: any;
@@ -1376,7 +1372,6 @@ const MenuForm = ({
 const MenuGroupForm = ({ 
   menuGroup, 
   onChange, 
-  isEdit = false 
 }: {
   menuGroup: any;
   onChange: (group: any) => void;

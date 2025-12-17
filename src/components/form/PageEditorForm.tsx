@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { updatePage,imagePath, addNewPage,deleteImages } from '@/app/utils/api';
+import React, { useState, useEffect, useRef } from 'react';
+import { updatePage, imagePath, addNewPage, deleteImages } from '@/app/utils/api';
 import { toast, ToastContainer } from 'react-toastify';
 import { ChevronDownIcon, Trash2 } from 'lucide-react';
 import FileInput from '@/components/form/input/FileInput';
 import Select from './Select';
 import { Button } from '../ui/Button';
-
+import Image from 'next/image';
 import { getPage } from "@/app/utils/api";
 
 
@@ -22,20 +22,37 @@ interface Page {
     thumbnail_url?: string;
     meta_title?: string;
     meta_description?: string;
-}
 
+}
+const emptyPage: Page = {
+  id: '',
+  title: '',
+  slug: '',
+  content: '',
+  status: '',
+  thumbnail_url: '',
+  meta_title: '',
+  meta_description: '',
+};
 const PageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpdate }: any) => {
-    const [formData, setFormData] = useState<Page>();
+    const [formData, setFormData] = useState<Page>(emptyPage);
     const [removeImages, setRemoveImages] = useState<string[]>([]);
     const [error, setError] = useState('');
     const [status, setStatus] = useState('draft');
     const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
     const loggedInUser = JSON.parse(autoPartsUserData);
+    const accessToken = loggedInUser?.access_token;
+    const hasFetched = useRef(false);
 
     useEffect(() => {
+
+        if (!pageData || !accessToken) return;
+        if (hasFetched.current) return;
+        hasFetched.current = true;
+
         const fetchData = async () => {
             if (!pageData) return;
-            const dataPage = await getPage(pageData, loggedInUser?.access_token);
+            const dataPage = await getPage(pageData, accessToken);
 
             setStatus(dataPage.status);
             setFormData({
@@ -50,30 +67,31 @@ const PageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpdate }
             });
         };
         fetchData();
-    }, []);
+    }, [pageData, accessToken]);
 
     const removethumbnail = (thumbnail_url: string) => {
         setRemoveImages(prev => [...prev, thumbnail_url]);
-  setFormData((prev) => ({ ...prev, thumbnail_url: '' }));
+        setFormData((prev) => ({ ...prev, thumbnail_url: '' }));
+        
 
-};
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    };
+    const handleChange = ( e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
         if (!value) {
             setError(`${name} is required`);
         }
-        else if (name === 'slug' && value.length < 3 ) {
+        else if (name === 'slug' && value.length < 3) {
             setError("Slug can not be less than 3 characters");
         }
         else {
             setError('');
         };
-        
-        if(name==='slug' ){
+
+        if (name === 'slug') {
             const slugValue = value.replace(/\s+/g, '-').toLowerCase();
             setFormData((prev) => ({ ...prev, [name]: slugValue }));
-        }else{
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        } else {
+            setFormData((prev) => ({ ...prev, [name]: value }));
         }
     };
 
@@ -84,11 +102,15 @@ const PageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpdate }
         { value: "published", label: "Published" },
     ];
 
-    const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            setFormData((prev) => ({...prev,thumbnail: e.target.files[0],}));
-        }
-    };
+const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setFormData((prev) => ({
+        ...prev!,
+        thumbnail: file,
+    }));
+};
 
     const handleSelectChange = (value: string) => {
 
@@ -100,7 +122,7 @@ const PageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpdate }
         e.preventDefault();
         if (
             !formData?.title ||
-            !formData?.slug 
+            !formData?.slug
         ) {
             setError('You can not leave the required fields empty');
             return;
@@ -109,29 +131,30 @@ const PageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpdate }
             return;
         }
         try {
-          if (pageData){
+            if (pageData) {
 
 
-            const response = await updatePage(pageData, loggedInUser?.access_token, formData)
-                     if (response?.status === 200) {
-                  removeImages.forEach( async (thumbnail_url) => await deleteImages(thumbnail_url,loggedInUser?.access_token));
-                toast("Page updated successfully");
-                setPageUpdate(true);
-                setTimeout(() => {
-                    
-                    handleClose();
-                }, 1000)
+                const response = await updatePage(pageData, loggedInUser?.access_token, formData)
+                if (response?.status === 200) {
+                    removeImages.forEach(async (thumbnail_url) => await deleteImages(thumbnail_url, loggedInUser?.access_token));
+                    toast("Page updated successfully");
+                    setPageUpdate(true);
+                    setTimeout(() => {
+
+                        handleClose();
+                    }, 1000)
+                }
+            } else {
+                const response = await addNewPage(loggedInUser?.access_token, formData)
+                if (response?.status === 200) {
+                    toast("Page added successfully");
+                    setPageUpdate(true);
+                    setTimeout(() => {
+                        handleClose();
+                    }, 1000)
+                }
             }
-          }else{
-            const response = await addNewPage(loggedInUser?.access_token, formData)
-                     if (response?.status === 200) {
-                toast("Page added successfully");
-                setTimeout(() => {
-                    handleClose();
-                }, 1000)
-            }
-          }
-   
+
 
         } catch (err: any) {
             // Handle errors more gracefully
@@ -175,7 +198,7 @@ const PageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpdate }
                 <div className="no-scrollbar relative w-full  overflow-y-auto rounded-3xl bg-white p-4 dark:bg-gray-900 lg:p-11">
                     <div className="px-2 pr-14">
                         <h4 className="mb-2 text-2xl font-semibold text-gray-800 dark:text-white/90">
-                             {pageData ? "Edit Page" : "Add Page"}
+                            {pageData ? "Edit Page" : "Add Page"}
                         </h4>
                     </div>
 
@@ -263,10 +286,10 @@ const PageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpdate }
                                 <div className='mt-3'>
                                     {formData?.thumbnail_url && (
                                         <div className='flex gap-2 items-center mb-2'>
-                                        <img  src={imagePath + formData?.thumbnail_url || "/placeholder-image.png"} alt="Thumbnail" width={150} height={150} className="mb-2 rounded-lg border object-cover w-40 h-40"/>
-                                 <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => removethumbnail(formData?.thumbnail_url)}><Trash2 size={16} /></Button>
-                                </div>
-                                )}
+                                            <Image src={imagePath + formData?.thumbnail_url || "/placeholder-image.png"} alt="Thumbnail" width={150} height={150} className="mb-2 rounded-lg border object-cover w-40 h-40" />
+                                            <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => formData?.thumbnail_url && removethumbnail(formData.thumbnail_url)}><Trash2 size={16} /></Button>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className='mt-3'>
                                     <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
