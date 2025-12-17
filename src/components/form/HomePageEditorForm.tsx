@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { updatePage, imagePath, uploadImage, deleteImages } from '@/app/utils/api';
 import { toast, ToastContainer } from 'react-toastify';
 import { ChevronDownIcon, Plus, Trash2 } from 'lucide-react';
@@ -74,7 +74,7 @@ interface Page {
   meta_description?: string;
 }
 
-const HomePageEditorForm = ({ isOpenModel, setIsOpenModel, pageData,setPageUpdate }: any) => {
+const HomePageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpdate }: any) => {
   const [formData, setFormData] = useState<Page>({
     id: '',
     title: '',
@@ -88,67 +88,59 @@ const HomePageEditorForm = ({ isOpenModel, setIsOpenModel, pageData,setPageUpdat
   const [sections, setSections] = useState<HomePageSections>({
     section1: {
       bg_image: "",
-      title: "What is Lorem Ipsum.",
-      list: [
-        "Lorem Ipsum is simply dummy text of the printing",
-        "It is a long established fact that a reader will be distracted",
-        "Contrary to popular belief, Lorem Ipsum is not simply",
-        "There are many variations of passages of Lorem Ipsum"
-      ],
+      title: "",
+      list: [""],
       primary_button: { text: "View All Products", link: "/" },
       secondary_button: { text: "Contact Us", link: "/" }
     },
     section2: {
-      bg_image: "bg.jpg",
-      title: "Why Choose Us",
+      bg_image: "",
+      title: "",
       items: [
-        { subtitle: "Verified Suppliers", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry." },
-        { subtitle: "Wide Variety", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry." },
-        { subtitle: "Quality Work", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry." },
-        { subtitle: "Affordable Rates", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry." }
+        { subtitle: "", description: "" }
+
       ],
       primary_button: { text: "Read More", link: "/" },
-      logos: ["logo1.png", "logo2.png", "logo3.png", "logo4.png", "logo5.png"]
+      logos: [""]
     },
     section3: [
-      { image: "img1.jpg", title: "Spare Parts for Industry", button: { text: "Learn More", link: "/feature-1" } },
-      { image: "img2.jpg", title: "Spare Parts for Industry", button: { text: "Learn More", link: "/feature-2" } },
-      { image: "img3.jpg", title: "Spare Parts for Industry", button: { text: "Learn More", link: "/feature-3" } },
-      { image: "img4.jpg", title: "Spare Parts for Industry", button: { text: "Learn More", link: "/feature-4" } },
-      { image: "img5.jpg", title: "Spare Parts for Industry", button: { text: "Learn More", link: "/feature-5" } }
+      { image: "", title: "", button: { text: "Learn More", link: "/feature-1" } }
+      
     ],
     section4: {
-      bg_image: "bg.jpg",
-      title: "The Standard Lorem Ipsum Passage, Used Since",
+      bg_image: "",
+      title: "",
       items: [
-        { subtitle: "Where can I get some", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry.", link: "/service-1" },
-        { subtitle: "Where can I get some", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry.", link: "/service-2" },
-        { subtitle: "Where can I get some", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum is simply dummy text of the printing and typesetting industry.", link: "/service-3" }
+        { subtitle: "", description: "", link: "/service-1" }  
       ]
     },
     section5: {
-      bg_image: "bg.jpg",
-      title: "Where Does It Come From",
+      bg_image: "",
+      title: "",
       items: [
-        { subtitle: "Where can I get some", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry." },
-        { subtitle: "Where does it come from", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry." },
-        { subtitle: "Quality work", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry." },
-        { subtitle: "Affordable Rates", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry." }
+        { subtitle: "", description: "" }
       ],
       primary_button: { text: "Read More", link: "/" }
     }
   });
- const [removeImages, setRemoveImages] = useState<string[]>([]);
+  const [removeImages, setRemoveImages] = useState<string[]>([]);
   const [error, setError] = useState('');
   const [status, setStatus] = useState('draft');
   const [activeSection, setActiveSection] = useState('section1');
   const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
   const loggedInUser = JSON.parse(autoPartsUserData);
 
+  const accessToken = loggedInUser?.access_token;
+  const hasFetched = useRef(false);
+
   useEffect(() => {
+    if (!pageData || !accessToken) return;
+    if (hasFetched.current) return;
+
+    hasFetched.current = true;
+
     const fetchData = async () => {
-      if (!pageData) return;
-      const dataPage = await getPage(pageData, loggedInUser?.access_token);
+      const dataPage = await getPage(pageData, accessToken);
 
       setStatus(dataPage.status);
       setFormData({
@@ -162,19 +154,17 @@ const HomePageEditorForm = ({ isOpenModel, setIsOpenModel, pageData,setPageUpdat
         meta_description: dataPage.meta_description,
       });
 
-      // Parse sections from content if exists
       if (dataPage.content) {
         try {
-          const parsedSections = JSON.parse(dataPage.content);
-          setSections(parsedSections);
+          setSections(JSON.parse(dataPage.content));
         } catch (err) {
-          console.error("Failed to parse sections from content");
+          console.error("Failed to parse sections", err);
         }
       }
     };
-    fetchData();
-  }, []);
 
+    fetchData();
+  }, [pageData, accessToken]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     if (!value && name !== 'slug') {
@@ -193,11 +183,8 @@ const HomePageEditorForm = ({ isOpenModel, setIsOpenModel, pageData,setPageUpdat
     }
   };
 
-  const handleSectionChangefile = async (section: string, value: string, field: string, img_data: File, e: React.ChangeEvent<HTMLInputElement>, index?: number) => {
-
-    console.log("img_data", index );
-    console.log("section", section );
-    console.log("field", field);
+  const handleSectionChangefile = async (section: string, value: string, field: string, img_data?: File, e?: React.ChangeEvent<HTMLInputElement>, index?: number) => {
+    if (!img_data) return;
     const formData = new FormData();
     formData.append("file", img_data);
 
@@ -214,16 +201,17 @@ const HomePageEditorForm = ({ isOpenModel, setIsOpenModel, pageData,setPageUpdat
         (newSections.section2 as any).logos = logos;
         return newSections;
       }
-        if (section === 'section3' && field === 'image' && index !== undefined) {
-     (newSections[section as keyof HomePageSections] as any)[index].image = uploadedImage.url;
-      return newSections;
+      if (section === 'section3' && field === 'image' && index !== undefined) {
+        (newSections[section as keyof HomePageSections] as any)[index].image = uploadedImage.url;
+        return newSections;
       }
 
       (newSections[section as keyof HomePageSections] as any)[field] = uploadedImage.url;
       return newSections;
     });
-    e.target.value = "";
-
+    if (e && e.target) {
+      e.target.value = "";
+    }
   }
   const handleSectionChange = (section: string, field: string, value: any, index?: number, subField?: string) => {
     setSections(prev => {
@@ -389,27 +377,27 @@ const HomePageEditorForm = ({ isOpenModel, setIsOpenModel, pageData,setPageUpdat
     }));
   };
 
-const removeSection3image = (index: number) => {
-  setSections(prev => {
-    const newSection3 = prev.section3.map((item, i) =>
-      i === index ? { ...item, image: '' } : item
-    );
+  const removeSection3image = (index: number) => {
+    setSections(prev => {
+      const newSection3 = prev.section3.map((item, i) =>
+        i === index ? { ...item, image: '' } : item
+      );
 
-    return {
-      ...prev,
-      section3: newSection3,
-    };
-  });
-};
+      return {
+        ...prev,
+        section3: newSection3,
+      };
+    });
+  };
 
-const removethumbnail = (thumbnail_url:string) => {
-   setRemoveImages(prev => [...prev, thumbnail_url]);
-  setFormData((prev) => ({ ...prev, thumbnail_url: '' }));
-};
+  const removethumbnail = (thumbnail_url: string) => {
+    setRemoveImages(prev => [...prev, thumbnail_url]);
+    setFormData((prev) => ({ ...prev, thumbnail_url: '' }));
+  };
 
-function RemoveImage(thumbnail_url:string){
-  setRemoveImages(prev => [...prev, thumbnail_url]);
-}
+  function RemoveImage(thumbnail_url: string) {
+    setRemoveImages(prev => [...prev, thumbnail_url]);
+  }
   const handleClose = () => setIsOpenModel(false);
 
   const selectOptions = [
@@ -418,9 +406,13 @@ function RemoveImage(thumbnail_url:string){
   ];
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData((prev) => ({ ...prev, thumbnail: e.target.files[0] }));
-    }
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setFormData((prev) => ({
+      ...prev!,
+      thumbnail: file,
+    }));
   };
 
   const handleSelectChange = (value: string) => {
@@ -447,12 +439,12 @@ function RemoveImage(thumbnail_url:string){
       const response = await updatePage(pageData, loggedInUser?.access_token, updatedFormData);
       if (response?.status === 200) {
 
-        removeImages.forEach( async (thumbnail_url) => await deleteImages(thumbnail_url,loggedInUser?.access_token));
+        removeImages.forEach(async (thumbnail_url) => await deleteImages(thumbnail_url, loggedInUser?.access_token));
 
         toast("Page updated successfully");
         setPageUpdate(true);
         setTimeout(() => {
-            
+
           handleClose();
         }, 1000);
       }
@@ -481,13 +473,12 @@ function RemoveImage(thumbnail_url:string){
               </label>
               <div className='flex flex-row gap-2 mb-2'>
                 <FileInput
-                  onChange={(e) => handleSectionChangefile('section1', sections.section1.bg_image, 'bg_image', e.target.files?.[0], e.target)}
-    
+                  onChange={(e) => handleSectionChangefile('section1', sections.section1.bg_image, 'bg_image', e.target.files?.[0], e)}
                 />
                 {sections.section1.bg_image && (
                   <>
                     <Image className='rounded-sm h-40' src={imagePath + sections.section1.bg_image} alt="bg image" width={150} height={100} />
-                    <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => {handleSectionChange('section1', 'bg_image', ''); RemoveImage(sections.section1.bg_image);}}><Trash2 size={16} /></Button>
+                    <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => { handleSectionChange('section1', 'bg_image', ''); RemoveImage(sections.section1.bg_image); }}><Trash2 size={16} /></Button>
                   </>
                 )}
 
@@ -591,12 +582,12 @@ function RemoveImage(thumbnail_url:string){
               </label>
               <div className='flex flex-row gap-2 mb-2'>
                 <FileInput
-                  onChange={(e) => handleSectionChangefile('section2', sections.section2.bg_image, 'bg_image', e.target.files?.[0], e.target)}
+                  onChange={(e) => handleSectionChangefile('section2', sections.section2.bg_image, 'bg_image', e.target.files?.[0], e)}
                 />
                 {sections.section2.bg_image && (
                   <>
                     <Image className='rounded-sm h-40' src={imagePath + sections.section2.bg_image} alt="bg image" width={150} height={100} />
-                    <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => {handleSectionChange('section2', 'bg_image', ''); RemoveImage(sections.section2.bg_image);}}><Trash2 size={16} /></Button>
+                    <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => { handleSectionChange('section2', 'bg_image', ''); RemoveImage(sections.section2.bg_image); }}><Trash2 size={16} /></Button>
                   </>
                 )}
               </div>
@@ -685,15 +676,15 @@ function RemoveImage(thumbnail_url:string){
               {sections.section2.logos.map((logo, index) => (
 
 
-                <div  key={index} className='flex flex-row gap-2 mb-2'>
+                <div key={index} className='flex flex-row gap-2 mb-2'>
                   <FileInput
-                    onChange={(e) => handleSectionChangefile('section2', sections.section2.logos[index], 'logos', e.target.files?.[0], e.target, index)}
-                   
+                    onChange={(e) => handleSectionChangefile('section2', sections.section2.logos[index], 'logos', e.target.files?.[0], e, index)}
+
                   />
                   {sections.section2.logos[index] && (
                     <>
                       <Image className='rounded-sm h-20' src={imagePath + sections.section2.logos[index]} alt="bg image" width={150} height={100} />
-                      <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => {removeLogo(index); RemoveImage(sections.section2.logos[index]);}}><Trash2 size={16} /></Button>
+                      <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => { removeLogo(index); RemoveImage(sections.section2.logos[index]); }}><Trash2 size={16} /></Button>
                     </>
                   )}
                 </div>
@@ -726,17 +717,17 @@ function RemoveImage(thumbnail_url:string){
                   </button>
                 </div>
                 <div className="space-y-3">
-                  <div  key={index} className='flex flex-row gap-2 mb-2'>
-                  <FileInput
-                    onChange={(e) => handleSectionChangefile('section3', sections.section3[index].image, 'image', e.target.files?.[0], e.target, index)}
+                  <div key={index} className='flex flex-row gap-2 mb-2'>
+                    <FileInput
+                      onChange={(e) => handleSectionChangefile('section3', sections.section3[index].image, 'image', e.target.files?.[0], e, index)}
                     />
-                  {sections.section3[index].image && (
-                    <>
-                      <Image className='rounded-sm h-20' src={imagePath + sections.section3[index].image} alt="bg image" width={150} height={100} />
-                      <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => {removeSection3image(index); RemoveImage(sections.section3[index].image)}}><Trash2 size={16} /></Button>
-                    </>
-                  )}
-                </div>
+                    {sections.section3[index].image && (
+                      <>
+                        <Image className='rounded-sm h-20' src={imagePath + sections.section3[index].image} alt="bg image" width={150} height={100} />
+                        <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => { removeSection3image(index); RemoveImage(sections.section3[index].image) }}><Trash2 size={16} /></Button>
+                      </>
+                    )}
+                  </div>
 
                   <input
                     type="text"
@@ -783,13 +774,13 @@ function RemoveImage(thumbnail_url:string){
               </label>
               <div className='flex flex-row gap-2 mb-2'>
                 <FileInput
-                  onChange={(e) => handleSectionChangefile('section4', sections.section4.bg_image, 'bg_image', e.target.files?.[0], e.target)}
-                 
+                  onChange={(e) => handleSectionChangefile('section4', sections.section4.bg_image, 'bg_image', e.target.files?.[0], e)}
+
                 />
                 {sections.section4.bg_image && (
                   <>
                     <Image className='rounded-sm h-40' src={imagePath + sections.section4.bg_image} alt="bg image" width={150} height={100} />
-                    <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => {handleSectionChange('section4', 'bg_image', '');RemoveImage(sections.section4.bg_image)}}><Trash2 size={16} /></Button>
+                    <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => { handleSectionChange('section4', 'bg_image', ''); RemoveImage(sections.section4.bg_image) }}><Trash2 size={16} /></Button>
                   </>
                 )}
               </div>
@@ -866,12 +857,12 @@ function RemoveImage(thumbnail_url:string){
               </label>
               <div className='flex flex-row gap-2 mb-2'>
                 <FileInput
-                  onChange={(e) => handleSectionChangefile('section5', sections.section5.bg_image, 'bg_image', e.target.files?.[0], e.target)}
-                  />
+                  onChange={(e) => handleSectionChangefile('section5', sections.section5.bg_image, 'bg_image', e.target.files?.[0], e)}
+                />
                 {sections.section5.bg_image && (
                   <>
                     <Image className='rounded-sm h-40' src={imagePath + sections.section5.bg_image} alt="bg image" width={150} height={100} />
-                    <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => {handleSectionChange('section5', 'bg_image', ''); RemoveImage(sections.section5.bg_image)}}><Trash2 size={16} /></Button>
+                    <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => { handleSectionChange('section5', 'bg_image', ''); RemoveImage(sections.section5.bg_image) }}><Trash2 size={16} /></Button>
                   </>
                 )}
               </div>
@@ -1053,14 +1044,14 @@ function RemoveImage(thumbnail_url:string){
                   </label>
                   {formData?.thumbnail_url && (
                     <div className="flex gap-2 mb-2 text-sm text-gray-500 dark:text-gray-400">
-                    <Image
-                      src={imagePath + formData?.thumbnail_url || "/placeholder-image.png"}
-                      alt="Thumbnail"
-                      width={150}
-                      height={150}
-                      className="mb-2 rounded-lg border object-cover w-40 h-40"
-                    />
-                    <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => removethumbnail(formData?.thumbnail_url)}><Trash2 size={16} /></Button>
+                      <Image
+                        src={imagePath + formData?.thumbnail_url || "/placeholder-image.png"}
+                        alt="Thumbnail"
+                        width={150}
+                        height={150}
+                        className="mb-2 rounded-lg border object-cover w-40 h-40"
+                      />
+                      <Button className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-1 text-sm bg-red-500 text-white shadow-theme-xs hover:bg-red-600" onClick={() => formData?.thumbnail_url && removethumbnail(formData?.thumbnail_url)}><Trash2 size={16} /></Button>
                     </div>
                   )}
                   <FileInput
