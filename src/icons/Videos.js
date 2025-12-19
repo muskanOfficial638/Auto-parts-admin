@@ -1,0 +1,3 @@
+import * as React from "react";
+const SvgVideos = props => <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" viewBox="0 0 25 24" {...props}><path stroke="currentColor" strokeLinejoin="round" strokeWidth={1.5} d="M6.708 5.931V18.07a1.5 1.5 0 0 0 2.285 1.278l9.884-6.069a1.5 1.5 0 0 0 0-2.556L8.993 4.653a1.5 1.5 0 0 0-2.285 1.278Z" /></svg>;
+export default SvgVideos;
