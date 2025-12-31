@@ -12,6 +12,7 @@ import {
 } from "@tanstack/react-table";
 import { useEffect, useMemo, useState } from "react";
 import { matchSorter } from "match-sorter";
+import { Trash2 } from "lucide-react";
 import {
     Table,
     TableBody,
@@ -129,7 +130,7 @@ export default function AuthLogTable() {
                         className="text-gray-500 hover:text-red-600 dark:hover:text-red-500 transition"
                         title="Delete log"
                     >
-                        🗑️
+                        <Trash2 className="h-4 w-4 text-error-500" />
                     </button>
                 ),
             },

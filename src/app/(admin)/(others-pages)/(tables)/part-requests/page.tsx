@@ -15,7 +15,7 @@ export default async function PartRequestPage() {
 
   return (
     <div>
-      <PageBreadcrumb pageTitle="User Part requests" />
+      <PageBreadcrumb pageTitle="Part requests" />
       <div className="space-y-6">
         <ComponentCard title="Part Request">
          <PartRequestTable />

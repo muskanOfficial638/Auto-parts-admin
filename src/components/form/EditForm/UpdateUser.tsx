@@ -9,8 +9,7 @@ import Select from '../Select';
 
 interface User {
     id: string;
-    supplier_name?: string;
-    buyer_name?: string;
+    user_name?: string;
     company_name: string;
     email: string,
     kyc_status?: string;
@@ -19,7 +18,7 @@ interface User {
     vat_number?: string;
 }
 
-const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData }: any) => {
+const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: any) => {
     const [formData, setFormData] = useState<User>(userData);
     const [error, setError] = useState('');
     const [status, setStatus] = useState(userData?.is_active == true ? 'Active' : 'Inactive');
@@ -31,7 +30,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData }: any) => {
         if (!value) {
             setError(`${name} is required`);
         }
-        else if (name === 'company_name' && value.length > 30 || (name === 'buyer_name' && value.length > 25 || name === 'supplier_name' && value.length > 25)) {
+        else if (name === 'company_name' && value.length > 30 || (name === 'user_name' && value.length > 25 )) {
             setError(`${name === 'company_name' ? 'Company name can not be more than 30 characters long' : `${name} can not be more than 25 characters long`} `);
         }
         else {
@@ -54,15 +53,14 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData }: any) => {
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         if (
-            (formData?.role === "supplier" && !formData?.supplier_name) ||
-            (formData?.role === "buyer" && !formData?.buyer_name) ||
+            (formData?.role === "buyer" && !formData?.user_name) ||
             (formData?.role === "buyer" && !formData?.vat_number)
         ) {
             setError('You can not leave the required fields empty');
             return;
         }
 
-        else if (formData?.company_name && formData?.company_name.length > 30 || formData?.buyer_name && formData?.buyer_name.length > 25) {
+        else if (formData?.company_name && formData?.company_name.length > 30 || formData?.user_name && formData?.user_name.length > 25) {
             setError(`${formData?.company_name && formData?.company_name.length > 30 ? 'Company name can not be more than 30 characters long' : `Name can not be more than 25 characters long`} `);
             return
         }
@@ -76,11 +74,11 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData }: any) => {
 
             if (response?.status === 200) {
                 toast("User updated successfully");
+                dataChanged(Math.random().toString())
                 setTimeout(() => {
                     handleClose();
-                    // Call the callback function from the parent
-                    window.location.reload();
-                }, 2000)
+                   
+                }, 1000)
             }
         } catch (err: any) {
             // Handle errors more gracefully
@@ -136,12 +134,9 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData }: any) => {
                         <div className="custom-scrollbar h-[450px] overflow-y-auto px-2 pb-3">
                             {/* Personal Information */}
                             <div className="mt-7">
-                                <h5 className="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
-                                    Personal Information
-                                </h5>
                                 <div className="grid grid-cols-1 gap-x-6 gap-y-5 lg:grid-cols-2">
                                     {[
-                                        { label: 'Name', name: userData?.role === 'buyer' ? 'buyer_name' : 'supplier_name' },
+                                        { label: 'Name', name: userData?.role === 'buyer' ? 'user_name' : 'user_name' },
                                         { label: 'Company Name', name: 'company_name' },
                                         { label: 'Email Address', name: 'email' },
                                         { label: 'Role', name: 'role' },
@@ -182,6 +177,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData }: any) => {
                                             name="kyc_status"
                                             value={formData.kyc_status}
                                             onChange={handleChange}
+                                            readOnly
                                             className="h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-brand-500/20 dark:border-gray-700 dark:focus:border-brand-800"
                                         />
                                     </div>)}

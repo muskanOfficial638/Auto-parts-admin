@@ -1,9 +1,7 @@
-
-import ComponentCard from "@/components/common/ComponentCard";
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import SupplierTable from "@/components/tables/SupplierTable";
 import { Metadata } from "next";
-import React from "react";
+
 
 export const metadata: Metadata = {
   title: "Suppliers",
@@ -18,10 +16,9 @@ export default async function SupplierPage() {
     <div>
       <PageBreadcrumb pageTitle="Manage users" />
       <div className="space-y-6">
-        <ComponentCard title="Suppliers">
           <SupplierTable />
-        </ComponentCard>
       </div>
     </div>
   );
 }
+
