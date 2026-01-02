@@ -27,6 +27,7 @@ import {
 } from "@tanstack/react-table";
 import { matchSorter } from "match-sorter";
 import UpdateUserModal from "../form/EditForm/UpdateUser";
+import ViewUserAddress from "../form/EditForm/ViewUserAddress";
 import DeleteUserModal from "../form/DeleteModal/DeleteUser";
 
 interface Supplier {
@@ -42,6 +43,8 @@ interface Supplier {
 export default function SupplierTable() {
   const [supplierData, setSuppliersData] = useState<Supplier[]>();
   const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+  const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
+  const [isOpenViewModal, setIsOpenViewModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -60,6 +63,15 @@ export default function SupplierTable() {
   }, [supplierDataChange]);
 
 
+  const handleViewModalOpen = (supplier: Supplier) => {
+    setIsOpenViewModal(true)
+    setSelectedSupplier(supplier)
+  }
+
+  const handleUpdateModalOpen = (supplier: Supplier) => {
+    setIsOpenUpdateModal(true)
+    setSelectedSupplier(supplier)
+  }
 
 
   const handleDeleteModalOpen = (supplier: Supplier) => {
@@ -106,6 +118,17 @@ export default function SupplierTable() {
           const supplier = row.original;
           return (
             <div className="flex items-center w-full gap-2">
+
+              {/* view Button */}
+              <button
+                onClick={() => handleViewModalOpen(supplier)}
+                className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white/90"
+              >
+                <svg className="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </button>
               {/* Delete Button */}
               <button
                 onClick={() => handleDeleteModalOpen(supplier)}
@@ -123,7 +146,7 @@ export default function SupplierTable() {
 
               {/* Edit Button */}
               <button
-                onClick={() => setSelectedSupplier(supplier)}
+                onClick={() => handleUpdateModalOpen(supplier)}
                 className="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white/90"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill="none">
@@ -168,7 +191,7 @@ export default function SupplierTable() {
   if (!supplierData) return <div>Loading...</div>;
 
   return (
-        <div
+    <div
       className={`rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]`}
     >
       <div className="px-6 py-5">
@@ -184,51 +207,51 @@ export default function SupplierTable() {
         </div>
       </div>
       <div className="p-4 border-t border-gray-100 dark:border-gray-800 sm:p-6">
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-      <div className="max-w-full overflow-x-auto">
-        <div className="min-w-full">
-          {/* Search */}
-          <div className="flex flex-col sm:flex-row justify-between items-center p-4 gap-4 dark:text-gray-400">
-            <input
-              type="text"
-              placeholder="Search Suppliers..."
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-              className="w-full sm:w-64 px-3 py-2 border rounded-md dark:bg-white/[0.05]"
-            />
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+          <div className="max-w-full overflow-x-auto">
+            <div className="min-w-full">
+              {/* Search */}
+              <div className="flex flex-col sm:flex-row justify-between items-center p-4 gap-4 dark:text-gray-400">
+                <input
+                  type="text"
+                  placeholder="Search Suppliers..."
+                  value={globalFilter}
+                  onChange={(e) => setGlobalFilter(e.target.value)}
+                  className="w-full sm:w-64 px-3 py-2 border rounded-md dark:bg-white/[0.05]"
+                />
 
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount()}
-              <select
-                className="ml-2 border rounded p-1"
-                value={table.getState().pagination.pageSize}
-                onChange={(e) => table.setPageSize(Number(e.target.value))}
-              >
-                {[5, 10, 20, 40].map((sz) => (
-                  <option key={sz} value={sz}>
-                    Show {sz}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                  Page {table.getState().pagination.pageIndex + 1} of{" "}
+                  {table.getPageCount()}
+                  <select
+                    className="ml-2 border rounded p-1"
+                    value={table.getState().pagination.pageSize}
+                    onChange={(e) => table.setPageSize(Number(e.target.value))}
+                  >
+                    {[5, 10, 20, 40].map((sz) => (
+                      <option key={sz} value={sz}>
+                        Show {sz}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
 
-          {/* Responsive Table Container */}
-          <div className="overflow-x-auto">
-            <Table>
-              {/* Headers */}
-              <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                {table.getHeaderGroups().map((hg) => (
-                  <TableRow key={hg.id}>
-                    {hg.headers.map((header) => (
-                      <TableCell
-                        key={header.id}
-                        isHeader
-                        onClick={header.column.getToggleSortingHandler()}
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
-                                                    <div
+              {/* Responsive Table Container */}
+              <div className="overflow-x-auto">
+                <Table>
+                  {/* Headers */}
+                  <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                    {table.getHeaderGroups().map((hg) => (
+                      <TableRow key={hg.id}>
+                        {hg.headers.map((header) => (
+                          <TableCell
+                            key={header.id}
+                            isHeader
+                            onClick={header.column.getToggleSortingHandler()}
+                            className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                          >
+                            <div
                               className={
                                 header.column.getCanSort()
                                   ? "cursor-pointer select-none"
@@ -245,96 +268,101 @@ export default function SupplierTable() {
                                 desc: " 🔽",
                               }[header.column.getIsSorted() as string] ?? null}
                             </div>
-                      </TableCell>
+                          </TableCell>
+                        ))}
+                      </TableRow>
                     ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
+                  </TableHeader>
 
-              {/* Rows */}
-              <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                {table.getRowModel().rows.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="text-center dark:text-gray-400">
-                      No Users found.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="px-5 py-4 sm:px-6 text-start dark:text-gray-400">
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
+                  {/* Rows */}
+                  <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                    {table.getRowModel().rows.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={columns.length} className="text-center dark:text-gray-400">
+                          No Users found.
                         </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                      </TableRow>
+                    ) : (
+                      table.getRowModel().rows.map((row) => (
+                        <TableRow key={row.id}>
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id} className="px-5 py-4 sm:px-6 text-start dark:text-gray-400">
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
 
-          {/* Pagination Controls */}
-          <div className="flex justify-between items-center p-4 text-sm">
-            <div className="flex gap-2">
-              <button
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-                className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
-              >
-                {"<<"}
-              </button>
-              <button
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-                className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
-              >
-                {"<"}
-              </button>
-              <button
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-                className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
-              >
-                {">"}
-              </button>
-              <button
-                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                disabled={!table.getCanNextPage()}
-                className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
-              >
-                {">>"}
-              </button>
+              {/* Pagination Controls */}
+              <div className="flex justify-between items-center p-4 text-sm">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => table.setPageIndex(0)}
+                    disabled={!table.getCanPreviousPage()}
+                    className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
+                  >
+                    {"<<"}
+                  </button>
+                  <button
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                    className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
+                  >
+                    {"<"}
+                  </button>
+                  <button
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                    className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
+                  >
+                    {">"}
+                  </button>
+                  <button
+                    onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                    disabled={!table.getCanNextPage()}
+                    className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
+                  >
+                    {">>"}
+                  </button>
+                </div>
+
+                <div className="dark:text-gray-400">
+                  Showing{" "}
+                  <strong>
+                    {table.getRowModel().rows.length} / {supplierData.length}
+                  </strong>{" "}
+                  results
+                </div>
+              </div>
+              {isOpenViewModal && (
+                <ViewUserAddress isOpenModel={isOpenViewModal}
+                  setIsOpenModel={setIsOpenViewModal} userData={selectedSupplier} />
+              )}
+
+
+              {isOpenUpdateModal && (
+                <UpdateUserModal isOpenModel={isOpenUpdateModal}
+                  setIsOpenModel={setIsOpenUpdateModal} userData={selectedSupplier} dataChanged={setSupplierDataChange} />
+              )}
+              {selectedSupplier && isOpenDeleteModal && (
+                <DeleteUserModal isOpenDeleteModel={!!selectedSupplier}
+                  setIsOpenDeleteModal={() => setSelectedSupplier(null)} userData={selectedSupplier} role="supplier" dataChanged={setSupplierDataChange} />
+              )}
             </div>
-
-            <div className="dark:text-gray-400">
-              Showing{" "}
-              <strong>
-                {table.getRowModel().rows.length} / {supplierData.length}
-              </strong>{" "}
-              results
-            </div>
           </div>
-
-          {selectedSupplier && !isOpenDeleteModal && (
-            <UpdateUserModal isOpenModel={!!selectedSupplier}
-              setIsOpenModel={() => setSelectedSupplier(null)} userData={selectedSupplier} dataChanged={setSupplierDataChange} />
-          )}
-          {selectedSupplier && isOpenDeleteModal && (
-            <DeleteUserModal isOpenDeleteModel={!!selectedSupplier}
-              setIsOpenDeleteModal={() => setSelectedSupplier(null)} userData={selectedSupplier} role="supplier" dataChanged={setSupplierDataChange}/>
+          {isOpen && (
+            <AddUserModal isOpen={isOpen}
+              closeModal={closeModal} role={'supplier'} dataChanged={setSupplierDataChange} />
           )}
         </div>
       </div>
-                {isOpen && (
-                  <AddUserModal isOpen={isOpen}
-                    closeModal={closeModal} role={'supplier'}  dataChanged={setSupplierDataChange} />
-                )}
     </div>
-            </div>
-        </div>
   );
 }

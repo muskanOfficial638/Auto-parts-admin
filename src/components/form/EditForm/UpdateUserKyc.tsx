@@ -3,7 +3,7 @@
 
 
 import React, { useEffect, useState } from 'react';
-import { updateUser } from '@/app/utils/api';
+import { fetchKycAttachments,updateKycUser, imagePath} from '@/app/utils/api';
 import { toast, ToastContainer } from 'react-toastify';
 import { ChevronDownIcon } from 'lucide-react';
 import Select from '../Select';
@@ -59,48 +59,20 @@ const UpdateUserKyc = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: a
         updated_at: string;
     }
     const [attachments, setAttachments] = useState<Attachment[]>([
-        {
-            "id": "979ffd6a-5b23-4833-903f-4798cbda99a6",
-            "status": "pending",
-            "user_id": "8085f8a8-9d03-43e5-8481-9d5eafe7ca6f",
-            "attachment_name": "20251212_0949_44_708436.pdf",
-            "created_at": "2025-12-12T09:48:09.564891+00:00",
-            "updated_at": "2025-12-12T09:48:09.564891+00:00"
-        },
-        {
-            "id": "5a3769b4-77c3-4f82-b4a0-b0e298c90e9f",
-            "status": "pending",
-            "user_id": "8085f8a8-9d03-43e5-8481-9d5eafe7ca6f",
-            "attachment_name": "20251212_1005_19_730793.exe",
-            "created_at": "2025-12-12T10:05:19.762639+00:00",
-            "updated_at": "2025-12-12T10:05:19.762639+00:00"
-        },
-        {
-            "id": "79e2bb2d-1589-4ea2-a873-cfafd79fb07a",
-            "status": "approved",
-            "user_id": "8085f8a8-9d03-43e5-8481-9d5eafe7ca6f",
-            "attachment_name": "20251202_1209_22_841520.pdf",
-            "created_at": "2025-12-02T12:09:22.846450+00:00",
-            "updated_at": "2025-12-02T12:09:22.846450+00:00"
-        },
-        {
-            "id": "9d56f010-9ed1-4e96-9cda-77f971a37006",
-            "status": "pending",
-            "user_id": "8085f8a8-9d03-43e5-8481-9d5eafe7ca6f",
-            "attachment_name": "20251231_0950_41_44091.png",
-            "created_at": "2025-12-31T09:50:41.045653+00:00",
-            "updated_at": "2025-12-31T09:50:41.045653+00:00"
-        }
     ]);
-    useEffect(() => {
-        console.log("Attachments updated:", attachments);
+    useEffect( () => {
 
+         fetchKycAttachments(loggedInUser?.access_token,formData.id).then((data) => {
+              if(data.length && data.length > 0){
+                setAttachments(data);
+       }
+        });
+  
 
-    }, [attachments]);
+    }, []);
+
 
     const handleStatusChange = (attachmentId: string, newStatus: 'pending' | 'approved' | 'rejected') => {
-        console.log(`Updating attachment ${attachmentId} to status: ${newStatus}`);
-
         // Update the state
         setAttachments(prevAttachments =>
             prevAttachments.map(attachment =>
@@ -120,10 +92,18 @@ const UpdateUserKyc = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: a
             return;
         }
         try {
-            formData.kyc_status = status;
-            formData.is_active = status === 'approved';
-            const response = await updateUser(formData?.role, loggedInUser?.access_token, formData)
-            // console.log("update:", response);
+
+            const filteredAttachments = attachments.map(
+  ({ attachment_name, created_at, ...rest }) => rest
+);
+
+            var formUpdateData ={user_id:"",type:"",attachment:{}};
+            formUpdateData.user_id = formData.id;
+            formUpdateData.type = status;
+            formUpdateData.attachment=filteredAttachments;
+            console.log(formUpdateData)
+            const response = await updateKycUser(loggedInUser?.access_token, formUpdateData)
+
 
             if (response?.status === 200) {
                 toast("User KYC updated successfully");
@@ -203,7 +183,7 @@ const UpdateUserKyc = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: a
 
                                     <div className="space-y-3">
                                         <h4 className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                                            Approved Attachments
+                                             Attachments
                                         </h4>
                                         {attachments.map((attachment) => (
                                             <div
@@ -249,7 +229,7 @@ const UpdateUserKyc = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: a
                                                     </div>
                                                 </div>
                                                 <a
-                                                    href={attachment.attachment_name}
+                                                    href={imagePath+attachment.attachment_name}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="inline-flex items-center justify-center w-9 h-9 text-gray-500 hover:text-blue-600 bg-white border border-gray-300 hover:border-blue-400 rounded-lg hover:bg-blue-50 transition-all duration-200 hover:shadow-sm group"
@@ -281,12 +261,9 @@ const UpdateUserKyc = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: a
 
                                         {/* Empty state */}
                                         {attachments.length === 0 && (
-                                            <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
-                                                <svg className="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                                </svg>
+                                            <div className="flex flex-col items-center justify-center p-4 border-2 border-dashed border-gray-300 rounded-lg bg-gray-50">
                                                 <p className="text-gray-500 font-medium">No attachments found</p>
-                                                <p className="text-sm text-gray-400 mt-1">Upload KYC documents to get started</p>
+                                               
                                             </div>
                                         )}
                                     </div>

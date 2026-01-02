@@ -96,7 +96,7 @@ export const VehicleFormDialog = ({
                     })));
                     if (selectedMake) {
 
-                        setSelectedMake(selectedMake);
+                        setSelectedMake(null);
                         // const selectedModel = selectedMake?.models.find((model: Model) => model.id === levelData?.model_id)
                         const selectedModel = selectedMake?.models.find((model: Model) => model.id)
                         setSelectedModel(selectedModel)
@@ -111,6 +111,7 @@ export const VehicleFormDialog = ({
         };
 
         fetchData();
+                 setSelectedMake(null);
     }, [initialValue, open, levelData, level]);
 
     useEffect(() => {
@@ -122,7 +123,7 @@ export const VehicleFormDialog = ({
             }));
             setSelectMakeOptions(vehicleOptions);
         });
-    }, []);
+    }, [initialValue, open, levelData, level]);
 
     const handleValueChange = (e: any) => {
         setValue(e.target.value);

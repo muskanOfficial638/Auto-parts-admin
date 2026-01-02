@@ -118,6 +118,7 @@ const columns: ColumnDef<AutoPartRequest>[] = [
                 </Button>
             );
         },
+        
         cell: ({ row }) => {
             const urgency = row.getValue("urgency") as string;
             return (
@@ -132,6 +133,39 @@ const columns: ColumnDef<AutoPartRequest>[] = [
 
                 >
                     {urgency}
+                </Badge>
+            );
+        },
+    },
+        {
+        accessorKey: "status",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    className="hover:bg-muted/50"
+                >
+                    Status
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            );
+        },
+        
+        cell: ({ row }) => {
+            const urgency = row.getValue("status") as string;
+            return (
+                <Badge color={
+                    urgency == "1"
+                        ? "success"
+                        : urgency == "0"
+                            ? "primary"
+                            : "error"
+                }
+                    variant="solid"
+
+                >
+                    {(urgency=='1'?'Active':urgency=='1' ?'deactivate':'suspend ')}
                 </Badge>
             );
         },

@@ -8,6 +8,9 @@ import axios from "axios";
 // export const deleteVehicleApiPath = "http://54.80.119.79:8000/v1/admin/vehicle";
 // export const partRequestPath = "http://54.80.119.79:8005/v1/supplier";
 
+
+export const profiles = "http://54.80.119.79:8004/profiles";
+
 //image path
 //export const imagePath = "http://54.80.119.79:8000/image/"; 
 export const imagePath = "/api/image-proxy/" 
@@ -32,8 +35,20 @@ export async function fetchUsers(role: string, token: string) {
   if (!res.ok) throw new Error("Failed to fetch profiles");
   return res.json();
 }
+// address fetch
+export async function getAddressbyID(role:string,id: string, token: string) {
+  const res = await fetch(`${profiles}/${role}/address/${id}`, {
+    cache: "no-store",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch profiles");
+  return res.json();
+}
 
-// user profiles
+// KYC admin page
 export async function fetchUsersKyc( token: string) {
   const res = await fetch(`${adminApiPath}/kyc/supplier`, {
     cache: "no-store",
@@ -46,10 +61,43 @@ export async function fetchUsersKyc( token: string) {
   if (!res.ok) throw new Error("Failed to fetch profiles");
   return res.json();
 }
+// Attachments data get 
+export async function fetchKycAttachments( token: string,userId: string) {
+  const res = await fetch(`${adminApiPath}/kyc/view?user_id=${userId}`, {
+    cache: "no-store",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch profiles");
+  return res.json();
+}
+
+// update KYC status
+export async function updateKycUser( token: string, userData: any) {
+  return axios.patch(
+    `${adminApiPath}/kyc/action`,
+    { ...userData },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error("unable to update user", error);
+      throw error;
+    });
+}
 
 // update user
 export async function updateUser(role: string, token: string, userData: any) {
-  console.log("role", role)
   return axios.patch(
     `${adminApiPath}/manage-users/${role}/${userData?.id}`,
     { ...userData },
