@@ -7,7 +7,7 @@ import { Modal } from "../../ui/modal";
 import { toast, ToastContainer } from "react-toastify";
 import { deleteUser } from "@/app/utils/api";
 
-export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModal, userData, role }: any) {
+export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModal, userData, role, dataChanged }: any) {
     const autoPartsUserData: any = localStorage.getItem("autoPartsUserData")
     const loggedInUser = JSON.parse(autoPartsUserData);
     const [error, setError] = useState('')
@@ -22,11 +22,11 @@ export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModa
             const response = await deleteUser(loggedInUser?.access_token, userData?.id, role)
             // console.log("Delete:", response);
             if (response?.status === 200) {
-                toast("User Deleted successfully");
+                toast(`${role === 'buyer' ? 'Buyer' : 'Supplier'} Deleted successfully`);
                 setTimeout(() => {
                     setIsOpenDeleteModal(false);
-                    window.location.reload();
-                }, 2000)
+                    dataChanged(Math.random().toString());
+                }, 1000)
             }
         } catch (err: any) {
             // Handle errors more gracefully

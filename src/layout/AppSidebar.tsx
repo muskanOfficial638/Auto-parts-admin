@@ -54,7 +54,7 @@ const navItems: NavItem[] = [
   {
     name: "Manage Users",
     icon: <TableIcon />,
-    subItems: [{ name: "Buyer", path: "/buyers", pro: false }, { name: "Supplier", path: "/suppliers", pro: false }],
+    subItems: [{ name: "Buyer", path: "/buyers", pro: false }, { name: "Supplier", path: "/suppliers", pro: false },{ name: "KYC", path: "/supplier-kyc", pro: false }],
   },
   {
     name: "Logs",

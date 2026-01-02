@@ -177,7 +177,7 @@ const columns: ColumnDef<AutoPartRequest>[] = [
 ];
 
 export function PartRequestTable() {
-    const [sorting, setSorting] = useState<SortingState>([]);
+    const [sorting, setSorting] = useState<SortingState>([ { id: 'created_at', desc: true },]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState("");
     const [autoPartsUserData, setAutoPartsUserData] = useState<string | null>("loading");
@@ -211,7 +211,7 @@ export function PartRequestTable() {
         },
         initialState: {
             pagination: {
-                pageSize: 10,
+                pageSize: 30,
             },
         },
     });

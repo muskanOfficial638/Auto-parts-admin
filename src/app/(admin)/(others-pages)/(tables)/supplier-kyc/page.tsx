@@ -1,12 +1,12 @@
 import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import BuyerTable from "@/components/tables/BuyerTable";
+import SupplierTableKyc from "@/components/tables/SupplierTableKyc";
 import { Metadata } from "next";
 
 
 export const metadata: Metadata = {
-  title: "Buyers",
+  title: "Supplier KYC",
   description:
-    "This is Table  page for Buyers",
+    "This is Table  page for Supplier KYC in Auto parts admin dashboard.",
   // other metadata
 };
 
@@ -16,8 +16,8 @@ export default function BuyerPage() {
     <div>
       <PageBreadcrumb pageTitle="Manage users" />
       <div className="space-y-6 ">
-          <BuyerTable />
+          <SupplierTableKyc />
       </div>
-    </div>
+    </div> 
   );
 }

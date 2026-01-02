@@ -1,5 +1,10 @@
 "use client";
 import { useEffect, useMemo, useState } from "react";
+import { useModal } from "@/hooks/useModal";
+import AddUserModal from "@/components/form/AddUserForm/AddUserModal";
+import { Plus } from "lucide-react";
+
+import { Button } from "@/components/ui/Button";
 import {
   Table,
   TableBody,
@@ -26,7 +31,7 @@ import DeleteUserModal from "../form/DeleteModal/DeleteUser";
 
 interface Buyer {
   id: number;
-  buyer_name: string;
+  user_name: string;
   company_name: string;
   email: string,
   vat_number: string;
@@ -41,6 +46,7 @@ export default function BuyerTable() {
   const [selectedBuyer, setSelectedBuyer] = useState<Buyer | null>();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [buyerDataChange, setBuyerDataChange] = useState("");
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -53,7 +59,7 @@ export default function BuyerTable() {
         });
       }
     }
-  }, []);
+  }, [buyerDataChange]);
 
   useEffect(() => {
   }, [buyerData]);
@@ -63,7 +69,7 @@ export default function BuyerTable() {
     () => [
       {
         header: "Name",
-        accessorKey: "buyer_name",
+        accessorKey: "user_name",
       },
       {
         header: "Company Name",
@@ -135,8 +141,10 @@ export default function BuyerTable() {
     ],
     []
   );
-
+  const { isOpen, openModal, closeModal } = useModal();
   // Table setup
+
+
   const table = useReactTable({
     data: buyerData ?? [],
     columns,
@@ -168,141 +176,172 @@ export default function BuyerTable() {
 
   if (!buyerData) return <div>Loading...</div>;
 
+
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
-      <div className="max-w-full overflow-x-auto">
-        <div className="min-w-full">
-          {/* Search */}
-          <div className="flex flex-col sm:flex-row justify-between items-center p-4 gap-4 dark:text-gray-400">
-            <input
-              type="text"
-              placeholder="Search Buyers..."
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-              className="w-full sm:w-64 px-3 py-2 border rounded-md dark:bg-white/[0.05]"
-            />
+    <div
+      className={`rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]`}
+    >
+      <div className="px-6 py-5">
+        <div className="flex justify-between">
+          <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
+            Buyers
+          </h3>
+          <Button onClick={openModal} className="dark:text-gray-400">
+            <Plus className="h-4 w-4 mr-2 dark:text-gray-400" />
+            Add Buyer
+          </Button>
 
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
-              Page {table.getState().pagination.pageIndex + 1} of{" "}
-              {table.getPageCount()}
-              <select
-                className="ml-2 border rounded p-1"
-                value={table.getState().pagination.pageSize}
-                onChange={(e) => table.setPageSize(Number(e.target.value))}
-              >
-                {[5, 10, 20, 40].map((sz) => (
-                  <option key={sz} value={sz}>
-                    Show {sz}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+        </div>
+      </div>
+      <div className="p-4 border-t border-gray-100 dark:border-gray-800 sm:p-6">
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+          <div className="max-w-full overflow-x-auto">
+            <div className="min-w-full">
+              {/* Search */}
+              <div className="flex flex-col sm:flex-row justify-between items-center p-4 gap-4 dark:text-gray-400">
+                <input
+                  type="text"
+                  placeholder="Search Buyers..."
+                  value={globalFilter}
+                  onChange={(e) => setGlobalFilter(e.target.value)}
+                  className="w-full sm:w-64 px-3 py-2 border rounded-md dark:bg-white/[0.05]"
+                />
 
-          {/* Responsive Table Container */}
-          <div className="overflow-x-auto">
-            <Table>
-              {/* Headers */}
-              <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                {table.getHeaderGroups().map((hg) => (
-                  <TableRow key={hg.id}>
-                    {hg.headers.map((header) => (
-                      <TableCell
-                        key={header.id}
-                        isHeader
-                        onClick={header.column.getToggleSortingHandler()}
-                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
-                        {header.column.getIsSorted() === "asc"
-                          ? " 🔼"
-                          : header.column.getIsSorted() === "desc"
-                            ? " 🔽"
-                            : ""}
-                      </TableCell>
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                  Page {table.getState().pagination.pageIndex + 1} of{" "}
+                  {table.getPageCount()}
+                  <select
+                    className="ml-2 border rounded p-1"
+                    value={table.getState().pagination.pageSize}
+                    onChange={(e) => table.setPageSize(Number(e.target.value))}
+                  >
+                    {[5, 10, 20, 40].map((sz) => (
+                      <option key={sz} value={sz}>
+                        Show {sz}
+                      </option>
                     ))}
-                  </TableRow>
-                ))}
-              </TableHeader>
+                  </select>
+                </div>
+              </div>
 
-              {/* Rows */}
-              <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-                {table.getRowModel().rows.length === 0 ? (
-                  <TableRow>
-                    <TableCell colSpan={columns.length} className="text-center dark:text-gray-400">
-                      No Users found.
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id}>
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="px-5 py-4 sm:px-6 text-start dark:text-gray-400">
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
+              {/* Responsive Table Container */}
+              <div className="overflow-x-auto">
+                <Table>
+                  {/* Headers */}
+                  <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
+                    {table.getHeaderGroups().map((hg) => (
+                      <TableRow key={hg.id}>
+                        {hg.headers.map((header) => (
+                          <TableCell
+                            key={header.id}
+                            isHeader
+                            className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                          >
+                            <div
+                              className={
+                                header.column.getCanSort()
+                                  ? "cursor-pointer select-none"
+                                  : ""
+                              }
+                              onClick={header.column.getToggleSortingHandler()}
+                            >
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                              {{
+                                asc: " 🔼",
+                                desc: " 🔽",
+                              }[header.column.getIsSorted() as string] ?? null}
+                            </div>
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))}
+                  </TableHeader>
+
+                  {/* Rows */}
+                  <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                    {table.getRowModel().rows.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={columns.length} className="text-center dark:text-gray-400">
+                          No Users found.
                         </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                      </TableRow>
+                    ) : (
+                      table.getRowModel().rows.map((row) => (
+                        <TableRow key={row.id}>
+                          {row.getVisibleCells().map((cell) => (
+                            <TableCell key={cell.id} className={`px-5 py-4 sm:px-6 text-start dark:text-gray-400  ${cell.column.id !== "is_active" && cell.column.id !== "user_name" ? "break-all" : ""
+                              }`}>
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )}
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
 
-          {/* Pagination Controls */}
-          <div className="flex justify-between items-center p-4 text-sm">
-            <div className="flex gap-2">
-              <button
-                onClick={() => table.setPageIndex(0)}
-                disabled={!table.getCanPreviousPage()}
-                className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
-              >
-                {"<<"}
-              </button>
-              <button
-                onClick={() => table.previousPage()}
-                disabled={!table.getCanPreviousPage()}
-                className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
-              >
-                {"<"}
-              </button>
-              <button
-                onClick={() => table.nextPage()}
-                disabled={!table.getCanNextPage()}
-                className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
-              >
-                {">"}
-              </button>
-              <button
-                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                disabled={!table.getCanNextPage()}
-                className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
-              >
-                {">>"}
-              </button>
+              {/* Pagination Controls */}
+              <div className="flex justify-between items-center p-4 text-sm">
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => table.setPageIndex(0)}
+                    disabled={!table.getCanPreviousPage()}
+                    className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
+                  >
+                    {"<<"}
+                  </button>
+                  <button
+                    onClick={() => table.previousPage()}
+                    disabled={!table.getCanPreviousPage()}
+                    className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
+                  >
+                    {"<"}
+                  </button>
+                  <button
+                    onClick={() => table.nextPage()}
+                    disabled={!table.getCanNextPage()}
+                    className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
+                  >
+                    {">"}
+                  </button>
+                  <button
+                    onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                    disabled={!table.getCanNextPage()}
+                    className="px-2 py-1 border rounded disabled:opacity-50 dark:text-gray-400"
+                  >
+                    {">>"}
+                  </button>
+                </div>
+
+                <div className="dark:text-gray-400">
+                  Showing{" "}
+                  <strong>
+                    {table.getRowModel().rows.length} / {buyerData.length}
+                  </strong>{" "}
+                  results
+                </div>
+              </div>
+
+              {isOpenUpdateModal && (
+                <UpdateUserModal isOpenModel={isOpenUpdateModal}
+                  setIsOpenModel={setIsOpenUpdateModal} userData={selectedBuyer} dataChanged={setBuyerDataChange} />
+              )}
+              {isOpenDeleteModal && (
+                <DeleteUserModal isOpenDeleteModel={isOpenDeleteModal}
+                  setIsOpenDeleteModal={setIsOpenDeleteModal} userData={selectedBuyer} role="buyer" dataChanged={setBuyerDataChange} />
+              )}
             </div>
-
-            <div className="dark:text-gray-400">
-              Showing{" "}
-              <strong>
-                {table.getRowModel().rows.length} / {buyerData.length}
-              </strong>{" "}
-              results
-            </div>
           </div>
-
-          {isOpenUpdateModal && (
-            <UpdateUserModal isOpenModel={isOpenUpdateModal}
-              setIsOpenModel={setIsOpenUpdateModal} userData={selectedBuyer} />
-          )}
-          {isOpenDeleteModal && (
-            <DeleteUserModal isOpenDeleteModel={isOpenDeleteModal}
-              setIsOpenDeleteModal={setIsOpenDeleteModal} userData={selectedBuyer} role="buyer" />
+          {isOpen && (
+            <AddUserModal isOpen={isOpen}
+              closeModal={closeModal} role={'buyer'} dataChanged={setBuyerDataChange} />
           )}
         </div>
       </div>

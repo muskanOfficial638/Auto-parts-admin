@@ -33,6 +33,20 @@ export async function fetchUsers(role: string, token: string) {
   return res.json();
 }
 
+// user profiles
+export async function fetchUsersKyc( token: string) {
+  const res = await fetch(`${adminApiPath}/kyc/supplier`, {
+    cache: "no-store",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch profiles");
+  return res.json();
+}
+
 // update user
 export async function updateUser(role: string, token: string, userData: any) {
   console.log("role", role)
@@ -336,6 +350,63 @@ export async function uploadImage( token: string, userData: any) {
     })
     .catch((error) => {
       console.error("unable to update user", error);
+      throw error;
+    });
+}
+
+//menu get
+export async function getMenuData( token: string) {
+  const res = await fetch(`${adminApiPath}/cms/menu/view`, {
+    cache: "no-store",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch page details");
+  return res.json();
+}
+
+//menu update
+export async function updateMenuData( token: string, menuData: any) {
+  return axios.post(
+    `${adminApiPath}/cms/menu/add`,
+    { data : [...menuData] },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.error("unable to update menu", error);
+      throw error;
+    });
+}
+
+// add Buyer 
+export async function addNewUser(role: string, token: string, userData: any) {
+
+  return axios.post(
+    `${authApiPath}/auth/register`,
+    { ...userData, "role": role },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error("unable to add user", error);
       throw error;
     });
 }

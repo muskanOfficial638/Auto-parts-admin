@@ -1,10 +1,6 @@
 "use client";
 import { useEffect, useState, useMemo } from "react";
-import { useModal } from "@/hooks/useModal";
-import AddUserModal from "@/components/form/AddUserForm/AddUserModal";
-import { Plus } from "lucide-react";
 
-import { Button } from "@/components/ui/Button";
 import {
   Table,
   TableBody,
@@ -14,7 +10,7 @@ import {
 } from "../ui/table";
 
 import Badge from "../ui/badge/Badge";
-import { fetchUsers } from "@/app/utils/api";
+import { fetchUsersKyc } from "@/app/utils/api";
 import {
   useReactTable,
   getCoreRowModel,
@@ -26,8 +22,7 @@ import {
   SortingState,
 } from "@tanstack/react-table";
 import { matchSorter } from "match-sorter";
-import UpdateUserModal from "../form/EditForm/UpdateUser";
-import DeleteUserModal from "../form/DeleteModal/DeleteUser";
+import UpdateUserKyc from "../form/EditForm/UpdateUserKyc";
 
 interface Supplier {
   id: number;
@@ -35,13 +30,12 @@ interface Supplier {
   company_name: string;
   email: string,
   kyc_status: string;
-  is_active?: boolean;
   role?: string;
 }
 
 export default function SupplierTable() {
   const [supplierData, setSuppliersData] = useState<Supplier[]>();
-  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -52,7 +46,7 @@ export default function SupplierTable() {
       const loggedInUser = JSON.parse(autoPartsUserData || "{}");
 
       if (loggedInUser?.access_token) {
-        fetchUsers("supplier", loggedInUser.access_token).then((data) => {
+        fetchUsersKyc( loggedInUser.access_token).then((data) => {
           setSuppliersData(data);
         });
       }
@@ -62,10 +56,7 @@ export default function SupplierTable() {
 
 
 
-  const handleDeleteModalOpen = (supplier: Supplier) => {
-    setIsOpenDeleteModal(true)
-    setSelectedSupplier(supplier)
-  }
+
 
   // Columns for TanStack Table
   const columns = useMemo<ColumnDef<Supplier>[]>(
@@ -84,20 +75,15 @@ export default function SupplierTable() {
       },
       {
         header: "Status",
-        accessorKey: "is_active",
+        accessorKey: "kyc_status",
         cell: ({ row }) => {
-          const isActive = row.original.is_active;
+          const isActive = row.original.kyc_status;
           return (
-            <Badge size="sm" color={isActive ? "success" : "error"}>
-              {isActive ? "Active" : "Inactive"}
+            <Badge size="sm" color={isActive ==='approved' ? "success" : "error"}>
+              {isActive}
             </Badge>
           );
         },
-      },
-      {
-        header: "KYC Status",
-        accessorKey: "kyc_status",
-
       },
       {
         header: "Actions",
@@ -106,20 +92,7 @@ export default function SupplierTable() {
           const supplier = row.original;
           return (
             <div className="flex items-center w-full gap-2">
-              {/* Delete Button */}
-              <button
-                onClick={() => handleDeleteModalOpen(supplier)}
-                className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none">
-                  <path
-                    fill="currentColor"
-                    fillRule="evenodd"
-                    d="M6.541 3.792a2.25 2.25 0 0 1 2.25-2.25h2.417a2.25 2.25 0 0 1 2.25 2.25v.25h3.208a.75.75 0 0 1 0 1.5h-.29v10.666a2.25 2.25 0 0 1-2.25 2.25h-8.25a2.25 2.25 0 0 1-2.25-2.25V5.541h-.292a.75.75 0 1 1 0-1.5H6.54zm8.334 9.454V5.541h-9.75v10.667c0 .414.336.75.75.75h8.25a.75.75 0 0 0 .75-.75zM8.041 4.041h3.917v-.25a.75.75 0 0 0-.75-.75H8.791a.75.75 0 0 0-.75.75zM8.334 8a.75.75 0 0 1 .75.75v5a.75.75 0 1 1-1.5 0v-5a.75.75 0 0 1 .75-.75m4.083.75a.75.75 0 0 0-1.5 0v5a.75.75 0 1 0 1.5 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </button>
+
 
               {/* Edit Button */}
               <button
@@ -144,7 +117,7 @@ export default function SupplierTable() {
     ],
     []
   );
-  const { isOpen, openModal, closeModal } = useModal();
+ 
   // Table setup
   const table = useReactTable({
     data: supplierData ?? [],
@@ -174,13 +147,8 @@ export default function SupplierTable() {
       <div className="px-6 py-5">
         <div className="flex justify-between">
           <h3 className="text-base font-medium text-gray-800 dark:text-white/90">
-            Suppliers
+            Suppliers KYC
           </h3>
-          <Button onClick={openModal} className="dark:text-gray-400">
-            <Plus className="h-4 w-4 mr-2 dark:text-gray-400" />
-            Add Supplier
-          </Button>
-
         </div>
       </div>
       <div className="p-4 border-t border-gray-100 dark:border-gray-800 sm:p-6">
@@ -319,20 +287,13 @@ export default function SupplierTable() {
             </div>
           </div>
 
-          {selectedSupplier && !isOpenDeleteModal && (
-            <UpdateUserModal isOpenModel={!!selectedSupplier}
+          {selectedSupplier  && (
+            <UpdateUserKyc isOpenModel={!!selectedSupplier}
               setIsOpenModel={() => setSelectedSupplier(null)} userData={selectedSupplier} dataChanged={setSupplierDataChange} />
           )}
-          {selectedSupplier && isOpenDeleteModal && (
-            <DeleteUserModal isOpenDeleteModel={!!selectedSupplier}
-              setIsOpenDeleteModal={() => setSelectedSupplier(null)} userData={selectedSupplier} role="supplier" dataChanged={setSupplierDataChange}/>
-          )}
+
         </div>
       </div>
-                {isOpen && (
-                  <AddUserModal isOpen={isOpen}
-                    closeModal={closeModal} role={'supplier'}  dataChanged={setSupplierDataChange} />
-                )}
     </div>
             </div>
         </div>
