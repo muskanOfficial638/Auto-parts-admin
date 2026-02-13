@@ -1,6 +1,19 @@
 {
     "rewrites": [
         {
+            "source": "/api/admin/dashboard/view-counts",
+            "destination": "http://54.80.119.79:8000/v1/admin/dashboard/view-counts"
+        },
+        {
+            "source": "/api/admin/order/view",
+            "destination": "http://54.80.119.79:8000/v1/admin/order/view"
+        },
+        {
+            "source": "/api/admin/part-request/viewall",
+            "destination": "http://54.80.119.79:8000/v1/admin/part-request/viewall"
+        },
+
+        {
             "source": "/api/admin/manage-users/buyer",
             "destination": "http://54.80.119.79:8000/v1/admin/manage-users/buyer"
         },
