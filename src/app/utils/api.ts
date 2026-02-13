@@ -21,7 +21,7 @@ export const adminApiPath = "/api/admin";
 export const vehicleApiPath = "/api/vehicle";
 export const deleteVehicleApiPath = "api/admin/vehicle";
 export const partRequestPath = "/api/parts";
-
+ 
 // user profiles
 export async function getDashBoard( token: string) {
   const res = await fetch(`${adminApiPath}/dashboard/view-counts`, {
