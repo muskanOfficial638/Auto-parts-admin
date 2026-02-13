@@ -4,7 +4,7 @@ import axios from "axios";
 // API paths for LOCAL
 export const authApiPath = "http://54.80.119.79:8001/v1";
 export const adminApiPath = "http://54.80.119.79:8000/v1/admin";
-export const vehicleApiPath = "http://54.80.119.79:8006/v1/vehicle";
+//export const vehicleApiPath = "http://54.80.119.79:8006/v1/vehicle";
 export const deleteVehicleApiPath = "http://54.80.119.79:8000/v1/admin/vehicle";
 export const partRequestPath = "http://54.80.119.79:8005/v1/supplier";
 
@@ -21,6 +21,70 @@ export const imagePath = "http://54.80.119.79:8000/image/";
 // export const vehicleApiPath = "/api/vehicle";
 // export const deleteVehicleApiPath = "api/admin/vehicle";
 // export const partRequestPath = "/api/parts";
+
+// user profiles
+export async function getDashBoard( token: string) {
+  const res = await fetch(`${adminApiPath}/dashboard/view-counts`, {
+    cache: "no-store",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch Dashboard data");
+  return res.json();
+}
+
+
+// update Order status
+export async function updateOrderStatus(token: string, data: any) {
+  return axios.put(
+    
+    `${adminApiPath}/orders/updatestatus`,
+    data,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error("unable to update order status", error);
+      throw error;
+    });
+}
+
+// Get orders Details
+export async function getOrdersDetails(token:string,orderId:string) {
+  const res = await fetch(`${adminApiPath}/view-order-details?order_id=${orderId}`, {
+    cache: "no-store",
+    method: "GET",
+   headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+  });
+  if (!res.ok) throw new Error("Failed to get orders details");
+  return res.json();
+}
+
+// Get Orders
+export async function getAllOrders(token:string) {
+  const res = await fetch(`${adminApiPath}/order/view`, {
+    cache: "no-store",
+    method: "GET",
+   headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+  });
+  if (!res.ok) throw new Error("Failed to get orders");
+  return res.json();
+}
 
 
 // user profiles
@@ -215,7 +279,7 @@ export async function deleteAdminLogs(token: string, logId: string) {
 
 // Get Vehicle makes
 export async function viewVehicleMake() {
-  const res = await fetch(`${vehicleApiPath}/view/`, {
+  const res = await fetch(`${adminApiPath}/vehicle/viewall/`, {
     cache: "no-store",
     method: "GET",
     headers: {
@@ -246,22 +310,22 @@ export async function deleteVehicle(level: string, makeId: string, token:string)
     });
 }
 
-// Vehicle model by make name
-export async function fetchVehicleModelByMake(makeName: string) {
-  const res = await fetch(`${vehicleApiPath}/model/${makeName}`, {
-    cache: "no-store",
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  if (!res.ok) throw new Error("Failed to vehicle model by make name");
-  return res.json();
-}
+// // Vehicle model by make name
+// export async function fetchVehicleModelByMake(makeName: string) {
+//   const res = await fetch(`${vehicleApiPath}/model/${makeName}`, {
+//     cache: "no-store",
+//     method: "GET",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//   });
+//   if (!res.ok) throw new Error("Failed to vehicle model by make name");
+//   return res.json();
+// }
 
 //all part requests
 export async function fetchAllPartRequests() {
-  const res = await fetch(`${partRequestPath}/all/part-request/`, {
+  const res = await fetch(`${adminApiPath}/part-request/viewall`, {
     cache: "no-store",
     headers: {
       "Content-Type": "application/json",

@@ -61,13 +61,18 @@ const navItems: NavItem[] = [
     icon: <AlertIcon />,
     subItems: [
       { name: "Auth Logs", path: "/authentication-logs", pro: false },
-      { name: "Other Logs", path: "/other-logs", pro: false },
+      // { name: "Other Logs", path: "/other-logs", pro: false },
     ],
   },
   {
     name: "Part Requests",
     icon: <ListIcon />,
     path: "/part-requests",
+  },
+  {
+    name: "Orders",
+    icon: <ListIcon />,
+    path: "/orders",
   },
   {
     name: "CMS",

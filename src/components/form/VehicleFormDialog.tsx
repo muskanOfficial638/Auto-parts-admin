@@ -16,6 +16,27 @@ import { adminApiPath, viewVehicleMake } from "@/app/utils/api";
 import { ChevronDownIcon } from "lucide-react";
 import Select from "./Select";
 
+
+
+interface Trim1 {
+    id: string;
+    trim: string;
+    year_from: number;
+    year_to: number;
+}
+
+interface Model1 {
+    id: string;
+    name: string;
+    trims: Trim1[];
+}
+
+interface Make1 {
+    make_id: string;
+    make_name: string;
+    models: Model1[];
+}
+
 interface VehicleFormDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
@@ -26,11 +47,13 @@ interface VehicleFormDialogProps {
     levelData: Model | Trim | any;
     editId?: string;
     onSave: (value: string) => void;
+    vehicleMakeData: Make1[];
 }
 
 interface VehicleMake {
     make_name: string;
     make_id: string;
+    models: Model[];
 }
 
 interface Trim {
@@ -50,6 +73,11 @@ interface Model {
     model_id?: string;
 }
 
+
+
+
+
+
 export const VehicleFormDialog = ({
     open,
     onOpenChange,
@@ -59,13 +87,18 @@ export const VehicleFormDialog = ({
     initialValue = "",
     onSave,
     editId,
-    levelData
+    levelData,
+    vehicleMakeData
 }: VehicleFormDialogProps) => {
+    type SelectOption = {
+        value: string;
+        label: string;
+    };
     const [value, setValue] = useState(initialValue);
     const [data, setData] = useState<Model | Trim | any>(null);
     const [error, setError] = useState(initialValue);
-    const [selectMakeOptions, setSelectMakeOptions] = useState([]);
-    const [selectModelOptions, setSelectModelOptions] = useState([]);
+    const [selectMakeOptions, setSelectMakeOptions] = useState<SelectOption[]>([]);
+    const [selectModelOptions, setSelectModelOptions] = useState<SelectOption[]>([]);
     const [selectedMake, setSelectedMake] = useState<VehicleMake | any>(null);
     const [selectedModel, setSelectedModel] = useState<Model | any>(null);
     const [accessToken, setToken] = useState('');
@@ -74,11 +107,11 @@ export const VehicleFormDialog = ({
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-          const autoPartsUserData = localStorage.getItem("autoPartsUserData");
-          const loggedInUser = JSON.parse(autoPartsUserData || "{}");
-          setToken(loggedInUser.access_token)
+            const autoPartsUserData = localStorage.getItem("autoPartsUserData");
+            const loggedInUser = JSON.parse(autoPartsUserData || "{}");
+            setToken(loggedInUser.access_token)
         }
-      }, []);
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -88,17 +121,26 @@ export const VehicleFormDialog = ({
             setYearFrom(levelData?.year_from)
             if (level === "model" || level === "trim") {
                 try {
-                    const vehicleMakeData = await viewVehicleMake();
-                    const selectedMake = vehicleMakeData.find((make: VehicleMake) => make.make_id === levelData?.make_id);
-                    setSelectModelOptions(selectedMake?.models.map((item: Model) => ({
-                        value: item.id,
-                        label: item.name,
-                    })));
+
+                    const selectedMake = vehicleMakeData.find((make: Make1) => make.make_id === levelData?.make_id);
+                    console.log("Selected Make:", selectedMake);
+                    if (!selectedMake) {
+                        setSelectModelOptions([]);
+                        return;
+                    }
+
+                    setSelectModelOptions(
+                        selectedMake.models.map((item: Model1) => ({
+                            value: item.id,
+                            label: item.name,
+                        }))
+                    );
+
                     if (selectedMake) {
 
                         setSelectedMake(null);
                         // const selectedModel = selectedMake?.models.find((model: Model) => model.id === levelData?.model_id)
-                        const selectedModel = selectedMake?.models.find((model: Model) => model.id)
+                        const selectedModel = selectedMake?.models.find((model: Model1) => model.id === levelData?.model_id)
                         setSelectedModel(selectedModel)
                     } else {
                         console.warn("Make not found for ID:", levelData?.make_id);
@@ -111,8 +153,8 @@ export const VehicleFormDialog = ({
         };
 
         fetchData();
-                 setSelectedMake(null);
-    }, [initialValue, open, levelData, level]);
+        setSelectedMake(null);
+    }, [vehicleMakeData,initialValue, open, levelData, level]);
 
     useEffect(() => {
         viewVehicleMake().then((data) => {
@@ -195,9 +237,10 @@ export const VehicleFormDialog = ({
 
     const handleSaveAndUpdate = (e: React.FormEvent) => {
         const endpoint = `${adminApiPath}/vehicle/${level}`;
-        // If there's no selectedMake but we're in vehicle mode, use the editId for the make_id
-        const makeId = selectedMake ? selectedMake.make_id : editId;
+        const makeId = selectedMake ? selectedMake.make_id : level === 'make' ? editId : levelData?.make_id ;
         const modelId = selectedModel ? selectedModel.id : editId;
+        console.log("Selected Make ID:", makeId);
+        console.log("Selected Model ID:", modelId);
         if (level !== 'make' && !makeId) {
             setError("Make is required!")
             return
@@ -208,11 +251,11 @@ export const VehicleFormDialog = ({
         }
         if (level === 'trim') {
             const currentYear = new Date().getFullYear();
-            if(yearTo > currentYear || yearFrom > currentYear){
+            if (yearTo > currentYear || yearFrom > currentYear) {
                 setError(`Year cannot be in the future (max: ${currentYear})`);
                 return
             }
-            if(yearFrom >= yearTo){
+            if (yearFrom >= yearTo) {
                 setError(`Year From value cannot be more than or equal to Year To value!`);
                 return
             }
@@ -236,7 +279,7 @@ export const VehicleFormDialog = ({
                     }, 1000);
                 },
                 onError: (msg: string) => setError(msg),
-                token:accessToken
+                token: accessToken
             })
         } else {
             handleSaveOrUpdateMake({
@@ -256,7 +299,7 @@ export const VehicleFormDialog = ({
                     }, 2000);
                 },
                 onError: (msg: string) => setError(msg),
-                token:accessToken
+                token: accessToken
             });
         }
     };

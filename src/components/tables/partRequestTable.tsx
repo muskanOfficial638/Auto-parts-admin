@@ -33,19 +33,48 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { fetchAllPartRequests, imagePath } from "@/app/utils/api";
+import Image from "next/image";
+export type BadgeColor =
+  | "primary"
+  | "success"
+  | "error"
+  | "warning"
+  | "info"
+  | "light"
+  | "dark";
+
+const OrderStatus = {
+    "0": "Active",
+    "1": "In Process",
+    "2": "In Transit",
+    "3": "Completed",
+    "4": "Cancelled",
+}
+
+const OrderStatusColor: Record<string, BadgeColor> = {
+    "0": "warning",
+    "1": "info",
+    "2": "primary",
+    "3": "success",
+    "4": "error",
+   
+      
+};
 
 const columns: ColumnDef<AutoPartRequest>[] = [
     {
         accessorKey: "attachment",
         header: "Image",
         cell: ({ row }) => {
-            const attachment = row.getValue("attachment") as string | undefined;
+            const attachment = row.getValue("attachment") as string[];
             return attachment ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                    src={`${imagePath}${attachment}`}
+               
+                <Image
+                width={100}
+                height={100}
+                    src={`${imagePath}${attachment[0]}`}
                     alt={row.getValue("title")}
-                    className="h-12 w-12 rounded object-cover"
+                    className="w-24 rounded object-cover"
                 />
             ) : (
                 <div className="h-12 w-12 rounded bg-muted flex items-center justify-center text-xs text-muted-foreground">
@@ -124,10 +153,10 @@ const columns: ColumnDef<AutoPartRequest>[] = [
             return (
                 <Badge color={
                     urgency === "high"
-                        ? "success"
+                        ? "error"
                         : urgency === "medium"
-                            ? "primary"
-                            : "error"
+                            ? "warning"
+                            : "success"
                 }
                     variant="solid"
 
@@ -155,17 +184,10 @@ const columns: ColumnDef<AutoPartRequest>[] = [
         cell: ({ row }) => {
             const urgency = row.getValue("status") as string;
             return (
-                <Badge color={
-                    urgency == "1"
-                        ? "success"
-                        : urgency == "0"
-                            ? "primary"
-                            : "error"
-                }
-                    variant="solid"
-
-                >
-                    {(urgency=='1'?'Active':urgency=='1' ?'deactivate':'suspend ')}
+                
+                <Badge color={OrderStatusColor[urgency]}  variant="solid" >
+                   
+                    {OrderStatus[urgency as keyof typeof OrderStatus]}
                 </Badge>
             );
         },

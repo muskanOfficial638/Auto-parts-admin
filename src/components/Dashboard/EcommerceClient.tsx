@@ -1,64 +1,150 @@
 "use client";
 
-import { EcommerceMetrics } from "@/components/ecommerce/EcommerceMetrics";
 import React, { useEffect, useState } from "react";
-// import MonthlyTarget from "@/components/ecommerce/MonthlyTarget";
-// import MonthlySalesChart from "@/components/ecommerce/MonthlySalesChart";
-// import StatisticsChart from "@/components/ecommerce/StatisticsChart";
-// import RecentOrders from "@/components/ecommerce/RecentOrders";
-// import DemographicCard from "@/components/ecommerce/DemographicCard";
-import { useRouter } from "next/navigation";
-import { fetchAllPartRequests, fetchUsers } from "@/app/utils/api";
-import { AutoPartsTable } from "../ecommerce/AutoPartsTable";
-import { AutoPartRequest } from "@/types/auto-part";
-// import { sampleAutoPartRequests } from "@/data/sample-data";
+
+import { BoxIconLine, GroupIcon } from "@/icons";
+import { getDashBoard } from "@/app/utils/api";
+import Link from "next/link";
 
 export default function EcommerceClient() {
-    const router = useRouter();
-
-    const [autoPartsUserData, setAutoPartsUserData] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true); // <-- Track load status
-    const [supplierCount, setSuppliersCount] = useState(0);
-    const [buyerCount, setBuyersCount] = useState(0);
-    const [autoPartsData, setAutoPartsData] = useState<AutoPartRequest[]>();
+    const [Count, setCount] = useState({
+        supplier_count: 0,
+        buyer_count: 0,
+        order_count: 0,
+        part_request_count: 0,
+        kyc_count: 0
+    });
 
     useEffect(() => {
         const data = localStorage.getItem("autoPartsUserData");
-        setAutoPartsUserData(data);
-        setIsLoading(false); // <-- Done loading
         const loggedInUser = JSON.parse(data || "{}");
-
+        setIsLoading(false);
         if (loggedInUser?.access_token) {
-            fetchUsers("supplier", loggedInUser.access_token).then((data) => {
-                setSuppliersCount(data?.length);
+            getDashBoard(loggedInUser.access_token).then((data) => {
+                setCount(data);
+                console.log("Dashboard data:", data);
             });
-            fetchUsers("buyer", loggedInUser.access_token).then((data) => {
-                setBuyersCount(data?.length);
-            });
+
         }
-        fetchAllPartRequests().then((data) => {
-            setAutoPartsData(data)
-        });
     }, []);
 
-    useEffect(() => {
-        if (!isLoading && !autoPartsUserData) {
-            router.push('/signin');
-        }
-    }, [autoPartsUserData, isLoading, router, supplierCount, buyerCount, autoPartsData]);
 
-    if (isLoading || !autoPartsUserData || !autoPartsData) return null;
+    if (isLoading) return null;
 
     return (
         <>
 
-            <div className="grid grid-cols-12 gap-4 md:gap-6">
-                <div className="col-span-12 space-y-6 xl:col-span-7">
-                    <EcommerceMetrics supplierCount={supplierCount} buyerCount={buyerCount} />
+            <div className="grid grid-cols-5 grid-rows-2 gap-4 md:gap-6">
 
-                    {/* <MonthlySalesChart /> */}
+                <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                    <Link href="/buyers">
+                        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+                            <GroupIcon className="text-gray-800 size-6 dark:text-white/90" />
+                        </div>
+
+                        <div className="flex items-end justify-between mt-5">
+                            
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Buyers
+                                </span>
+                                <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                                    {Count.buyer_count}
+                                </h4>
+                           
+                            {/* <Badge color="success">
+                                        <ArrowUpIcon />
+                                        0%
+                                    </Badge> */}
+                        </div>
+                    </Link>
                 </div>
 
+                <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                    <Link href="/suppliers">
+                        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+                             <GroupIcon className="text-gray-800 size-6 dark:text-white/90" />
+                        </div>
+                        <div className="flex items-end justify-between mt-5">
+                            
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Suppliers
+                                </span>
+                                <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                                    {Count.supplier_count}
+                                </h4>
+                            
+
+
+                        </div>
+                    </Link>
+                </div>
+
+                <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                    <Link href="/supplier-kyc">
+                        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+                            <GroupIcon className="text-gray-800 size-6 dark:text-white/90" />
+                        </div>
+                        <div className="flex items-end justify-between mt-5">
+                            
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    KYC Pending
+                                </span>
+                                <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                                    {Count.kyc_count}
+                                </h4>
+                           
+
+
+                        </div>
+                    </Link>
+                </div>
+
+                <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                    <Link href="/part-requests">
+                        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+                            <BoxIconLine className="text-gray-800 dark:text-white/90" />
+                        </div>
+                        <div className="flex items-end justify-between mt-5">
+                           
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Part Requests
+                                </span>
+                                <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                                    {Count.part_request_count}
+                                </h4>
+                            
+
+
+                        </div>
+                    </Link>
+                </div>
+
+                <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+                    <Link href="/orders">
+                        <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
+                            <BoxIconLine className="text-gray-800 dark:text-white/90" />
+                        </div>
+                        <div className="flex items-end justify-between mt-5">
+                            
+                                <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    Orders
+                                </span>
+                                <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
+                                    {Count.order_count}
+                                </h4>
+                            
+
+
+                        </div>
+                    </Link>
+                </div>
+
+
+
+
+
+                {/* <MonthlySalesChart /> */}
                 {/* <div className="col-span-12 xl:col-span-5">
                 <MonthlyTarget />
             </div> */}
@@ -72,18 +158,6 @@ export default function EcommerceClient() {
             </div> */}
 
 
-                <div className="col-span-12">
-                    <div className="mx-auto max-w-7xl space-y-6">
-                        <div className="space-y-2">
-                            <h1 className="text-4xl font-bold tracking-tight dark:text-gray-400">Auto Parts Requests</h1>
-                            <p className="text-lg text-muted-foreground dark:text-white/90">
-                                Manage and track all vehicle part requests in one place
-                            </p>
-                        </div>
-
-                        <AutoPartsTable data={autoPartsData} />
-                    </div>
-                </div>
                 {/* <div className="col-span-12 xl:col-span-7">
                     <RecentOrders />
                 </div> */}

@@ -59,6 +59,7 @@ export const EcommerceMetrics = ({ buyerCount, supplierCount }: EcommercePros) =
           </div>
         </Link>
       </div>
+      
       {/* <!-- Metric Item End --> */}
     </div>
   );

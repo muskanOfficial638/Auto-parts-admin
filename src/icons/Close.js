@@ -1,3 +1,5 @@
 import * as React from "react";
-const SvgClose = props => <svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="none" className="close_svg__fill-current" viewBox="0 0 24 24" {...props}><path fillRule="evenodd" d="M6.043 16.542a1 1 0 1 0 1.414 1.414L12 13.414l4.542 4.542a1 1 0 0 0 1.414-1.414L13.413 12l4.542-4.542a1 1 0 0 0-1.414-1.414l-4.542 4.542-4.542-4.542A1 1 0 1 0 6.043 7.46L10.585 12z" clipRule="evenodd" /></svg>;
+const SvgClose = props => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x h-4 w-4 dark:text-gray-400" aria-hidden="true" {...props}><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>;
 export default SvgClose;
+
+
