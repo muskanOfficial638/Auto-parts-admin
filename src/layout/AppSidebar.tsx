@@ -54,20 +54,25 @@ const navItems: NavItem[] = [
   {
     name: "Manage Users",
     icon: <TableIcon />,
-    subItems: [{ name: "Buyer", path: "/buyers", pro: false }, { name: "Supplier", path: "/suppliers", pro: false }],
+    subItems: [{ name: "Buyer", path: "/buyers", pro: false }, { name: "Supplier", path: "/suppliers", pro: false },{ name: "KYC", path: "/supplier-kyc", pro: false }],
   },
   {
     name: "Logs",
     icon: <AlertIcon />,
     subItems: [
       { name: "Auth Logs", path: "/authentication-logs", pro: false },
-      { name: "Other Logs", path: "/other-logs", pro: false },
+      // { name: "Other Logs", path: "/other-logs", pro: false },
     ],
   },
   {
     name: "Part Requests",
     icon: <ListIcon />,
     path: "/part-requests",
+  },
+  {
+    name: "Orders",
+    icon: <ListIcon />,
+    path: "/orders",
   },
   {
     name: "CMS",

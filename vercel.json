@@ -32,6 +32,14 @@
             "source": "/api/admin/vehicle/trim/:id?",
             "destination": "http://54.80.119.79:8000/v1/admin/vehicle/trim/:id?/"
         },
+        {
+            "source": "/api/admin/cms/menu/add",
+            "destination": "http://54.80.119.79:8000/v1/admin/cms/menu/add"
+        },
+        {
+            "source": "/api/admin/cms/menu/view",
+            "destination": "http://54.80.119.79:8000/v1/admin/cms/menu/view"
+        },
 
         {
             "source": "/api/vehicle/make/:id?",

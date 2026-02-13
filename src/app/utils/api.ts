@@ -2,11 +2,14 @@
 import axios from "axios";
 
 // API paths for LOCAL
-// export const authApiPath = "http://54.80.119.79:8001/v1";
-// export const adminApiPath = "http://54.80.119.79:8000/v1/admin";
-// export const vehicleApiPath = "http://54.80.119.79:8006/v1/vehicle";
-// export const deleteVehicleApiPath = "http://54.80.119.79:8000/v1/admin/vehicle";
-// export const partRequestPath = "http://54.80.119.79:8005/v1/supplier";
+//export const authApiPath = "http://54.80.119.79:8001/v1";
+//export const adminApiPath = "http://54.80.119.79:8000/v1/admin";
+//export const vehicleApiPath = "http://54.80.119.79:8006/v1/vehicle";
+//export const deleteVehicleApiPath = "http://54.80.119.79:8000/v1/admin/vehicle";
+//export const partRequestPath = "http://54.80.119.79:8005/v1/supplier";
+
+
+export const profiles = "http://54.80.119.79:8004/profiles";
 
 //image path
 //export const imagePath = "http://54.80.119.79:8000/image/"; 
@@ -18,6 +21,70 @@ export const adminApiPath = "/api/admin";
 export const vehicleApiPath = "/api/vehicle";
 export const deleteVehicleApiPath = "api/admin/vehicle";
 export const partRequestPath = "/api/parts";
+ 
+// user profiles
+export async function getDashBoard( token: string) {
+  const res = await fetch(`${adminApiPath}/dashboard/view-counts`, {
+    cache: "no-store",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch Dashboard data");
+  return res.json();
+}
+
+
+// update Order status
+export async function updateOrderStatus(token: string, data: any) {
+  return axios.put(
+    
+    `${adminApiPath}/orders/updatestatus`,
+    data,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error("unable to update order status", error);
+      throw error;
+    });
+}
+
+// Get orders Details
+export async function getOrdersDetails(token:string,orderId:string) {
+  const res = await fetch(`${adminApiPath}/view-order-details?order_id=${orderId}`, {
+    cache: "no-store",
+    method: "GET",
+   headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+  });
+  if (!res.ok) throw new Error("Failed to get orders details");
+  return res.json();
+}
+
+// Get Orders
+export async function getAllOrders(token:string) {
+  const res = await fetch(`${adminApiPath}/order/view`, {
+    cache: "no-store",
+    method: "GET",
+   headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+  });
+  if (!res.ok) throw new Error("Failed to get orders");
+  return res.json();
+}
 
 
 // user profiles
@@ -32,10 +99,69 @@ export async function fetchUsers(role: string, token: string) {
   if (!res.ok) throw new Error("Failed to fetch profiles");
   return res.json();
 }
+// address fetch
+export async function getAddressbyID(role:string,id: string, token: string) {
+  const res = await fetch(`${profiles}/${role}/address/${id}`, {
+    cache: "no-store",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch profiles");
+  return res.json();
+}
+
+// KYC admin page
+export async function fetchUsersKyc( token: string) {
+  const res = await fetch(`${adminApiPath}/kyc/supplier`, {
+    cache: "no-store",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch profiles");
+  return res.json();
+}
+// Attachments data get 
+export async function fetchKycAttachments( token: string,userId: string) {
+  const res = await fetch(`${adminApiPath}/kyc/view?user_id=${userId}`, {
+    cache: "no-store",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch profiles");
+  return res.json();
+}
+
+// update KYC status
+export async function updateKycUser( token: string, userData: any) {
+  return axios.patch(
+    `${adminApiPath}/kyc/action`,
+    { ...userData },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error("unable to update user", error);
+      throw error;
+    });
+}
 
 // update user
 export async function updateUser(role: string, token: string, userData: any) {
-  console.log("role", role)
   return axios.patch(
     `${adminApiPath}/manage-users/${role}/${userData?.id}`,
     { ...userData },
@@ -153,7 +279,7 @@ export async function deleteAdminLogs(token: string, logId: string) {
 
 // Get Vehicle makes
 export async function viewVehicleMake() {
-  const res = await fetch(`${vehicleApiPath}/view/`, {
+  const res = await fetch(`${adminApiPath}/vehicle/viewall/`, {
     cache: "no-store",
     method: "GET",
     headers: {
@@ -184,22 +310,22 @@ export async function deleteVehicle(level: string, makeId: string, token:string)
     });
 }
 
-// Vehicle model by make name
-export async function fetchVehicleModelByMake(makeName: string) {
-  const res = await fetch(`${vehicleApiPath}/model/${makeName}`, {
-    cache: "no-store",
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  if (!res.ok) throw new Error("Failed to vehicle model by make name");
-  return res.json();
-}
+// // Vehicle model by make name
+// export async function fetchVehicleModelByMake(makeName: string) {
+//   const res = await fetch(`${vehicleApiPath}/model/${makeName}`, {
+//     cache: "no-store",
+//     method: "GET",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//   });
+//   if (!res.ok) throw new Error("Failed to vehicle model by make name");
+//   return res.json();
+// }
 
 //all part requests
 export async function fetchAllPartRequests() {
-  const res = await fetch(`${partRequestPath}/all/part-request/`, {
+  const res = await fetch(`${adminApiPath}/part-request/viewall`, {
     cache: "no-store",
     headers: {
       "Content-Type": "application/json",
@@ -306,7 +432,7 @@ export async function addNewPage( token: string, userData: any) {
     { ...userData },
     {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,
       },
     }
@@ -336,6 +462,63 @@ export async function uploadImage( token: string, userData: any) {
     })
     .catch((error) => {
       console.error("unable to update user", error);
+      throw error;
+    });
+}
+
+//menu get
+export async function getMenuData( token: string) {
+  const res = await fetch(`${adminApiPath}/cms/menu/view`, {
+    cache: "no-store",
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!res.ok) throw new Error("Failed to fetch page details");
+  return res.json();
+}
+
+//menu update
+export async function updateMenuData( token: string, menuData: any) {
+  return axios.post(
+    `${adminApiPath}/cms/menu/add`,
+    { data : [...menuData] },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      return response.data;
+    })
+    .catch((error) => {
+      console.error("unable to update menu", error);
+      throw error;
+    });
+}
+
+// add Buyer 
+export async function addNewUser(role: string, token: string, userData: any) {
+
+  return axios.post(
+    `${authApiPath}/auth/register`,
+    { ...userData, "role": role },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`,
+      },
+    }
+  )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error("unable to add user", error);
       throw error;
     });
 }

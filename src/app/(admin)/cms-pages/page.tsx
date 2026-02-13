@@ -62,7 +62,7 @@ const CmsPages = () => {
         fetchData();
     }
     }, [pageUpdateValue]);
-console.log("data",pageUpdateValue  )
+
     const handleUpdateModalOpen = (pageId: string,pageSlug: string ) => {
        if(pageSlug=="/"){
         setIsHomeOpenUpdateModal(true)

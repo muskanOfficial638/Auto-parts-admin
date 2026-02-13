@@ -33,19 +33,48 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { fetchAllPartRequests, imagePath } from "@/app/utils/api";
+import Image from "next/image";
+export type BadgeColor =
+  | "primary"
+  | "success"
+  | "error"
+  | "warning"
+  | "info"
+  | "light"
+  | "dark";
+
+const OrderStatus = {
+    "0": "Active",
+    "1": "In Process",
+    "2": "In Transit",
+    "3": "Completed",
+    "4": "Cancelled",
+}
+
+const OrderStatusColor: Record<string, BadgeColor> = {
+    "0": "warning",
+    "1": "info",
+    "2": "primary",
+    "3": "success",
+    "4": "error",
+   
+      
+};
 
 const columns: ColumnDef<AutoPartRequest>[] = [
     {
         accessorKey: "attachment",
         header: "Image",
         cell: ({ row }) => {
-            const attachment = row.getValue("attachment") as string | undefined;
+            const attachment = row.getValue("attachment") as string[];
             return attachment ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                    src={`${imagePath}${attachment}`}
+               
+                <Image
+                width={100}
+                height={100}
+                    src={`${imagePath}${attachment[0]}`}
                     alt={row.getValue("title")}
-                    className="h-12 w-12 rounded object-cover"
+                    className="w-24 rounded object-cover"
                 />
             ) : (
                 <div className="h-12 w-12 rounded bg-muted flex items-center justify-center text-xs text-muted-foreground">
@@ -118,20 +147,47 @@ const columns: ColumnDef<AutoPartRequest>[] = [
                 </Button>
             );
         },
+        
         cell: ({ row }) => {
             const urgency = row.getValue("urgency") as string;
             return (
                 <Badge color={
                     urgency === "high"
-                        ? "success"
+                        ? "error"
                         : urgency === "medium"
-                            ? "primary"
-                            : "error"
+                            ? "warning"
+                            : "success"
                 }
                     variant="solid"
 
                 >
                     {urgency}
+                </Badge>
+            );
+        },
+    },
+        {
+        accessorKey: "status",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    className="hover:bg-muted/50"
+                >
+                    Status
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            );
+        },
+        
+        cell: ({ row }) => {
+            const urgency = row.getValue("status") as string;
+            return (
+                
+                <Badge color={OrderStatusColor[urgency]}  variant="solid" >
+                   
+                    {OrderStatus[urgency as keyof typeof OrderStatus]}
                 </Badge>
             );
         },
@@ -177,7 +233,7 @@ const columns: ColumnDef<AutoPartRequest>[] = [
 ];
 
 export function PartRequestTable() {
-    const [sorting, setSorting] = useState<SortingState>([]);
+    const [sorting, setSorting] = useState<SortingState>([ { id: 'created_at', desc: true },]);
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
     const [globalFilter, setGlobalFilter] = useState("");
     const [autoPartsUserData, setAutoPartsUserData] = useState<string | null>("loading");
@@ -211,7 +267,7 @@ export function PartRequestTable() {
         },
         initialState: {
             pagination: {
-                pageSize: 10,
+                pageSize: 30,
             },
         },
     });

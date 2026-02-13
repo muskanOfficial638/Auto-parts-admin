@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { getMenuData, updateMenuData } from "@/app/utils/api";
 import {
   DndContext,
   closestCenter,
@@ -20,11 +21,12 @@ import {
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { toast, ToastContainer } from 'react-toastify';
-import { 
-  Plus, Edit2, Trash2, X, GripVertical, 
+import {
+  Plus, Edit2, Trash2, X, GripVertical,
   ChevronRight, Folder, Home, Menu, ChevronDown,
   ChevronUp, FolderTree, Indent,
 } from 'lucide-react';
+
 
 interface MenuItem {
   id: string;
@@ -33,7 +35,6 @@ interface MenuItem {
   order: number;
   parentId?: string | null;
   target?: '_blank' | '_self';
-  isActive: boolean;
   icon?: string;
   submenu?: MenuItem[];
   level: number;
@@ -43,7 +44,6 @@ interface MenuGroup {
   id: string;
   name: string;
   slug: string;
-  description?: string;
   items: MenuItem[];
   isActive: boolean;
   createdAt: Date;
@@ -51,9 +51,9 @@ interface MenuGroup {
 }
 
 // Sortable Item Component
-const SortableMenuItem = ({ 
-  menu, 
-  onEdit, 
+const SortableMenuItem = ({
+  menu,
+  onEdit,
   onDelete,
   onAddSubmenu,
   depth = 0,
@@ -94,9 +94,8 @@ const SortableMenuItem = ({
       <div
         ref={setNodeRef}
         style={style}
-        className={`flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 ${
-          depth > 0 ? 'border-l-4 border-l-brand-300 dark:border-l-brand-700' : ''
-        } ${isDragging ? 'shadow-lg z-10' : ''} relative group`}
+        className={`flex items-center justify-between p-4 hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 ${depth > 0 ? 'border-l-4 border-l-brand-300 dark:border-l-brand-700' : ''
+          } ${isDragging ? 'shadow-lg z-10' : ''} relative group`}
       >
         {/* Drag handle area */}
         <div className="absolute left-0 top-0 bottom-0 w-12 flex items-center justify-center">
@@ -122,16 +121,12 @@ const SortableMenuItem = ({
               </button>
             )}
           </div>
-          
+
           <div className="flex items-center gap-3">
-            <div className={`w-8 h-8 flex items-center justify-center rounded-lg ${
-              menu.isActive 
-                ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300' 
-                : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
-            }`}>
+            <div className={`w-8 h-8 flex items-center justify-center rounded-lg bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300`}>
               {getIcon()}
             </div>
-            
+
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-medium text-gray-800 dark:text-white">
@@ -147,11 +142,7 @@ const SortableMenuItem = ({
                     New Tab
                   </span>
                 )}
-                {!menu.isActive && (
-                  <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400 rounded">
-                    Inactive
-                  </span>
-                )}
+
               </div>
               <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
                 <code className="bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">
@@ -171,7 +162,7 @@ const SortableMenuItem = ({
             </div>
           </div>
         </div>
-        
+
         <div className="flex items-center gap-2">
           {depth < 2 && (
             <button
@@ -223,183 +214,24 @@ const SortableMenuItem = ({
 
 // Main Menu Manager Component
 const MenuManager = () => {
-  const defaultMenuGroups: MenuGroup[] = [
-    {
-      id: '1',
-      name: 'Main Navigation',
-      slug: 'main',
-      description: 'Primary website navigation with submenus',
-      isActive: true,
-      maxDepth: 3,
-      items: [
-        { 
-          id: '1', 
-          name: 'Home', 
-          slug: '/', 
-          order: 1, 
-          parentId: null, 
-          target: '_self', 
-          isActive: true, 
-          icon: 'home',
-          submenu: [],
-          level: 0
-        },
-        { 
-          id: '2', 
-          name: 'About', 
-          slug: '/about', 
-          order: 2, 
-          parentId: null, 
-          target: '_self', 
-          isActive: true,
-          submenu: [
-            { 
-              id: '2-1', 
-              name: 'Our Team', 
-              slug: '/about/team', 
-              order: 1, 
-              parentId: '2', 
-              target: '_self', 
-              isActive: true,
-              submenu: [],
-              level: 1
-            },
-            { 
-              id: '2-2', 
-              name: 'History', 
-              slug: '/about/history', 
-              order: 2, 
-              parentId: '2', 
-              target: '_self', 
-              isActive: true,
-              submenu: [],
-              level: 1
-            }
-          ],
-          level: 0
-        },
-        { 
-          id: '3', 
-          name: 'Services', 
-          slug: '/services', 
-          order: 3, 
-          parentId: null, 
-          target: '_self', 
-          isActive: true,
-          submenu: [],
-          level: 0
-        },
-        { 
-          id: '4', 
-          name: 'Contact', 
-          slug: '/contact', 
-          order: 4, 
-          parentId: null, 
-          target: '_self', 
-          isActive: true,
-          submenu: [],
-          level: 0
-        },
-      ],
-      createdAt: new Date(),
-    },
-       {
-      id: '2',
-      name: 'Main Navigation',
-      slug: 'main2',
-      description: 'Primary website navigation with submenus',
-      isActive: true,
-      maxDepth: 3,
-      items: [
-        { 
-          id: '1', 
-          name: 'Home', 
-          slug: '/', 
-          order: 1, 
-          parentId: null, 
-          target: '_self', 
-          isActive: true, 
-          icon: 'home',
-          submenu: [],
-          level: 0
-        },
-        { 
-          id: '2', 
-          name: 'About', 
-          slug: '/about', 
-          order: 2, 
-          parentId: null, 
-          target: '_self', 
-          isActive: true,
-          submenu: [
-            { 
-              id: '2-1', 
-              name: 'Our Team', 
-              slug: '/about/team', 
-              order: 1, 
-              parentId: '2', 
-              target: '_self', 
-              isActive: true,
-              submenu: [],
-              level: 1
-            },
-            { 
-              id: '2-2', 
-              name: 'History', 
-              slug: '/about/history', 
-              order: 2, 
-              parentId: '2', 
-              target: '_self', 
-              isActive: true,
-              submenu: [],
-              level: 1
-            }
-          ],
-          level: 0
-        },
-        { 
-          id: '3', 
-          name: 'Services', 
-          slug: '/services', 
-          order: 3, 
-          parentId: null, 
-          target: '_self', 
-          isActive: true,
-          submenu: [],
-          level: 0
-        },
-        { 
-          id: '4', 
-          name: 'Contact', 
-          slug: '/contact', 
-          order: 4, 
-          parentId: null, 
-          target: '_self', 
-          isActive: true,
-          submenu: [],
-          level: 0
-        },
-      ],
-      createdAt: new Date(),
-    },
-  ];
 
-  const [menuGroups, setMenuGroups] = useState<MenuGroup[]>(defaultMenuGroups);
+
+
+  const [menuGroups, setMenuGroups] = useState<MenuGroup[]>([]);
   const [activeMenuGroup, setActiveMenuGroup] = useState<string>('main');
   const [editingMenu, setEditingMenu] = useState<MenuItem | null>(null);
   const [editingMenuGroup, setEditingMenuGroup] = useState<MenuGroup | null>(null);
+
   const [newMenu, setNewMenu] = useState<Omit<MenuItem, 'id' | 'order' | 'submenu' | 'level'>>({
     name: '',
     slug: '',
     parentId: null,
     target: '_self',
-    isActive: true,
     icon: '',
   });
   const [newMenuGroup, setNewMenuGroup] = useState<Omit<MenuGroup, 'id' | 'items' | 'createdAt'>>({
     name: '',
     slug: '',
-    description: '',
     isActive: true,
     maxDepth: 3,
   });
@@ -408,6 +240,9 @@ const MenuManager = () => {
   const [isEditMenuModalOpen, setIsEditMenuModalOpen] = useState(false);
   const [isEditMenuGroupModalOpen, setIsEditMenuGroupModalOpen] = useState(false);
   const [activeParentId, setActiveParentId] = useState<string | null>(null);
+  const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
+  const loggedInUser = JSON.parse(autoPartsUserData);
+  const accessToken = loggedInUser?.access_token;
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -420,21 +255,27 @@ const MenuManager = () => {
     })
   );
 
-  // Load from localStorage
-  useEffect(() => {
-    const savedMenuGroups = localStorage.getItem('menuGroups');
-    if (savedMenuGroups) {
-      try {
-        const parsedGroups = JSON.parse(savedMenuGroups);
-        setMenuGroups(parsedGroups.map((group: any) => ({
-          ...group,
-          createdAt: new Date(group.createdAt),
-        })));
-      } catch (error) {
-        console.error('Failed to parse saved menus:', error);
-      }
+
+async function saveMenus(){
+  const data = await updateMenuData(accessToken,
+    menuGroups);
+    if (data.status=='success') {
+      toast.success('Menu saved successfully');
     }
-  }, []);
+  console.log("Menu data saved:", data);
+}
+
+  useEffect(() => {
+    if (!accessToken) return;
+    const fetchMenuData = async () => {
+      const data = await getMenuData(accessToken);
+      setMenuGroups(data);
+      setActiveMenuGroup(data.length > 0 ? data[0].slug : '');
+    };
+    fetchMenuData();
+
+
+  }, [accessToken]);
 
   // Save to localStorage
   useEffect(() => {
@@ -444,15 +285,15 @@ const MenuManager = () => {
   // Helper functions for nested structure
   const flattenMenuItems = (items: MenuItem[]): MenuItem[] => {
     const flatItems: MenuItem[] = [];
-    
+
     items.sort((a, b) => a.order - b.order).forEach(item => {
       flatItems.push(item);
-      
+
       if (item.submenu && item.submenu.length > 0) {
         flatItems.push(...flattenMenuItems(item.submenu));
       }
     });
-    
+
     return flatItems;
   };
 
@@ -505,13 +346,13 @@ const MenuManager = () => {
       const newItems = [...items, newItem];
       return newItems.sort((a, b) => a.order - b.order);
     }
-    
+
     return items.map(item => {
       if (item.id === parentId) {
         const submenu = [...(item.submenu || []), newItem];
-        return { 
-          ...item, 
-          submenu: submenu.sort((a, b) => a.order - b.order) 
+        return {
+          ...item,
+          submenu: submenu.sort((a, b) => a.order - b.order)
         };
       }
       if (item.submenu && item.submenu.length > 0) {
@@ -525,14 +366,14 @@ const MenuManager = () => {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     const activeGroup = getActiveMenuGroup();
-    
+
     if (!over || !activeGroup || active.id === over.id) {
       return;
     }
 
     const activeItem = findMenuItem(activeGroup.items, active.id as string);
     const overItem = findMenuItem(activeGroup.items, over.id as string);
-    
+
     if (!activeItem || !overItem) {
       return;
     }
@@ -540,7 +381,7 @@ const MenuManager = () => {
     // Find parents
     const activeParent = findMenuItemParent(activeGroup.items, activeItem.id);
     const overParent = findMenuItemParent(activeGroup.items, overItem.id);
-    
+
     // IMPORTANT: Only allow reordering within same parent level
     // If parents are different, show error and return
     if ((activeParent?.id || null) !== (overParent?.id || null)) {
@@ -549,17 +390,17 @@ const MenuManager = () => {
     }
 
     let updatedItems = [...activeGroup.items];
-    
+
     if (activeParent) {
       // Reordering within submenu
       const parentSubmenu = activeParent.submenu || [];
       const oldIndex = parentSubmenu.findIndex(item => item.id === activeItem.id);
       const newIndex = parentSubmenu.findIndex(item => item.id === overItem.id);
-      
+
       if (oldIndex !== -1 && newIndex !== -1) {
         const newSubmenu = arrayMove(parentSubmenu, oldIndex, newIndex)
           .map((item, index) => ({ ...item, order: index + 1 }));
-        
+
         updatedItems = updateMenuItemInTree(updatedItems, activeParent.id, { submenu: newSubmenu });
       }
     } else {
@@ -567,11 +408,11 @@ const MenuManager = () => {
       const rootItems = updatedItems.filter(item => !item.parentId);
       const oldIndex = rootItems.findIndex(item => item.id === activeItem.id);
       const newIndex = rootItems.findIndex(item => item.id === overItem.id);
-      
+
       if (oldIndex !== -1 && newIndex !== -1) {
         const newRootItems = arrayMove(rootItems, oldIndex, newIndex)
           .map((item, index) => ({ ...item, order: index + 1 }));
-        
+
         // Replace root items while keeping submenus
         updatedItems = updatedItems.map(item => {
           if (!item.parentId) {
@@ -583,15 +424,15 @@ const MenuManager = () => {
       }
     }
 
-    setMenuGroups(groups => 
+    setMenuGroups(groups =>
       groups.map(group =>
         group.slug === activeMenuGroup
           ? { ...group, items: updatedItems }
           : group
       )
     );
- 
-    toast.success('Menu order updated');
+
+    
   };
 
   const getActiveMenuGroup = () => {
@@ -621,7 +462,7 @@ const MenuManager = () => {
       return;
     }
 
- 
+
     const newMenuItem: MenuItem = {
       ...newMenu,
       id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -631,7 +472,7 @@ const MenuManager = () => {
     };
 
     // Get siblings count for order
-    const siblings = parentItem 
+    const siblings = parentItem
       ? parentItem.submenu || []
       : activeGroup.items.filter(item => !item.parentId);
     newMenuItem.order = siblings.length + 1;
@@ -649,12 +490,10 @@ const MenuManager = () => {
       slug: '',
       parentId: null,
       target: '_self',
-      isActive: true,
       icon: '',
     });
     setActiveParentId(null);
     setIsMenuModalOpen(false);
-    toast.success('Menu item created successfully');
   };
 
   const handleUpdateMenu = () => {
@@ -678,16 +517,16 @@ const MenuManager = () => {
       groups.map(group =>
         group.slug === activeMenuGroup
           ? {
-              ...group,
-              items: updateMenuItemInTree(group.items, updatedMenu.id, updatedMenu),
-            }
+            ...group,
+            items: updateMenuItemInTree(group.items, updatedMenu.id, updatedMenu),
+          }
           : group
       )
     );
 
     setEditingMenu(null);
     setIsEditMenuModalOpen(false);
-    toast.success('Menu item updated successfully');
+
   };
 
   const handleDeleteMenu = (id: string) => {
@@ -698,7 +537,7 @@ const MenuManager = () => {
     if (!itemToDelete) return;
 
     const hasChildren = itemToDelete.submenu && itemToDelete.submenu.length > 0;
-    const message = hasChildren 
+    const message = hasChildren
       ? `This menu item has ${itemToDelete.submenu!.length} subitem(s). Delete this item and all its children?`
       : 'Are you sure you want to delete this menu item?';
 
@@ -707,13 +546,13 @@ const MenuManager = () => {
         groups.map(group =>
           group.slug === activeMenuGroup
             ? {
-                ...group,
-                items: deleteMenuItemFromTree(group.items, id),
-              }
+              ...group,
+              items: deleteMenuItemFromTree(group.items, id),
+            }
             : group
         )
       );
-      toast.success('Menu item deleted successfully');
+
     }
   };
 
@@ -740,7 +579,6 @@ const MenuManager = () => {
     setNewMenuGroup({
       name: '',
       slug: '',
-      description: '',
       isActive: true,
       maxDepth: 3,
     });
@@ -764,7 +602,7 @@ const MenuManager = () => {
 
     setEditingMenuGroup(null);
     setIsEditMenuGroupModalOpen(false);
-    toast.success('Menu group updated successfully');
+
   };
 
   const handleDeleteMenuGroup = (id: string) => {
@@ -774,12 +612,10 @@ const MenuManager = () => {
     if (window.confirm(`Are you sure you want to delete the "${groupToDelete.name}" menu group? This will delete all menu items in this group.`)) {
       const updatedGroups = menuGroups.filter(group => group.id !== id);
       setMenuGroups(updatedGroups);
-      
+
       if (activeMenuGroup === groupToDelete.slug && updatedGroups.length > 0) {
         setActiveMenuGroup(updatedGroups[0].slug);
       }
-      
-      toast.success('Menu group deleted successfully');
     }
   };
 
@@ -804,7 +640,6 @@ const MenuManager = () => {
       slug: '',
       parentId: parentId,
       target: '_self',
-      isActive: true,
       icon: '',
     });
     setIsMenuModalOpen(true);
@@ -814,21 +649,7 @@ const MenuManager = () => {
     return flattenMenuItems(items);
   };
 
-  const convertToJSONStructure = (items: MenuItem[]): any[] => {
-    return items.sort((a, b) => a.order - b.order).map(item => {
-      const jsonItem: any = {
-        name: item.name,
-        slug: item.slug,
-        order: item.order,
-      };
 
-      if (item.submenu && item.submenu.length > 0) {
-        jsonItem.submenu = convertToJSONStructure(item.submenu);
-      }
-
-      return jsonItem;
-    });
-  };
 
   const openEditMenuModal = (menu: MenuItem) => {
     setEditingMenu({ ...menu });
@@ -843,12 +664,11 @@ const MenuManager = () => {
   const activeGroup = getActiveMenuGroup();
   const activeItems = getActiveMenuItems();
   const flatItems = getFlatMenuItems(activeItems);
-  const jsonStructure = convertToJSONStructure(activeItems);
 
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen dark:bg-gray-900">
       <ToastContainer position="top-right" autoClose={3000} />
-      
+
       {/* Header */}
       <div className="mb-6 md:mb-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -863,7 +683,7 @@ const MenuManager = () => {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => setIsMenuGroupModalOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors text-sm"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors text-sm dark:text-gray-400 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm"
               type="button"
             >
               <Folder size={18} />
@@ -877,12 +697,11 @@ const MenuManager = () => {
                   slug: '',
                   parentId: null,
                   target: '_self',
-                  isActive: true,
                   icon: '',
                 });
                 setIsMenuModalOpen(true);
               }}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-brand-500 text-white rounded-lg hover:bg-brand-600 transition-colors text-sm"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors text-sm dark:text-gray-400 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 shadow-sm"
               type="button"
             >
               <Plus size={18} />
@@ -912,20 +731,18 @@ const MenuManager = () => {
                 return (
                   <div
                     key={group.id}
-                    className={`p-3 mb-2 rounded-lg cursor-pointer transition-all ${
-                      activeMenuGroup === group.slug
-                        ? 'bg-brand-500 text-white'
-                        : 'hover:bg-gray-50 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300'
-                    }`}
+                    className={`p-3 mb-2 rounded-lg cursor-pointer transition-all ${activeMenuGroup === group.slug
+                      ? 'bg-brand-500 text-white'
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300'
+                      }`}
                     onClick={() => setActiveMenuGroup(group.slug)}
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className={`p-2 rounded ${
-                          activeMenuGroup === group.slug
-                            ? 'bg-white/20'
-                            : 'bg-gray-100 dark:bg-gray-700'
-                        }`}>
+                        <div className={`p-2 rounded ${activeMenuGroup === group.slug
+                          ? 'bg-white/20'
+                          : 'bg-gray-100 dark:bg-gray-700'
+                          }`}>
                           <Folder size={18} />
                         </div>
                         <div>
@@ -959,11 +776,6 @@ const MenuManager = () => {
                         <ChevronRight size={18} />
                       </div>
                     </div>
-                    {group.description && (
-                      <p className="text-xs mt-2 opacity-75 truncate">
-                        {group.description}
-                      </p>
-                    )}
                   </div>
                 );
               })}
@@ -982,16 +794,19 @@ const MenuManager = () => {
                       {activeGroup?.name || 'Select a Menu Group'}
                     </h2>
                   </div>
-                  {activeGroup?.description && (
-                    <p className="text-gray-600 dark:text-gray-400 text-sm">
-                      {activeGroup.description}
-                    </p>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                   <span className="text-sm text-gray-500 dark:text-gray-400">
                     {flattenMenuItems(activeItems).length} total items
                   </span>
+                </div>
+                <div className="flex items-center gap-2">
+
+                                    <button
+                    onClick={saveMenus}
+                    className="px-3 py-1 bg-brand-500 text-white text-lg rounded hover:bg-brand-600"
+                    type="button"
+                  >
+                    Save
+                  </button>
                 </div>
               </div>
             </div>
@@ -1051,41 +866,6 @@ const MenuManager = () => {
               </div>
             )}
           </div>
-
-          {/* JSON Preview with exact structure */}
-          {activeGroup && (
-            <div className="mt-4 bg-white rounded-xl shadow-lg overflow-hidden dark:bg-gray-800">
-              <div className="p-4 md:p-6 border-b dark:border-gray-700">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-xl font-semibold text-gray-800 dark:text-white">
-                      JSON Structure Preview
-                    </h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      Exact structure for your frontend
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(JSON.stringify(jsonStructure, null, 2));
-                      toast.success('Copied to clipboard');
-                    }}
-                    className="px-3 py-1.5 bg-brand-500 text-white text-sm rounded hover:bg-brand-600"
-                    type="button"
-                  >
-                    Copy JSON
-                  </button>
-                </div>
-              </div>
-              <div className="p-4 md:p-6">
-                <div className="relative">
-                  <pre className="bg-gray-100 dark:bg-gray-900 p-4 rounded-lg overflow-x-auto text-xs md:text-sm max-h-64 overflow-y-auto">
-                    {JSON.stringify(jsonStructure, null, 2)}
-                  </pre>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -1166,13 +946,13 @@ const MenuManager = () => {
 };
 
 // Modal Component
-const Modal = ({ 
-  title, 
-  isOpen, 
-  onClose, 
-  onSubmit, 
-  submitText, 
-  children 
+const Modal = ({
+  title,
+  isOpen,
+  onClose,
+  onSubmit,
+  submitText,
+  children
 }: {
   title: string;
   isOpen: boolean;
@@ -1227,12 +1007,10 @@ const Modal = ({
 };
 
 // Menu Form Component
-const MenuForm = ({ 
-  menu, 
-  onChange, 
-  menuGroups,
-  activeGroupSlug,
-  isEdit = false 
+const MenuForm = ({
+  menu,
+  onChange,
+  isEdit = false
 }: {
   menu: any;
   onChange: (menu: any) => void;
@@ -1241,30 +1019,8 @@ const MenuForm = ({
   parentId?: string | null;
   isEdit?: boolean;
 }) => {
-  const activeGroup = menuGroups.find(g => g.slug === activeGroupSlug);
-  const maxDepth = activeGroup?.maxDepth || 3;
 
-  // Get all available parents for dropdown
-  const getAllParents = (items: MenuItem[], currentId?: string): MenuItem[] => {
-    const parents: MenuItem[] = [];
-    
-    const traverse = (items: MenuItem[], level = 0) => {
-      items.forEach(item => {
-        if (item.id !== currentId && level < maxDepth - 1) {
-          parents.push(item);
-          if (item.submenu && item.submenu.length > 0) {
-            traverse(item.submenu, level + 1);
-          }
-        }
-      });
-    };
-    
-    traverse(items);
-    return parents;
-  };
-
-  const availableParents = getAllParents(activeGroup?.items || [], menu.id);
-
+ 
   return (
     <div className="space-y-4">
       <div>
@@ -1295,30 +1051,6 @@ const MenuForm = ({
           Use <code>/path</code> for internal links or <code>https://</code> for external links
         </p>
       </div>
-
-      {isEdit && (
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Parent Menu
-          </label>
-          <select
-            value={menu.parentId || ''}
-            onChange={(e) => onChange({ ...menu, parentId: e.target.value || null })}
-            className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-white focus:ring-2 focus:ring-brand-500 focus:border-transparent"
-          >
-            <option value="">None (Top Level)</option>
-            {availableParents.map(parent => (
-              <option key={parent.id} value={parent.id}>
-                {parent.name} (Level {parent.level + 1})
-              </option>
-            ))}
-          </select>
-          <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Change parent to move item to different submenu
-          </p>
-        </div>
-      )}
-
       <div>
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -1333,24 +1065,7 @@ const MenuForm = ({
             <option value="_blank">New Tab</option>
           </select>
         </div>
-
       </div>
-
-      <div className="flex items-center gap-4">
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            id="isActive"
-            checked={menu.isActive}
-            onChange={(e) => onChange({ ...menu, isActive: e.target.checked })}
-            className="w-4 h-4 text-brand-500 bg-gray-100 border-gray-300 rounded focus:ring-brand-500 dark:focus:ring-brand-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-          />
-          <label htmlFor="isActive" className="ml-2 text-sm text-gray-700 dark:text-gray-300">
-            Active
-          </label>
-        </div>
-      </div>
-
       {isEdit && (
         <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <div className="text-sm text-gray-600 dark:text-gray-400">
@@ -1369,9 +1084,9 @@ const MenuForm = ({
 };
 
 // Menu Group Form Component
-const MenuGroupForm = ({ 
-  menuGroup, 
-  onChange, 
+const MenuGroupForm = ({
+  menuGroup,
+  onChange,
 }: {
   menuGroup: any;
   onChange: (group: any) => void;

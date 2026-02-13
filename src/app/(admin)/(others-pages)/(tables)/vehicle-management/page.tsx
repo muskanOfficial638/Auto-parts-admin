@@ -40,12 +40,14 @@ import { MakesTable, MakeRow } from "@/components/tables/MakesTable";
 import { ModelsTable, ModelRow } from "@/components/tables/ModelsTable";
 import { TrimsTable, TrimRow } from "@/components/tables/TrimsTable";
 import { deleteVehicle, viewVehicleMake } from "@/app/utils/api";
+import AddVehicleFormDialog from "@/components/form/AddVehicleFormDialog";
 
 const VehicleManagement = () => {
-     const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
+    const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
     const loggedInUser = JSON.parse(autoPartsUserData);
     const [data, setData] = useState<Make[]>([]);
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [showAddVehicleForm, setShowAddVehicleForm] = useState(false);
     const [dialogConfig, setDialogConfig] = useState<{
         level: string;
         title: string;
@@ -66,47 +68,23 @@ const VehicleManagement = () => {
         parentIds?: any;
     }>({ level: "", id: "" });
     const [activeTab, setActiveTab] = useState("makes");
-
-    // Use useEffect to fetch the data asynchronously
-    useEffect(() => {
-        const fetchData = async () => {
+ 
+ 
+ 
+    const fetchData = async () => {
             const makeData = await viewVehicleMake();
-            // console.log("makeData", makeData)
             setData(makeData);
         };
+    
+    
+    
+        useEffect(() => {
+       
         fetchData();
     }, []);
 
-    // const generateId = () => Math.random().toString(36).substring(7);
 
-    const handleAddMake = () => {
-        setDialogConfig({
-            level: "make",
-            title: "Add Vehicle Make",
-            description: "Add a new vehicle make/brand",
-        });
-        setDialogOpen(true);
-    };
 
-    const handleAddModel = (makeId: string) => {
-        setDialogConfig({
-            level: "model",
-            title: "Add Vehicle Model",
-            description: "Add a new vehicle model",
-            parentIds: { makeId },
-        });
-        setDialogOpen(true);
-    };
-
-    const handleAddTrim = (makeId: string, modelId: string) => {
-        setDialogConfig({
-            level: "trim",
-            title: "Add Vehicle Trim",
-            description: "Add a new vehicle trim level",
-            parentIds: { makeId, modelId },
-        });
-        setDialogOpen(true);
-    };
 
     const handleEdit = (level: string, id: string, parentIds?: any) => {
         let currentValue = "";
@@ -182,59 +160,6 @@ const VehicleManagement = () => {
         else { toast.success(`${level.charAt(0).toUpperCase() + level.slice(1)} added successfully`) }
     };
 
-    // const handleSave = async (value: string) => {
-    //     const { level, parentIds, editId } = dialogConfig;
-    //     if (editId) {
-    //         // Edit existing
-    //         setData((prevData) => {
-    //             const newData = [...prevData];
-    //             if (level === "make") {
-    //                 const make = newData.find((m) => m.make_id === editId);
-    //                 if (make) make.make_name = value;
-    //             } else if (level === "model" && parentIds) {
-    //                 const make = newData.find((m) => m.make_id === parentIds.makeId);
-    //                 const model = make?.models.find((m) => m.id === editId);
-    //                 if (model) model.name = value;
-    //             } else if (level === "trim" && parentIds) {
-    //                 const make = newData.find((m) => m.make_id === parentIds.makeId);
-    //                 const model = make?.models.find((m) => m.id === parentIds.modelId);
-    //                 const trim = model?.trims.find((t) => t.id === editId);
-    //                 if (trim) trim.trim = value;
-    //             }
-
-    //             return newData;
-    //         });
-    //         toast.success(`${level.charAt(0).toUpperCase() + level.slice(1)} updated successfully`);
-    //     } else {
-    //         // Add new
-    //         setData((prevData) => {
-    //             const newData = [...prevData];
-    //             if (level === "make") {
-    //                 newData.push({ id: generateId(), make_name: value, models: [] });
-
-    //             } else if (level === "model" && parentIds) {
-    //                 const make = newData.find((m) => m.id === parentIds.makeId);
-    //                 if (make) {
-    //                     make.models.push({ id: generateId(), name: value, trims: [] });
-    //                 }
-    //             } else if (level === "trim" && parentIds) {
-    //                 const make = newData.find((m) => m.id === parentIds.makeId);
-    //                 const model = make?.models.find((m) => m.id === parentIds.modelId);
-    //                 if (model) {
-    //                     model.trims.push({
-    //                         id: generateId(),
-    //                         trim: value,
-    //                         year_from: 2024,
-    //                         year_to: 2024
-    //                     });
-    //                 }
-    //             }
-
-    //             return newData;
-    //         });
-    //         toast.success(`${level.charAt(0).toUpperCase() + level.slice(1)} added successfully`);
-    //     }
-    // };
 
     const makesData = useMemo((): MakeRow[] => {
         return data.map((make) => ({
@@ -305,37 +230,12 @@ const VehicleManagement = () => {
                         </TabsList>
 
                         <div className="flex gap-2">
-                            {activeTab === "makes" && (
-                                <Button onClick={handleAddMake} className="dark:text-gray-400">
-                                    <Plus className="h-4 w-4 mr-2 dark:text-gray-400" />
-                                    Add Make
-                                </Button>
-                            )}
-                            {activeTab === "models" && (
-                                <Button
-                                    onClick={() =>
-                                        handleAddModel(data[0]?.make_id || "")
-                                    }
-                                    className="dark:text-gray-400"
-                                >
-                                    <Plus className="h-4 w-4 mr-2 dark:text-gray-400" />
-                                    Add Model
-                                </Button>
-                            )}
-                            {activeTab === "trims" && (
-                                <Button
-                                    onClick={() =>
-                                        handleAddTrim(
-                                            data[0]?.make_id || "",
-                                            data[0]?.models[0]?.id || ""
-                                        )
-                                    }
-                                    className="dark:text-gray-400"
-                                >
-                                    <Plus className="h-4 w-4 mr-2 dark:text-gray-400" />
-                                    Add Trim
-                                </Button>
-                            )}
+                            <Button onClick={() => setShowAddVehicleForm(true)} className="dark:text-gray-400">
+                                <Plus className="h-4 w-4 mr-2 dark:text-gray-400" />
+                                Add Make
+                            </Button>
+
+
                         </div>
                     </div>
 
@@ -372,7 +272,7 @@ const VehicleManagement = () => {
                     </TabsContent>
                 </Tabs>
             </div>
-
+       
             <VehicleFormDialog
                 open={dialogOpen}
                 onOpenChange={setDialogOpen}
@@ -383,8 +283,11 @@ const VehicleManagement = () => {
                 levelData={dialogConfig?.levelData}
                 onSave={handleSave}
                 editId={dialogConfig?.editId ? dialogConfig?.editId : ''}
+                vehicleMakeData={data}
             />
-
+            {showAddVehicleForm && (
+                <AddVehicleFormDialog setShowAddVehicleForm={setShowAddVehicleForm} onSave={fetchData} />
+            )}
             <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
