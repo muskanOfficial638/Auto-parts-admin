@@ -96,7 +96,7 @@ export async function fetchUsers(role: string) {
   return res.json();
 }
 // address fetch
-// export async function getAddressbyID(role:string,id: string) {
+ export async function getAddressbyID(role:string,id: string) {
 //   const res = await fetch(`${profiles}/${role}/address/${id}`, {
 //     cache: "no-store",
 //     headers: {
@@ -106,7 +106,7 @@ export async function fetchUsers(role: string) {
 //   });
 //   if (!res.ok) throw new Error("Failed to fetch profiles");
 //   return res.json();
-// }
+}
 
 // KYC admin page
 export async function fetchUsersKyc( ) {
