@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { apiRequest } from "@/lib/apiAuth";
+//import { apiRequest } from "@/lib/apiAuth";
 import { cookies } from "next/headers";
 
 
@@ -14,11 +14,11 @@ export async function POST() {
     
   }
 
-  const res = await apiRequest("/refresh", true, {
+  const res = await fetch("/refresh",  {
     method: "POST",
     headers: {
       Authorization: `Bearer ${refresh}`,
-    },
+    }
   });
 
   const data = await res.json();
