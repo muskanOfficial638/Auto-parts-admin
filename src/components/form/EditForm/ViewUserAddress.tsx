@@ -41,13 +41,13 @@ const ViewUserAddress = ({ isOpenModel, setIsOpenModel, userData }: any) => {
     useEffect(() => {
         if (typeof window !== 'undefined') {
 
-                getAddressbyID(userData.role,userData.id).then((data) => {
-                    console.log(data)
-                    if (data.data?.length > 0) {
-                        setaddresses(data);
-                    }else{
-                        setAddressError(true);
-                    }
+                getAddressbyID(userData.role,userData.id).then(() => {
+                    // console.log(data)
+                    // if (data.data?.length > 0) {
+                    //     setaddresses(data);
+                    // }else{
+                    //     setAddressError(true);
+                    // }
 
                 });
             
