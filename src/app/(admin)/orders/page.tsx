@@ -43,11 +43,8 @@ const CmsPages = () => {
 
     const handleSubmit = () => {
 
-        const raw = localStorage.getItem("autoPartsUserData");
-        const loggedInUser = JSON.parse(raw || "{}");
-
-        updateOrderStatus(loggedInUser.access_token, { order_id: changeStatusData, status }).then((res) => {
-
+    
+        updateOrderStatus( { order_id: changeStatusData, status }).then((res) => {
             if (res.data.status === true) {
                 toast.success("Order status updated successfully!");
                 setChangeStatus(false);
@@ -65,10 +62,9 @@ const CmsPages = () => {
     };
 
     useEffect(() => {
-        const raw = localStorage.getItem("autoPartsUserData");
-        const loggedInUser = JSON.parse(raw || "{}");
+
         const fetchData = async () => {
-            const makeData = await getAllOrders(loggedInUser.access_token);
+            const makeData = await getAllOrders();
             setData(makeData);
         };
         fetchData();

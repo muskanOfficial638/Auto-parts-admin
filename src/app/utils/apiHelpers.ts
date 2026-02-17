@@ -13,7 +13,7 @@ interface SaveOrUpdateParamsForMake {
   model_id?: string;
   onSuccess: () => void;
   onError: (msg: string) => void;
-  token: string;
+
 }
 
 interface SaveOrUpdateParamsForTrim {
@@ -29,7 +29,7 @@ interface SaveOrUpdateParamsForTrim {
   year_to: number;
   onSuccess: () => void;
   onError: (msg: string) => void;
-  token: string;
+
 }
 
 export async function handleSaveOrUpdateMake({
@@ -42,7 +42,7 @@ export async function handleSaveOrUpdateMake({
   endpoint,
   onSuccess,
   onError,
-  token
+
 }: SaveOrUpdateParamsForMake) {
   e.preventDefault();
   // console.log(isUpdate , id , level);
@@ -70,7 +70,7 @@ export async function handleSaveOrUpdateMake({
       url,
       data: { name, make_id },
       headers: {
-        Authorization: `Bearer ${token}`,
+      
       },
     });
 
@@ -107,7 +107,7 @@ export async function handleSaveOrUpdateTrim({
   endpoint,
   onSuccess,
   onError,
-  token
+ 
 }: SaveOrUpdateParamsForTrim) {
   e.preventDefault();
   if (!trim.trim()) {
@@ -129,7 +129,7 @@ export async function handleSaveOrUpdateTrim({
       url,
       data: { trim, model_id, make_id, year_from, year_to },
       headers: {
-        Authorization: `Bearer ${token}`,
+        
       },
     });
 

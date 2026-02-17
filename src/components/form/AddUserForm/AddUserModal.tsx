@@ -24,8 +24,6 @@ export default function AddUserModal({ isOpen, closeModal, role, dataChanged }: 
 
   const [emailError, setEmailError] = useState("");
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
-  const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
-  const loggedInUser = JSON.parse(autoPartsUserData);
 
   // Email Validation
   const validateEmail = (value: string) => {
@@ -94,7 +92,7 @@ export default function AddUserModal({ isOpen, closeModal, role, dataChanged }: 
         return;
       }
 
-      const response = await addNewUser(role,loggedInUser?.access_token, formData);
+      const response = await addNewUser(role,formData);
 
       if (response.data.type=="success") {
 

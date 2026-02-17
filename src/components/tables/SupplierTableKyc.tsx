@@ -42,14 +42,12 @@ export default function SupplierTable() {
   const [supplierDataChange, setSupplierDataChange] = useState("");
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const autoPartsUserData = localStorage.getItem("autoPartsUserData");
-      const loggedInUser = JSON.parse(autoPartsUserData || "{}");
 
-      if (loggedInUser?.access_token) {
-        fetchUsersKyc( loggedInUser.access_token).then((data) => {
+     
+        fetchUsersKyc().then((data) => {
           setSuppliersData(data);
         });
-      }
+      
     }
   }, [supplierDataChange]);
 

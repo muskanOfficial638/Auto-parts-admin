@@ -43,8 +43,8 @@ import { deleteVehicle, viewVehicleMake } from "@/app/utils/api";
 import AddVehicleFormDialog from "@/components/form/AddVehicleFormDialog";
 
 const VehicleManagement = () => {
-    const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
-    const loggedInUser = JSON.parse(autoPartsUserData);
+
+
     const [data, setData] = useState<Make[]>([]);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [showAddVehicleForm, setShowAddVehicleForm] = useState(false);
@@ -125,7 +125,7 @@ const VehicleManagement = () => {
 
     const confirmDelete = async () => {
         const { level, id, parentIds } = deleteConfig;
-        await deleteVehicle(level, id, loggedInUser?.access_token)
+        await deleteVehicle(level, id)
 
         setData((prevData) => {
             const newData = [...prevData];

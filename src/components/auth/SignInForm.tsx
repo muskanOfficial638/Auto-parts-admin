@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { authApiPath } from "@/app/utils/api";
 import Checkbox from "@/components/form/input/Checkbox";
 import Input from "@/components/form/input/InputField";
 import Label from "@/components/form/Label";
@@ -75,32 +74,30 @@ export default function SignInForm() {
     }
 
     try {
-      const response = await axios.post(`${authApiPath}/auth/login`, {
+      const response = await axios.post(`/api/auth/login`, {
         email,
         password,
       });
 
-      // console.log("Logged in:", response.data);
-      if (response?.data && response.data.access_token) {
+       
+      if (response?.data && response.data.role) {
+        if(response.data.role==="admin" ){
         localStorage.setItem("autoPartsUserData", JSON.stringify(response.data));
         localStorage.setItem("loginTime", Date.now().toString());
         localStorage.setItem("lastActivity", Date.now().toString());
         router.push('/');
+        }else{
+          toast.error("You do not have permission to access this application.")
       }
-
+    }
     } catch (err: any) {
-      // Handle errors more gracefully
       if (err.response) {
-        // Server responded with a status other than 2xx
         console.error("Server error:", err.response.data);
         setError(err.response.data.detail || "Login failed")
-        // toast.error(err.response.data.detail || "Login failed");
       } else if (err.request) {
-        // Request was made but no response received
         console.error("No response:", err.request);
         toast.error("No response from server");
       } else {
-        // Something else happened
         console.error("Error:", err.message);
         toast.error("Unexpected error occurred");
       }

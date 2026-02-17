@@ -240,9 +240,6 @@ const MenuManager = () => {
   const [isEditMenuModalOpen, setIsEditMenuModalOpen] = useState(false);
   const [isEditMenuGroupModalOpen, setIsEditMenuGroupModalOpen] = useState(false);
   const [activeParentId, setActiveParentId] = useState<string | null>(null);
-  const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
-  const loggedInUser = JSON.parse(autoPartsUserData);
-  const accessToken = loggedInUser?.access_token;
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -257,7 +254,7 @@ const MenuManager = () => {
 
 
 async function saveMenus(){
-  const data = await updateMenuData(accessToken,
+  const data = await updateMenuData(
     menuGroups);
     if (data.status=='success') {
       toast.success('Menu saved successfully');
@@ -266,16 +263,15 @@ async function saveMenus(){
 }
 
   useEffect(() => {
-    if (!accessToken) return;
     const fetchMenuData = async () => {
-      const data = await getMenuData(accessToken);
+      const data = await getMenuData();
       setMenuGroups(data);
       setActiveMenuGroup(data.length > 0 ? data[0].slug : '');
     };
     fetchMenuData();
 
 
-  }, [accessToken]);
+  }, []);
 
   // Save to localStorage
   useEffect(() => {

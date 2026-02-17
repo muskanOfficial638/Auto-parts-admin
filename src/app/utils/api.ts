@@ -1,43 +1,40 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
 import axios from "axios";
 
-// API paths for LOCAL
-//export const authApiPath = "http://54.80.119.79:8001/v1";
-//export const adminApiPath = "http://54.80.119.79:8000/v1/admin";
-//export const vehicleApiPath = "http://54.80.119.79:8006/v1/vehicle";
-//export const deleteVehicleApiPath = "http://54.80.119.79:8000/v1/admin/vehicle";
-//export const partRequestPath = "http://54.80.119.79:8005/v1/supplier";
-
-
-export const profiles = "http://54.80.119.79:8004/profiles";
-
-//image path
-//export const imagePath = "http://54.80.119.79:8000/image/"; 
-export const imagePath = "/api/image-proxy/" 
-
-//API paths for Vercel
-export const authApiPath = "/api/auth";
+export const BACKEND = "https://api.autopartsxchange.co.za/8000/v1/admin";
 export const adminApiPath = "/api/admin";
-export const vehicleApiPath = "/api/vehicle";
-export const deleteVehicleApiPath = "api/admin/vehicle";
-export const partRequestPath = "/api/parts";
+// API paths for LOCAL
+
+export const authApiPath = "https://api.autopartsxchange.co.za/8001/v1";
+export const imagePath = "https://api.autopartsxchange.co.za/8000/image/"; 
+
+
+//export const vehicleApiPath = "http://54.80.119.79:8006/v1/vehicle";
+//export const deleteVehicleApiPath = "https://api.autopartsxchange.co.za/8000/v1/admin/vehicle";
+//export const partRequestPath = "/https://api.autopartsxchange.co.za/8005/v1/supplier";
+//export const profiles = "http://54.80.119.79:8004/profiles";
+//image path
+// export const imagePath = "/api/image-proxy/" 
+// //API paths for Vercel
+// export const authApiPath = "/api/auth";
+// export const adminApiPath = "/api/admin";
+// export const vehicleApiPath = "/api/vehicle";
+// export const deleteVehicleApiPath = "api/admin/vehicle";
+// export const partRequestPath = "/api/parts";
  
 // user profiles
-export async function getDashBoard( token: string) {
-  const res = await fetch(`${adminApiPath}/dashboard/view-counts`, {
-    cache: "no-store",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-    },
-  });
+export async function getDashBoard() {
+  const res = await fetch(`${adminApiPath}/dashboard/view-counts`  );
+
+
   if (!res.ok) throw new Error("Failed to fetch Dashboard data");
   return res.json();
 }
 
 
 // update Order status
-export async function updateOrderStatus(token: string, data: any) {
+export async function updateOrderStatus( data: any) {
   return axios.put(
     
     `${adminApiPath}/orders/updatestatus`,
@@ -45,7 +42,7 @@ export async function updateOrderStatus(token: string, data: any) {
     {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+
       },
     }
   )
@@ -59,13 +56,13 @@ export async function updateOrderStatus(token: string, data: any) {
 }
 
 // Get orders Details
-export async function getOrdersDetails(token:string,orderId:string) {
+export async function getOrdersDetails(orderId:string) {
   const res = await fetch(`${adminApiPath}/view-order-details?order_id=${orderId}`, {
     cache: "no-store",
     method: "GET",
    headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+
       },
   });
   if (!res.ok) throw new Error("Failed to get orders details");
@@ -73,13 +70,12 @@ export async function getOrdersDetails(token:string,orderId:string) {
 }
 
 // Get Orders
-export async function getAllOrders(token:string) {
+export async function getAllOrders() {
   const res = await fetch(`${adminApiPath}/order/view`, {
     cache: "no-store",
     method: "GET",
    headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
       },
   });
   if (!res.ok) throw new Error("Failed to get orders");
@@ -88,51 +84,51 @@ export async function getAllOrders(token:string) {
 
 
 // user profiles
-export async function fetchUsers(role: string, token: string) {
+export async function fetchUsers(role: string) {
   const res = await fetch(`${adminApiPath}/manage-users/${role}`, {
     cache: "no-store",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+
     },
   });
   if (!res.ok) throw new Error("Failed to fetch profiles");
   return res.json();
 }
 // address fetch
-export async function getAddressbyID(role:string,id: string, token: string) {
-  const res = await fetch(`${profiles}/${role}/address/${id}`, {
-    cache: "no-store",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-    },
-  });
-  if (!res.ok) throw new Error("Failed to fetch profiles");
-  return res.json();
-}
+// export async function getAddressbyID(role:string,id: string) {
+//   const res = await fetch(`${profiles}/${role}/address/${id}`, {
+//     cache: "no-store",
+//     headers: {
+//       "Content-Type": "application/json",
+   
+//     },
+//   });
+//   if (!res.ok) throw new Error("Failed to fetch profiles");
+//   return res.json();
+// }
 
 // KYC admin page
-export async function fetchUsersKyc( token: string) {
+export async function fetchUsersKyc( ) {
   const res = await fetch(`${adminApiPath}/kyc/supplier`, {
     cache: "no-store",
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+
     },
   });
   if (!res.ok) throw new Error("Failed to fetch profiles");
   return res.json();
 }
 // Attachments data get 
-export async function fetchKycAttachments( token: string,userId: string) {
+export async function fetchKycAttachments( userId: string) {
   const res = await fetch(`${adminApiPath}/kyc/view?user_id=${userId}`, {
     cache: "no-store",
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+   
     },
   });
   if (!res.ok) throw new Error("Failed to fetch profiles");
@@ -140,14 +136,14 @@ export async function fetchKycAttachments( token: string,userId: string) {
 }
 
 // update KYC status
-export async function updateKycUser( token: string, userData: any) {
+export async function updateKycUser(  userData: any) {
   return axios.patch(
     `${adminApiPath}/kyc/action`,
     { ...userData },
     {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+ 
       },
     }
   )
@@ -161,14 +157,14 @@ export async function updateKycUser( token: string, userData: any) {
 }
 
 // update user
-export async function updateUser(role: string, token: string, userData: any) {
+export async function updateUser(role: string, userData: any) {
   return axios.patch(
     `${adminApiPath}/manage-users/${role}/${userData?.id}`,
     { ...userData },
     {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+   
       },
     }
   )
@@ -182,13 +178,13 @@ export async function updateUser(role: string, token: string, userData: any) {
 }
 
 // delete user
-export async function deleteUser(token: string, userId: string , role: string) {
+export async function deleteUser( userId: string , role: string) {
   return axios.delete(
     `${adminApiPath}/manage-users/${role}/${userId}`,
     {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+     
       },
     }
   )
@@ -245,12 +241,12 @@ export async function sendVerification(email: string) {
 
 
 // Admin logs
-export async function fetchAdminLogs(token: string, pageCount: number , pageSize:number) {
+export async function fetchAdminLogs( pageCount: number , pageSize:number) {
   const res = await fetch(`${adminApiPath}/logs/?page=${pageCount}&page_size=${pageSize}`, {
     cache: "no-store",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+
     },
   });
   if (!res.ok) throw new Error("Failed to load admin logs");
@@ -258,13 +254,13 @@ export async function fetchAdminLogs(token: string, pageCount: number , pageSize
 }
 
 // delete user
-export async function deleteAdminLogs(token: string, logId: string) {
+export async function deleteAdminLogs( logId: string) {
   return axios.delete(
     `${adminApiPath}/logs/${logId}`,
     {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+
       },
     }
   )
@@ -291,13 +287,13 @@ export async function viewVehicleMake() {
 }
 
 // Delete Vehicle make
-export async function deleteVehicle(level: string, makeId: string, token:string) {
+export async function deleteVehicle(level: string, makeId: string) {
   return axios.delete(
-    `${deleteVehicleApiPath}/${level}/${makeId}`,
+    `${adminApiPath}/vehicle/${level}/${makeId}`,
     {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+     
       },
     }
   )
@@ -350,13 +346,12 @@ export async function getAllPages() {
 }
 
 // Delete Page
-export async function deletePage(pageId: string, token:string) {
+export async function deletePage(pageId: string) {
   return axios.delete(
     `${adminApiPath}/cms/${pageId}`,
     {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
       },
     }
   )
@@ -370,13 +365,12 @@ export async function deletePage(pageId: string, token:string) {
 }
 
 
-export async function deleteImages(pageId: string, token:string) {
+export async function deleteImages(pageId: string) {
   return axios.delete(
     `${adminApiPath}/cms/image/${pageId}`,
     {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
       },
     }
   )
@@ -389,13 +383,13 @@ export async function deleteImages(pageId: string, token:string) {
     });
 }
 
-export async function getPage(pageId: string, token: string) {
+export async function getPage(pageId: string) {
   const res = await fetch(`${adminApiPath}/cms/${pageId}`, {
     cache: "no-store",
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+ 
     },
   });
   if (!res.ok) throw new Error("Failed to fetch page details");
@@ -403,7 +397,7 @@ export async function getPage(pageId: string, token: string) {
 }
 
 // update page
-export async function updatePage( pageId: string, token: string, userData: any) {
+export async function updatePage( pageId: string, userData: any) {
 
   return axios.put(
     `${adminApiPath}/cms/${pageId}`,
@@ -411,7 +405,6 @@ export async function updatePage( pageId: string, token: string, userData: any) 
     {
       headers: {
         "Content-Type": "multipart/form-data",
-        "Authorization": `Bearer ${token}`,
       },
     }
   )
@@ -425,7 +418,7 @@ export async function updatePage( pageId: string, token: string, userData: any) 
 }
 
 // add new page
-export async function addNewPage( token: string, userData: any) {
+export async function addNewPage( userData: any) {
 
   return axios.post(
     `${adminApiPath}/cms/`,
@@ -433,7 +426,7 @@ export async function addNewPage( token: string, userData: any) {
     {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+ 
       },
     }
   )
@@ -446,14 +439,14 @@ export async function addNewPage( token: string, userData: any) {
     });
 }
 // upload image
-export async function uploadImage( token: string, userData: any) {
+export async function uploadImage( userData: any) {
 
   return axios.post(
     `${adminApiPath}/cms/upload-image`,
     userData ,
     {
       headers: {
-        "Authorization": `Bearer ${token}`,
+      
       },
     }
   )
@@ -467,13 +460,13 @@ export async function uploadImage( token: string, userData: any) {
 }
 
 //menu get
-export async function getMenuData( token: string) {
+export async function getMenuData( ) {
   const res = await fetch(`${adminApiPath}/cms/menu/view`, {
     cache: "no-store",
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+     
     },
   });
   if (!res.ok) throw new Error("Failed to fetch page details");
@@ -481,14 +474,14 @@ export async function getMenuData( token: string) {
 }
 
 //menu update
-export async function updateMenuData( token: string, menuData: any) {
+export async function updateMenuData( menuData: any) {
   return axios.post(
     `${adminApiPath}/cms/menu/add`,
     { data : [...menuData] },
     {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+       
       },
     }
   )
@@ -502,7 +495,7 @@ export async function updateMenuData( token: string, menuData: any) {
 }
 
 // add Buyer 
-export async function addNewUser(role: string, token: string, userData: any) {
+export async function addNewUser(role: string, userData: any) {
 
   return axios.post(
     `${authApiPath}/auth/register`,
@@ -510,7 +503,7 @@ export async function addNewUser(role: string, token: string, userData: any) {
     {
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
+
       },
     }
   )

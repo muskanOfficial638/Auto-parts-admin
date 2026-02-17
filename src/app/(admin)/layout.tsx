@@ -42,7 +42,7 @@ export default function AdminLayout({
     if (isExpired) {
       // Clear old session
       localStorage.removeItem("autoPartsUserData");
-      localStorage.removeItem("autoPartsLoginTime");
+      localStorage.removeItem("loginTime");
 
       router.push("/signin");
       return;

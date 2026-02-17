@@ -127,20 +127,17 @@ const HomePageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpda
   const [error, setError] = useState('');
   const [status, setStatus] = useState('draft');
   const [activeSection, setActiveSection] = useState('section1');
-  const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
-  const loggedInUser = JSON.parse(autoPartsUserData);
 
-  const accessToken = loggedInUser?.access_token;
   const hasFetched = useRef(false);
 
   useEffect(() => {
-    if (!pageData || !accessToken) return;
+    if (!pageData ) return;
     if (hasFetched.current) return;
 
     hasFetched.current = true;
 
     const fetchData = async () => {
-      const dataPage = await getPage(pageData, accessToken);
+      const dataPage = await getPage(pageData);
 
       setStatus(dataPage.status);
       setFormData({
@@ -164,7 +161,7 @@ const HomePageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpda
     };
 
     fetchData();
-  }, [pageData, accessToken]);
+  }, [pageData]);
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     if (!value && name !== 'slug') {
@@ -188,7 +185,7 @@ const HomePageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpda
     const formData = new FormData();
     formData.append("file", img_data);
 
-    const uploadedImage = await uploadImage(loggedInUser?.access_token, formData);
+    const uploadedImage = await uploadImage(formData);
     console.log("img_data", uploadedImage);
 
     setSections(prev => {
@@ -436,10 +433,10 @@ const HomePageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpda
         content: JSON.stringify(sections, null, 2)
       };
 
-      const response = await updatePage(pageData, loggedInUser?.access_token, updatedFormData);
+      const response = await updatePage(pageData, updatedFormData);
       if (response?.status === 200) {
 
-        removeImages.forEach(async (thumbnail_url) => await deleteImages(thumbnail_url, loggedInUser?.access_token));
+        removeImages.forEach(async (thumbnail_url) => await deleteImages(thumbnail_url));
 
         toast("Page updated successfully");
         setPageUpdate(true);

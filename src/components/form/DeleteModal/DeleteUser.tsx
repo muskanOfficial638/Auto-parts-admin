@@ -8,8 +8,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { deleteUser } from "@/app/utils/api";
 
 export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModal, userData, role, dataChanged }: any) {
-    const autoPartsUserData: any = localStorage.getItem("autoPartsUserData")
-    const loggedInUser = JSON.parse(autoPartsUserData);
+
     const [error, setError] = useState('')
 
     const handleClose = () => {
@@ -19,7 +18,7 @@ export default function DeleteUserModal({ isOpenDeleteModel, setIsOpenDeleteModa
     async function handleDelete(e: React.FormEvent) {
         e.preventDefault();
         try {
-            const response = await deleteUser(loggedInUser?.access_token, userData?.id, role)
+            const response = await deleteUser( userData?.id, role)
             // console.log("Delete:", response);
             if (response?.status === 200) {
                 toast(`${role === 'buyer' ? 'Buyer' : 'Supplier'} Deleted successfully`);

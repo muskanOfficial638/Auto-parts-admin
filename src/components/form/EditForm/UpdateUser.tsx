@@ -22,8 +22,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, dataChanged }:
     const [formData, setFormData] = useState<User>(userData);
     const [error, setError] = useState('');
     const [status, setStatus] = useState(userData?.is_active == true ? 'Active' : 'Inactive');
-    const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
-    const loggedInUser = JSON.parse(autoPartsUserData);
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -69,7 +68,7 @@ const UpdateUserModal = ({ isOpenModel, setIsOpenModel, userData, dataChanged }:
         }
         try {
             formData.is_active = status === 'Active';
-            const response = await updateUser(formData?.role, loggedInUser?.access_token, formData)
+            const response = await updateUser(formData?.role,  formData)
             // console.log("update:", response);
 
             if (response?.status === 200) {

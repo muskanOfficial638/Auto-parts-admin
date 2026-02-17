@@ -42,16 +42,9 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
   const [yearTo, setYearTo] = useState<string>("");
   const [trim, setTrim] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  let token = "";
 
-  if (typeof window !== "undefined") {
-    const raw = localStorage.getItem("autoPartsUserData");
 
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      token = parsed?.access_token || "";
-    }
-  }
+
 
   useEffect(() => {
     viewVehicleMake()
@@ -94,12 +87,12 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
 
   async function createMake(name: string) {
     const res = await fetch(
-      "http://54.80.119.79:8000/v1/admin/vehicle/make/",
+      "/api/admin/vehicle/make/",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+         
         },
         body: JSON.stringify({ name }),
       }
@@ -110,12 +103,12 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
 
   async function createModel(makeId: string, name: string) {
     const res = await fetch(
-      "http://54.80.119.79:8000/v1/admin/vehicle/model/",
+      "/api/admin/vehicle/model/",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+        
         },
         body: JSON.stringify({
           make_id: makeId,
@@ -135,12 +128,12 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
     trim: string;
   }) {
     const res = await fetch(
-      "http://54.80.119.79:8000/v1/admin/vehicle/trim/",
+      "/api/admin/vehicle/trim/",
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+         
         },
         body: JSON.stringify(payload),
       }
