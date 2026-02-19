@@ -50,7 +50,9 @@ async function handle(
   try {
 
     const { path } = await context.params;
+    const search = request.nextUrl.search; // ?id=5&name=test
 
+  
     if (!path || path.length === 0) {
       return NextResponse.json(
         { error: "Invalid API path" },
@@ -73,12 +75,13 @@ async function handle(
     headers.delete("host");
     headers.delete("content-length");
     headers.set("Authorization", `Bearer ${token}`);
-    const url = `${BACKEND}/${apiPath}`;
+    const url = `${BACKEND}/${apiPath}${search}`;
 
     interface NodeRequestInit extends RequestInit {
       duplex?: "half";
     }
   const bodydata = request.method !== "GET" && request.method !== "HEAD" ? request.body : undefined;
+
     const apiRes = await fetch(url, {
       method: request.method,
       headers,
