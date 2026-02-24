@@ -31,7 +31,7 @@ export default function AdminLayout({
 
     // User NOT logged in → redirect
     if (!user || !loginTime) {
-      router.push("/signin");
+      router.push("/logout");
       return; // Stop the flow
     }
 
@@ -43,8 +43,7 @@ export default function AdminLayout({
       // Clear old session
       localStorage.removeItem("autoPartsUserData");
       localStorage.removeItem("loginTime");
-
-      router.push("/signin");
+      router.push("/logout");
       return;
     }
 

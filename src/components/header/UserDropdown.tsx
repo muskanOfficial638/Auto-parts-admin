@@ -5,20 +5,23 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function UserDropdown() {
   const router = useRouter();
+  const pathname = usePathname(); // detects route changes
   const [isOpen, setIsOpen] = useState(false);
   const [autoPartsUserData, setAutoPartsUserData] = useState<string | null | any>(null);
 
   useEffect(() => {
      if (typeof window !== 'undefined') {
     const data: any = localStorage.getItem("autoPartsUserData");
+    const userdata = JSON.parse(data) || {};
+    if(!userdata.id){ ;router.replace("/logout")};
     setAutoPartsUserData(JSON.parse(data));
-    // console.log("autoPartsUserData", JSON.parse(data));
+    
      }
-  }, []);
+  }, [pathname,router]);
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation();

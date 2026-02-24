@@ -81,8 +81,9 @@ async function handle(
       duplex?: "half";
     }
   const bodydata = request.method !== "GET" && request.method !== "HEAD" ? request.body : undefined;
-
+  console.log(url)
     const apiRes = await fetch(url, {
+    
       method: request.method,
       headers,
       body: bodydata,

@@ -10,18 +10,6 @@ export const authApiPath = "https://api.autopartsxchange.co.za/8001/v1";
 export const imagePath = "https://api.autopartsxchange.co.za/8000/image/"; 
 
 
-//export const vehicleApiPath = "http://54.80.119.79:8006/v1/vehicle";
-//export const deleteVehicleApiPath = "https://api.autopartsxchange.co.za/8000/v1/admin/vehicle";
-//export const partRequestPath = "/https://api.autopartsxchange.co.za/8005/v1/supplier";
-//export const profiles = "http://54.80.119.79:8004/profiles";
-//image path
-// export const imagePath = "/api/image-proxy/" 
-// //API paths for Vercel
-// export const authApiPath = "/api/auth";
-// export const adminApiPath = "/api/admin";
-// export const vehicleApiPath = "/api/vehicle";
-// export const deleteVehicleApiPath = "api/admin/vehicle";
-// export const partRequestPath = "/api/parts";
  
 // user profiles
 export async function getDashBoard() {
@@ -425,7 +413,7 @@ export async function addNewPage( userData: any) {
     { ...userData },
     {
       headers: {
-        "Content-Type": "application/json",
+       "Content-Type": "multipart/form-data",
  
       },
     }
