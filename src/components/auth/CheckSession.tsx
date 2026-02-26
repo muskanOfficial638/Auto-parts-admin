@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 
 export default function CheckSession() {
   const router = useRouter();
-
+  
   useEffect(() => {
     const MAX_SESSION_MS = 12 * 60 * 60 * 1000; // 12 hours
     const INACTIVITY_MS = 10 * 60 * 1000; // FOR TESTING: 10 minutes
@@ -15,7 +15,7 @@ export default function CheckSession() {
       localStorage.removeItem("loginTime");
       localStorage.removeItem("lastActivity");
       localStorage.clear();
-      router.replace("/signin");
+      router.replace("/logout");
     };
 
     // 🔍 Function that checks session continuously
@@ -41,10 +41,8 @@ export default function CheckSession() {
       }
     };
 
-    // 🚀 Run check every 20 seconds (adjust if needed)
     const interval = setInterval(checkSession, 20 * 1000);
-
-    // 🎯 Update activity on user interactions
+    
     const updateActivity = () => {
       localStorage.setItem("lastActivity", Date.now().toString());
     };

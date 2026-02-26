@@ -48,26 +48,25 @@ export default function AuthLogTable() {
     // Fetch logs
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const raw = localStorage.getItem("autoPartsUserData");
-            const loggedInUser = JSON.parse(raw || "{}");
-            if (loggedInUser?.access_token) {
-                fetchAdminLogs(loggedInUser.access_token, 1, 40).then((data) => {
+
+        
+          
+                fetchAdminLogs( 1, 40).then((data) => {
                     setLogsCount(data?.total);
                     setTotalPage(data?.pages)
                     if (data?.items) setLogs(data.items);
                 });
-            }
+            
         }
     }, []);
 
     async function handleDeleteLog(logId: string) {
-        const autoPartsUserData = localStorage.getItem("autoPartsUserData");
-        const loggedInUser = JSON.parse(autoPartsUserData || "{}");
+
         try {
-            const response = await deleteAdminLogs(loggedInUser?.access_token, logId)
+            const response = await deleteAdminLogs( logId)
             if (response) {
                 toast("Log deleted successfully");
-                fetchAdminLogs(loggedInUser.access_token, 1, 40).then((data) => {
+                fetchAdminLogs( 1, 40).then((data) => {
                     if (data?.items) setLogs(data.items);
                 });
             }
@@ -161,11 +160,10 @@ export default function AuthLogTable() {
     });
 
     const handlePageChange = async (newPageIndex: number) => {
-        const autoPartsUserData = localStorage.getItem("autoPartsUserData");
-        const loggedInUser = JSON.parse(autoPartsUserData || "{}");
+  
         try {
             const data = await fetchAdminLogs(
-                loggedInUser.access_token,
+            
                 newPageIndex + 1,              // API page starts from 1
                 table.getState().pagination.pageSize
             );
@@ -179,11 +177,10 @@ export default function AuthLogTable() {
 
     const handlePageSizeChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
         const newSize = Number(e.target.value);
-        const autoPartsUserData = localStorage.getItem("autoPartsUserData");
-        const loggedInUser = JSON.parse(autoPartsUserData || "{}");
+
         try {
             const data = await fetchAdminLogs(
-                loggedInUser.access_token,
+             
                 1,         // reset to page 1 when pageSize changes
                 newSize
             );

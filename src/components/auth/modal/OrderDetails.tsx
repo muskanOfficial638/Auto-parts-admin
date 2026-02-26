@@ -58,10 +58,9 @@ export default function OrderDetails({ OrderID, onOpen, setOpen }: { OrderID: st
     const [orderDetails, setOrderDetails] = useState<OrderType | null>(null);
 
     useEffect(() => {
-            const raw = localStorage.getItem("autoPartsUserData");
-            const loggedInUser = JSON.parse(raw || "{}");
+ 
     
-        getOrdersDetails(loggedInUser.access_token,OrderID).then((data) => {
+        getOrdersDetails(OrderID).then((data) => {
 
         
             setOrderDetails(data);

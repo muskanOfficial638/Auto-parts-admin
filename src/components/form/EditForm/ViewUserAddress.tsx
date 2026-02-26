@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { updateUser } from '@/app/utils/api';
-import { toast, ToastContainer } from 'react-toastify';
-import { ChevronDownIcon } from 'lucide-react';
-import Select from '../Select';
+
+import {  ToastContainer } from 'react-toastify';
+
+
 import { getAddressbyID } from "@/app/utils/api";
 
 interface User {
@@ -40,24 +40,20 @@ const ViewUserAddress = ({ isOpenModel, setIsOpenModel, userData }: any) => {
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
-            const autoPartsUserData = localStorage.getItem("autoPartsUserData");
-            const loggedInUser = JSON.parse(autoPartsUserData || "{}");
 
-            if (loggedInUser?.access_token) {
-
-                getAddressbyID(userData.role,userData.id, loggedInUser.access_token).then((data) => {
-                    console.log(data)
-                    if (data.data?.length > 0) {
-                        setaddresses(data);
-                    }else{
-                        setAddressError(true);
-                    }
+                getAddressbyID(userData.role,userData.id).then(() => {
+                    // console.log(data)
+                    // if (data.data?.length > 0) {
+                    //     setaddresses(data);
+                    // }else{
+                    //     setAddressError(true);
+                    // }
 
                 });
-            }
+            
         }
 
-    }, [])
+    }, [userData])
 
     if (!isOpenModel) return null;
 

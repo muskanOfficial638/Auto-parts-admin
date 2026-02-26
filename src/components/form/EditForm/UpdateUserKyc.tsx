@@ -23,8 +23,7 @@ const UpdateUserKyc = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: a
     const [formData, setFormData] = useState<User>(userData);
     const [error, setError] = useState('');
     const [status, setStatus] = useState(userData?.kyc_status ?? 'pending');
-    const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
-    const loggedInUser = JSON.parse(autoPartsUserData);
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -62,14 +61,14 @@ const UpdateUserKyc = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: a
     ]);
     useEffect( () => {
 
-         fetchKycAttachments(loggedInUser?.access_token,formData.id).then((data) => {
+         fetchKycAttachments(formData.id).then((data) => {
               if(data.length && data.length > 0){
                 setAttachments(data);
        }
         });
   
 
-    }, []);
+    }, [formData.id]);
 
 
     const handleStatusChange = (attachmentId: string, newStatus: 'pending' | 'approved' | 'rejected') => {
@@ -97,12 +96,13 @@ const UpdateUserKyc = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: a
   ({ attachment_name, created_at, ...rest }) => rest
 );
 
-            var formUpdateData ={user_id:"",type:"",attachment:{}};
+
+            const formUpdateData ={user_id:"",type:"",attachment:{}};
             formUpdateData.user_id = formData.id;
             formUpdateData.type = status;
             formUpdateData.attachment=filteredAttachments;
             console.log(formUpdateData)
-            const response = await updateKycUser(loggedInUser?.access_token, formUpdateData)
+            const response = await updateKycUser( formUpdateData)
 
 
             if (response?.status === 200) {

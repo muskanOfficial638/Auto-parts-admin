@@ -17,16 +17,16 @@ export default function EcommerceClient() {
     });
 
     useEffect(() => {
-        const data = localStorage.getItem("autoPartsUserData");
-        const loggedInUser = JSON.parse(data || "{}");
+
         setIsLoading(false);
-        if (loggedInUser?.access_token) {
-            getDashBoard(loggedInUser.access_token).then((data) => {
+        
+     
+            getDashBoard().then((data) => {
                 setCount(data);
                 console.log("Dashboard data:", data);
             });
 
-        }
+        
     }, []);
 
 

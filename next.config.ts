@@ -4,9 +4,9 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "http",
-        hostname: "54.80.119.79",
-        pathname: "/image/**",
+        protocol: "https",
+        hostname: "api.autopartsxchange.co.za",
+ 
       },
     ],
   },

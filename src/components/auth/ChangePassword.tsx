@@ -9,25 +9,24 @@ import { ToastContainer, toast } from 'react-toastify';
 
 export default function ChangePasswordPage() {
     const [error, setError] = useState("");
-    const [loggedInUser, setLoggedInUser] = useState<any>(null);
+   
 
     const [formData, setFormData] = useState({
-        email: '',
+        user_id: '',
         old_password: '',
         new_password: '',
         confirm_new_password: ''
     });
 
-     // 🧠 Load user from localStorage only on client
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const autoPartsUserData = localStorage.getItem("autoPartsUserData");
             if (autoPartsUserData) {
                 const parsedUser = JSON.parse(autoPartsUserData);
-                setLoggedInUser(parsedUser);
+               
                 setFormData(prev => ({
                     ...prev,
-                    email: parsedUser?.user?.email || ''
+                    user_id: parsedUser?.id || ''
                 }));
             }
         }
@@ -50,7 +49,7 @@ export default function ChangePasswordPage() {
             }, {
                 headers: {
                     "Content-Type": "application/json",
-                    "Authorization": `Bearer ${loggedInUser?.access_token}`,
+                   
                 },
             });
             // console.log("change:", response.data);

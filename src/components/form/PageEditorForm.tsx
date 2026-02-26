@@ -39,20 +39,17 @@ const PageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpdate }
     const [removeImages, setRemoveImages] = useState<string[]>([]);
     const [error, setError] = useState('');
     const [status, setStatus] = useState('draft');
-    const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
-    const loggedInUser = JSON.parse(autoPartsUserData);
-    const accessToken = loggedInUser?.access_token;
     const hasFetched = useRef(false);
 
     useEffect(() => {
 
-        if (!pageData || !accessToken) return;
+        if (!pageData) return;
         if (hasFetched.current) return;
         hasFetched.current = true;
 
         const fetchData = async () => {
             if (!pageData) return;
-            const dataPage = await getPage(pageData, accessToken);
+            const dataPage = await getPage(pageData);
 
             setStatus(dataPage.status);
             setFormData({
@@ -67,7 +64,7 @@ const PageEditorForm = ({ isOpenModel, setIsOpenModel, pageData, setPageUpdate }
             });
         };
         fetchData();
-    }, [pageData, accessToken]);
+    }, [pageData]);
 
     const removethumbnail = (thumbnail_url: string) => {
         setRemoveImages(prev => [...prev, thumbnail_url]);
@@ -134,9 +131,9 @@ const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
             if (pageData) {
 
 
-                const response = await updatePage(pageData, loggedInUser?.access_token, formData)
+                const response = await updatePage(pageData, formData)
                 if (response?.status === 200) {
-                    removeImages.forEach(async (thumbnail_url) => await deleteImages(thumbnail_url, loggedInUser?.access_token));
+                    removeImages.forEach(async (thumbnail_url) => await deleteImages(thumbnail_url));
                     toast("Page updated successfully");
                     setPageUpdate(true);
                     setTimeout(() => {
@@ -145,7 +142,7 @@ const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
                     }, 1000)
                 }
             } else {
-                const response = await addNewPage(loggedInUser?.access_token, formData)
+                const response = await addNewPage( formData)
                 if (response?.status === 200) {
                     toast("Page added successfully");
                     setPageUpdate(true);
@@ -159,17 +156,18 @@ const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
         } catch (err: any) {
             // Handle errors more gracefully
             if (err.response) {
-                // Server responded with a status other than 2xx
-                console.error("Server error:", err.response.data);
-                setError(err.response.data.detail || "User not found");
+            
+                
+                toast.error(err.response.data.error);
             } else if (err.request) {
-                // Request was made but no response received
+           
                 console.error("No response:", err.request);
-                setError("No response from server");
+             
+                toast.error('No response from server');
             } else {
-                // Something else happened
                 console.error("Error:", err.message);
-                setError("Unexpected error occurred");
+                  toast.error('Unexpected error occurred');
+                
             }
         }
     }

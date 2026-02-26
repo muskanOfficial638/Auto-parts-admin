@@ -30,9 +30,6 @@ import PageEditorForm from "@/components/form/PageEditorForm";
 import HomePageEditorForm from "@/components/form/HomePageEditorForm";
 
 const CmsPages = () => {
-
-    const autoPartsUserData: any = localStorage.getItem("autoPartsUserData");
-    const loggedInUser = JSON.parse(autoPartsUserData);
     const [data, setData] = useState<Pages[]>([]);
 
     const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
@@ -88,7 +85,7 @@ const CmsPages = () => {
 
     const confirmDelete = async () => {
         const {  id } = deleteConfig;
-        await deletePage(id, loggedInUser?.access_token)
+        await deletePage(id)
         setData((prevData) => {
             const newData = [...prevData];
             return newData.filter((m) => m.id !== id);
