@@ -319,7 +319,7 @@ export function PartRequestTable() {
                                     className="hover:bg-muted/50 transition-colors border"
                                 >
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id} className="p-4 dark:text-gray-400">
+                                        <TableCell key={cell.id} className="p-4 text-center dark:text-gray-400">
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()

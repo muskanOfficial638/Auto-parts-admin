@@ -49,7 +49,8 @@ export default function UserDropdown() {
         className="flex items-center text-gray-700 dark:text-gray-400 dropdown-toggle"
       >
         <span className="mr-3 overflow-hidden rounded-full h-11 w-11">
-          <Image
+          <Image 
+           className="h-full object-cover"
             width={44}
             height={44}
             // src="/images/user/owner.jpg"
