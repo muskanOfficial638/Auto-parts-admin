@@ -6,7 +6,7 @@ import Label from "@/components/form/Label";
 import Button from "@/components/ui/button/Button";
 import { EyeCloseIcon, EyeIcon } from "@/icons";
 // import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
@@ -20,8 +20,21 @@ export default function SignInForm() {
   const [error, setError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  // Email Validation
+    useEffect(() => {
+          if (typeof window !== 'undefined') {
+              const autoPartsUserData = localStorage.getItem("autoPartsUserData");
+              if (autoPartsUserData) {
+                  const parsedUser = JSON.parse(autoPartsUserData);
+                 
+                  if (parsedUser.role === "admin") {
+                      router.replace('/');
+                  } 
+              }
+          }
+      }, [router]);
+
   const validateEmail = (value: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!value) {
@@ -73,6 +86,8 @@ export default function SignInForm() {
       return;
     }
 
+    if (loading) return;
+    setLoading(true);
     try {
       const response = await axios.post(`/api/auth/login`, {
         email,
@@ -81,16 +96,18 @@ export default function SignInForm() {
 
        
       if (response?.data && response.data.role) {
+        setLoading(false);
         if(response.data.role==="admin" ){
         localStorage.setItem("autoPartsUserData", JSON.stringify(response.data));
         localStorage.setItem("loginTime", Date.now().toString());
         localStorage.setItem("lastActivity", Date.now().toString());
-        router.push('/');
+        router.replace('/');
         }else{
           toast.error("You do not have permission to access this application.")
       }
     }
     } catch (err: any) {
+       setLoading(false);
       if (err.response) {
         console.error("Server error:", err.response.data);
         setError(err.response.data.detail || "Login failed")
@@ -129,6 +146,9 @@ export default function SignInForm() {
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
               Sign In
             </h1>
+            
+
+
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Enter your email and password to sign in!
             </p>
@@ -188,7 +208,9 @@ export default function SignInForm() {
                 </div>
                 <div>
                   <Button className="w-full" size="sm">
-                    Sign in
+               
+   {loading && ( <div className="w-6 h-6 border-4 border-gray-300 border-t-transparent rounded-full animate-spin"></div>)}
+   Sign in
                   </Button>
                 </div>
               </div>

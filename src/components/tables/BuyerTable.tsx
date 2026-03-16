@@ -115,7 +115,7 @@ export default function BuyerTable() {
                 </svg>
               </button> */}
               {/* Delete Button */}
-              <button
+              {/* <button
                 onClick={() => handleDeleteModalOpen(buyer)}
                 className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500"
               >
@@ -127,7 +127,7 @@ export default function BuyerTable() {
                     clipRule="evenodd"
                   />
                 </svg>
-              </button>
+              </button> */}
 
               {/* Edit Button */}
               <button
@@ -186,10 +186,10 @@ export default function BuyerTable() {
 
   
 
-  const handleDeleteModalOpen = (buyer: Buyer) => {
-    setIsOpenDeleteModal(true)
-    setSelectedBuyer(buyer)
-  }
+  // const handleDeleteModalOpen = (buyer: Buyer) => {
+  //   setIsOpenDeleteModal(true)
+  //   setSelectedBuyer(buyer)
+  // }
 
   if (!buyerData) return <div>Loading...</div>;
 
@@ -228,7 +228,7 @@ export default function BuyerTable() {
                   Page {table.getState().pagination.pageIndex + 1} of{" "}
                   {table.getPageCount()}
                   <select
-                    className="ml-2 border rounded p-1"
+                    className="ml-2 p-2 rounded-md border border-gray-300 bg-white text-gray-700  dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600  focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={table.getState().pagination.pageSize}
                     onChange={(e) => table.setPageSize(Number(e.target.value))}
                   >

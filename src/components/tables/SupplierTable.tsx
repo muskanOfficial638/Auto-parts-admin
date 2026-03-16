@@ -28,7 +28,7 @@ import {
 import { matchSorter } from "match-sorter";
 import UpdateUserModal from "../form/EditForm/UpdateUser";
 //import ViewUserAddress from "../form/EditForm/ViewUserAddress";
-import DeleteUserModal from "../form/DeleteModal/DeleteUser";
+//import DeleteUserModal from "../form/DeleteModal/DeleteUser";
 
 interface Supplier {
   id: number;
@@ -42,7 +42,7 @@ interface Supplier {
 
 export default function SupplierTable() {
   const [supplierData, setSuppliersData] = useState<Supplier[]>();
-  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+ // const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
   const [isOpenUpdateModal, setIsOpenUpdateModal] = useState(false);
  // const [isOpenViewModal, setIsOpenViewModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>();
@@ -72,10 +72,10 @@ export default function SupplierTable() {
   }
 
 
-  const handleDeleteModalOpen = (supplier: Supplier) => {
-    setIsOpenDeleteModal(true)
-    setSelectedSupplier(supplier)
-  }
+  // const handleDeleteModalOpen = (supplier: Supplier) => {
+  //   setIsOpenDeleteModal(true)
+  //   setSelectedSupplier(supplier)
+  // }
 
   // Columns for TanStack Table
   const columns = useMemo<ColumnDef<Supplier>[]>(
@@ -128,7 +128,7 @@ export default function SupplierTable() {
                 </svg>
               </button> */}
               {/* Delete Button */}
-              <button
+              {/* <button
                 onClick={() => handleDeleteModalOpen(supplier)}
                 className="text-gray-500 hover:text-error-500 dark:text-gray-400 dark:hover:text-error-500"
               >
@@ -140,7 +140,7 @@ export default function SupplierTable() {
                     clipRule="evenodd"
                   />
                 </svg>
-              </button>
+              </button> */}
 
               {/* Edit Button */}
               <button
@@ -222,7 +222,7 @@ export default function SupplierTable() {
                   Page {table.getState().pagination.pageIndex + 1} of{" "}
                   {table.getPageCount()}
                   <select
-                    className="ml-2 border rounded p-1"
+                    className="ml-2 p-2 rounded-md border border-gray-300 bg-white text-gray-700  dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600  focus:outline-none focus:ring-2 focus:ring-blue-500"
                     value={table.getState().pagination.pageSize}
                     onChange={(e) => table.setPageSize(Number(e.target.value))}
                   >
@@ -349,10 +349,10 @@ export default function SupplierTable() {
                 <UpdateUserModal isOpenModel={isOpenUpdateModal}
                   setIsOpenModel={setIsOpenUpdateModal} userData={selectedSupplier} dataChanged={setSupplierDataChange} />
               )}
-              {selectedSupplier && isOpenDeleteModal && (
+              {/* {selectedSupplier && isOpenDeleteModal && (
                 <DeleteUserModal isOpenDeleteModel={!!selectedSupplier}
                   setIsOpenDeleteModal={() => setSelectedSupplier(null)} userData={selectedSupplier} role="supplier" dataChanged={setSupplierDataChange} />
-              )}
+              )} */}
             </div>
           </div>
           {isOpen && (

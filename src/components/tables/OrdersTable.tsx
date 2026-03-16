@@ -114,5 +114,5 @@ export function OrdersTable({ data, onEdit,onView }: OrdersTableProps) {
     },
   ];
 
-  return <DataTable columns={columns} data={data} searchPlaceholder="Search makes..." />;
+  return <DataTable columns={columns} data={data} searchPlaceholder="Search" />;
 }

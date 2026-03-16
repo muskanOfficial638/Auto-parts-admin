@@ -23,6 +23,7 @@ const UpdateUserKyc = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: a
     const [formData, setFormData] = useState<User>(userData);
     const [error, setError] = useState('');
     const [status, setStatus] = useState(userData?.kyc_status ?? 'pending');
+    const [statusApp, setStatusApp] = useState(false);
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,6 +41,12 @@ const UpdateUserKyc = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: a
 
     const selectOptions = [
         { value: "approved", label: "Approved" },
+        { value: "pending", label: "Pending" },
+        { value: "rejected", label: "Rejected" }
+
+    ];
+     const selectOptions1 = [
+       
         { value: "pending", label: "Pending" },
         { value: "rejected", label: "Rejected" }
 
@@ -64,13 +71,19 @@ const UpdateUserKyc = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: a
          fetchKycAttachments(formData.id).then((data) => {
               if(data.length && data.length > 0){
                 setAttachments(data);
-       }
+               }
         });
   
 
     }, [formData.id]);
 
+ useEffect(() => {
+  const hasApproved = attachments.some(
+    (attachment: Attachment) => attachment.status === "approved"
+  );
 
+  setStatusApp(hasApproved);
+}, [attachments]);
     const handleStatusChange = (attachmentId: string, newStatus: 'pending' | 'approved' | 'rejected') => {
         // Update the state
         setAttachments(prevAttachments =>
@@ -93,6 +106,7 @@ const UpdateUserKyc = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: a
         try {
 
             const filteredAttachments = attachments.map(
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
   ({ attachment_name, created_at, ...rest }) => rest
 );
 
@@ -272,13 +286,24 @@ const UpdateUserKyc = ({ isOpenModel, setIsOpenModel, userData, dataChanged }: a
                                             KYC Status:
                                         </label>
                                         <div className="relative">
-                                            <Select
+                                            {statusApp ? (
+                                               <Select 
                                                 options={selectOptions}
                                                 placeholder="Select status"
                                                 onChange={handleSelectChange}
                                                 className="dark:bg-dark-900"
                                                 value={status}
                                             />
+                                            ): (
+                                               <Select 
+                                                options={selectOptions1}
+                                                placeholder="Select status"
+                                                onChange={handleSelectChange}
+                                                className="dark:bg-dark-900"
+                                                value={status}
+                                            />
+                                            )}
+                                            
                                             <span className="absolute text-gray-500 -translate-y-1/2 pointer-events-none right-3 top-1/2 dark:text-gray-400">
                                                 <ChevronDownIcon />
                                             </span>

@@ -125,8 +125,9 @@ const VehicleManagement = () => {
 
     const confirmDelete = async () => {
         const { level, id, parentIds } = deleteConfig;
-        await deleteVehicle(level, id)
-
+        const result = await deleteVehicle(level, id);
+        console.log("Delete result:", result);
+        if (result.status === 200) {
         setData((prevData) => {
             const newData = [...prevData];
 
@@ -147,9 +148,12 @@ const VehicleManagement = () => {
 
             return newData;
         });
-
         toast.success(`${level.charAt(0).toUpperCase() + level.slice(1)} deleted successfully`);
         setDeleteDialogOpen(false);
+    }else {
+
+        toast.error(result.data.detail || `Failed to delete ${level}`);
+    }
     };
 
     const handleSave = async () => {

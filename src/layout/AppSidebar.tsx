@@ -79,7 +79,7 @@ const navItems: NavItem[] = [
     icon: <ListIcon />,
     subItems: [
       { name: "pages", path: "/cms-pages", pro: false },
-      { name: "Menu", path: "/cms-menu", pro: false },
+      //{ name: "Menu", path: "/cms-menu", pro: false },
     ],
   },
   // {

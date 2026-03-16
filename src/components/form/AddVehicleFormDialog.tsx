@@ -142,14 +142,15 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
     return await res.json();
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     try {
       if (!make || !model || !yearFrom || !yearTo || !trim) {
         
         toast.error(`Please fill all fields`);
         return;
       }
-
+      if(loading) return;
       setLoading(true);
 
       let makeId = make.value;
@@ -173,7 +174,13 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
         year_to: Number(yearTo),
         trim,
       };
+   if(Number(yearFrom)>Number(yearTo)){
+    toast.error(`Year From cannot be greater than Year To`);
+    setLoading(false);
+    return;
+   }
 
+       
       await createTrim(payload);
        toast.success(`Trim Created Successfully!`);
        setShowAddVehicleForm(false);
@@ -193,6 +200,7 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
     <div className="max-w-lg p-6 bg-white shadow rounded space-y-4 relative w-full rounded-lg">
         <h2 className="text-center block mb-1 font-medium text-lg">Add Vehicle </h2>
         <span className="absolute top-4 right-4 cursor-pointer bg-gray-100 p-1 rounded-full hover:bg-gray-200 transition-colors duration-200" onClick={() => setShowAddVehicleForm(false)}><Close className="h-6 w-6 text-red-500 hover:text-red-700" /></span>
+      <form onSubmit={handleSubmit}>
       <div>
         <label className="block mb-1 font-medium text-sm">
           Vehicle Make
@@ -228,6 +236,8 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
           placeholder="Year From"
           className="w-1/2 border p-2 rounded"
           value={yearFrom}
+          min={1980}
+            max={new Date().getFullYear()}
           onChange={(e) =>
             setYearFrom(e.target.value)
           }
@@ -238,6 +248,8 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
           placeholder="Year To"
           className="w-1/2 border p-2 rounded"
           value={yearTo}
+          min={1980}
+          max={new Date().getFullYear()}
           onChange={(e) =>
             setYearTo(e.target.value)
           }
@@ -254,13 +266,13 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
         }
       />
       <button
-        onClick={handleSubmit}
+        type="submit"
         disabled={loading}
         className="w-full bg-brand-500 text-white py-2 rounded hover:bg-blue-700"
       >
         {loading ? "Saving..." : "Save Trim"}
       </button>
-
+</form>
     </div>
     </div>
   );

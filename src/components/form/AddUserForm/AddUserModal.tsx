@@ -23,6 +23,7 @@ export default function AddUserModal({ isOpen, closeModal, role, dataChanged }: 
   const [error, setError] = useState('');
 
   const [emailError, setEmailError] = useState("");
+  const [loading, setLoading] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
 
   // Email Validation
@@ -47,7 +48,7 @@ export default function AddUserModal({ isOpen, closeModal, role, dataChanged }: 
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(value))
       errors.push("Must contain at least one special character");
     setPasswordErrors(errors);
-  };
+  }
 
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -87,10 +88,17 @@ export default function AddUserModal({ isOpen, closeModal, role, dataChanged }: 
       validateEmail(formData.email);
       validatePassword(formData.password);
 
-      if (!formData.email || emailError || passwordErrors.length > 0) {
-        setError("Please fix the errors before submitting");
+      if (!formData.email || emailError ) {
+        setError("Please enter a valid email address");
         return;
       }
+      if(passwordErrors.length > 0){
+        setError("Password must be 6+ characters with uppercase, lowercase, number, and special character.");
+         return;
+      }
+
+      if(loading) return;
+      setLoading(true);
 
       const response = await addNewUser(role,formData);
 
@@ -99,9 +107,10 @@ export default function AddUserModal({ isOpen, closeModal, role, dataChanged }: 
         toast.success(`${ role =='buyer' ? 'Buyer' : 'Supplier'} added successfully`);
         dataChanged(Math.random().toString())
         setTimeout(closeModal, 1000);
- 
+       setLoading(false);
       }
     } catch (err: any) {
+      setLoading(false);
       if (err.response) {
         toast.error(err.response.data?.detail[0]?.msg || "Signup failed");
         setError(err.response.data?.detail[0]?.msg || "Signup failed");

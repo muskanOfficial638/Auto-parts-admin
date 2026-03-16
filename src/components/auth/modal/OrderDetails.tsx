@@ -53,6 +53,20 @@ interface PaymentMeta {
   productData: ProductData;
   created_at: string; // You can convert to Date if needed
 }
+ const colorStatus: Record<string, string> = {
+    pending: "text-yellow-500 bg-gray-100",
+    in_process: "text-gray-500 bg-gray-100",
+    in_transit: "text-blue-500 bg-blue-100",
+    completed: "text-green-500 bg-green-100 ",
+    cancelled: "text-red-500 bg-red-100",
+  };
+   const colorStatusName: Record<string, string> = {
+    pending: "Active",
+    in_process: "In Process",
+    in_transit: "In Transit",
+    completed: "Completed",
+    cancelled:"Cancelled"
+  };
 export default function OrderDetails({ OrderID, onOpen, setOpen }: { OrderID: string, onOpen: boolean, setOpen: (value: boolean) => void }) {
    
     const [orderDetails, setOrderDetails] = useState<OrderType | null>(null);
@@ -91,8 +105,8 @@ export default function OrderDetails({ OrderID, onOpen, setOpen }: { OrderID: st
                                     Order ID: {orderDetails?.orderID}
                                 </h2>
 
-                                <span className="bg-green-100 text-green-700 text-sm px-3 py-1 rounded-full font-medium">
-                                    Completed
+                                <span className={`text-sm px-3 py-1 rounded-full font-medium ${colorStatus[orderDetails?.status]} `}>
+                                    {colorStatusName[orderDetails?.status]}
                                 </span>
                             </div>
 
@@ -114,10 +128,12 @@ export default function OrderDetails({ OrderID, onOpen, setOpen }: { OrderID: st
                                     {orderDetails?.shipping_details.tracking}
                                 </p>
                             </div>
-
+                            {orderDetails?.status =="in_transit" && (
                             <Link href={orderDetails?.shipping_details.tracking_url || "#"} className="bg-green-600 hover:bg-green-700 transition text-white px-5 py-2 rounded-lg shadow">
                                Track Now
                             </Link>
+
+                           )}
                         </div>
 
 

@@ -289,8 +289,8 @@ export async function deleteVehicle(level: string, makeId: string) {
       return response;
     })
     .catch((error) => {
-      console.error("unable to delete user", error);
-      throw error;
+       return error.response;
+
     });
 }
 
