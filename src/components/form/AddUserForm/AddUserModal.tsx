@@ -179,7 +179,7 @@ export default function AddUserModal({ isOpen, closeModal, role, dataChanged }: 
             type="submit"
             className="inline-flex items-center justify-center font-medium gap-2 rounded-lg transition px-4 py-3 text-sm bg-brand-500 text-white shadow-theme-xs hover:bg-brand-600"
           >
-            Save Changes
+            Save
           </button>
         </div>
       </form>

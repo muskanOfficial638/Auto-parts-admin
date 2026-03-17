@@ -215,7 +215,7 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
         />
       </div>
 
-      <div>
+      <div className="my-2">
         <label className="block mb-1 font-medium text-sm">
           Vehicle Model
         </label>
@@ -230,7 +230,7 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
         />
       </div>
 
-      <div className="flex gap-3">
+      <div className="flex gap-3 my-2">
         <input
           type="number"
           placeholder="Year From"
@@ -255,7 +255,10 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
           }
         />
       </div>
-
+      <div className="my-2">
+     <label className="block mb-1 font-medium text-sm">
+          Trim Name
+        </label>
       <input
         type="text"
         placeholder="Trim Name"
@@ -265,6 +268,7 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
           setTrim(e.target.value)
         }
       />
+      </div>
       <button
         type="submit"
         disabled={loading}
