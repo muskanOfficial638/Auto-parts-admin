@@ -56,14 +56,7 @@ const navItems: NavItem[] = [
     icon: <TableIcon />,
     subItems: [{ name: "Buyer", path: "/buyers", pro: false }, { name: "Supplier", path: "/suppliers", pro: false },{ name: "KYC", path: "/supplier-kyc", pro: false }],
   },
-  {
-    name: "Logs",
-    icon: <AlertIcon />,
-    subItems: [
-      { name: "Auth Logs", path: "/authentication-logs", pro: false },
-      // { name: "Other Logs", path: "/other-logs", pro: false },
-    ],
-  },
+
   {
     name: "Part Requests",
     icon: <ListIcon />,
@@ -74,13 +67,34 @@ const navItems: NavItem[] = [
     icon: <ListIcon />,
     path: "/orders",
   },
+   {
+    name: "Payment History",
+    icon: <ListIcon />,
+    path: "/payment-history",
+  },
+    {
+    name: "Payout History",
+    icon: <ListIcon />,
+    path: "/payout-history",
+  },
   {
     name: "CMS",
     icon: <ListIcon />,
     subItems: [
-      { name: "pages", path: "/cms-pages", pro: false },
-      //{ name: "Menu", path: "/cms-menu", pro: false },
+      { name: "pages", path: "/cms-pages", pro: false },  
     ],
+  },
+    {
+    name: "Logs",
+    icon: <AlertIcon />,
+    subItems: [
+      { name: "Auth Logs", path: "/authentication-logs", pro: false },
+    ],
+  },
+  {
+    name: "Settings",
+    icon: <ListIcon />,
+    path: "/settings",
   },
   // {
   //   name: "Forms",

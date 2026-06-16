@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import {  ToastContainer } from 'react-toastify';
 
 
-import { getAddressbyID } from "@/app/utils/api";
+//import { getAddressbyID } from "@/app/utils/api";
 
 interface User {
     id: string;
@@ -41,7 +41,7 @@ const ViewUserAddress = ({ isOpenModel, setIsOpenModel, userData }: any) => {
     useEffect(() => {
         if (typeof window !== 'undefined') {
 
-                getAddressbyID(userData.role,userData.id).then(() => {
+              //  getAddressbyID(userData.role,userData.id).then(() => {
                     // console.log(data)
                     // if (data.data?.length > 0) {
                     //     setaddresses(data);
@@ -49,7 +49,7 @@ const ViewUserAddress = ({ isOpenModel, setIsOpenModel, userData }: any) => {
                     //     setAddressError(true);
                     // }
 
-                });
+             //   });
             
         }
 

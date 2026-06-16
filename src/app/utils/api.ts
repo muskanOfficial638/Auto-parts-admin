@@ -10,6 +10,49 @@ export const authApiPath = "https://api.autopartsxchange.co.za/8001/v1";
 export const imagePath = "https://api.autopartsxchange.co.za/8000/image/"; 
 
 
+
+
+// get payment history
+export async function getPaymentHistory() {
+  const res = await fetch(`${adminApiPath}/payment-history?page=1&limit=50`, {
+    cache: "no-store",
+    method: "GET",
+   headers: {
+        "Content-Type": "application/json",
+      },
+  });
+  if (!res.ok) throw new Error("Failed to get payment history");
+  return res.json();
+}
+
+
+// get Payout details
+export async function getPayoutDetails(payoutId: string) {
+  const res = await fetch(`${adminApiPath}/payout-details/${payoutId}`, {
+    cache: "no-store",
+    method: "GET",
+   headers: {
+        "Content-Type": "application/json",
+
+      },
+  });
+  if (!res.ok) throw new Error("Failed to get payout details");
+  return res.json();
+}
+
+// get Payout history
+export async function getPayoutHistory() {
+  const res = await fetch(`${adminApiPath}/view-payout`, {
+    cache: "no-store",
+    method: "GET",
+   headers: {
+        "Content-Type": "application/json",
+      },
+  });
+  if (!res.ok) throw new Error("Failed to get payout history");
+  return res.json();
+}
+
  
 // user profiles
 export async function getDashBoard() {
@@ -20,17 +63,48 @@ export async function getDashBoard() {
   return res.json();
 }
 
+//get platform fee
+export async function getPlatformFee() {
+  const res = await fetch(`${adminApiPath}/settings`, {  
+    cache: "no-store",
+    method: "GET",
+   headers: {
+        "Content-Type": "application/json",
+
+      },
+  });
+  if (!res.ok) throw new Error("Failed to get platform fee");
+  return res.json();
+}
+
+// update platform fee
+export async function UpdatePlatformFee( data: any) {
+  return axios.put(
+    `${adminApiPath}/settings/platform-fee`,
+    data,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error("unable to update platform fee", error);
+      throw error;
+    });
+}
 
 // update Order status
 export async function updateOrderStatus( data: any) {
   return axios.put(
-    
     `${adminApiPath}/orders/updatestatus`,
     data,
     {
       headers: {
         "Content-Type": "application/json",
-
       },
     }
   )
@@ -84,17 +158,17 @@ export async function fetchUsers(role: string) {
   return res.json();
 }
 // address fetch
- export async function getAddressbyID(role:string,id: string) {
-//   const res = await fetch(`${profiles}/${role}/address/${id}`, {
-//     cache: "no-store",
-//     headers: {
-//       "Content-Type": "application/json",
+//  export async function getAddressbyID(role:string,id: string) {
+// //   const res = await fetch(`${profiles}/${role}/address/${id}`, {
+// //     cache: "no-store",
+// //     headers: {
+// //       "Content-Type": "application/json",
    
-//     },
-//   });
-//   if (!res.ok) throw new Error("Failed to fetch profiles");
-//   return res.json();
-}
+// //     },
+// //   });
+// //   if (!res.ok) throw new Error("Failed to fetch profiles");
+// //   return res.json();
+// }
 
 // KYC admin page
 export async function fetchUsersKyc( ) {

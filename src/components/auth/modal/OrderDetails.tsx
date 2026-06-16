@@ -152,7 +152,7 @@ export default function OrderDetails({ OrderID, onOpen, setOpen }: { OrderID: st
                                    
                                     <Image
                                         src={imagePath+orderDetails?.productData.image[0] }
-                                        alt="Disc Brake"
+                                        alt="product image"
                                         width={150}
                                         height={150}
                                         className="w-full h-full object-contain p-1"
@@ -193,6 +193,40 @@ export default function OrderDetails({ OrderID, onOpen, setOpen }: { OrderID: st
                             </div>
 
                         </div>
+
+
+                  {  orderDetails?.payment_meta && (
+                    <>
+                            {/* Order Summary */}
+                            <h3 className="text-lg font-semibold text-gray-900 my-3">
+                                Payment Details
+                            </h3>
+
+                        <div className="bg-gray-50 border border-gray-200 rounded-xl grid md:grid-cols-3 gap-4 p-5">
+
+                            {/* Product */}
+                            <div className="md:col-span-2 flex gap-4">
+
+     
+                                <div>
+            
+
+                                    <p className="text-sm text-gray-500">
+                                        Transaction Id: {orderDetails?.payment_meta.transactionId}
+                                    </p>
+
+                                    <p className="text-sm text-gray-500 capitalize">
+                                        Payment Status: {orderDetails?.payment_meta.paymentStatus}
+                                    </p>
+                                    <p className="text-sm text-gray-700 capitalize">
+                                        Payment Method: <span className="font-semibold">{orderDetails?.payment_meta.paymentMethod}</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                        </div>
+                        </>
+)}
 
 
                         {/* Total */}

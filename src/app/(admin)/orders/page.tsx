@@ -9,7 +9,8 @@ interface Orders {
     created_at: string,
     quotedPrice: string,
     productImage: string[],
-    id: string
+    id: string,
+    paymentStatus: string,
 }
 
 import {
@@ -83,7 +84,8 @@ const CmsPages = () => {
             images: order.productImage[0],
             amount: order.quotedPrice,
             id: order.id,
-            orderId: order.orderID
+            orderId: order.orderID,
+            paymentStatus: order.paymentStatus,
 
         }));
     }, [data]);

@@ -14,6 +14,7 @@ export type OrderRow = {
   amount: string;
   id: string;
   orderId:string;
+  paymentStatus: string;
 
   
 };
@@ -59,8 +60,42 @@ export function OrdersTable({ data, onEdit,onView }: OrdersTableProps) {
     {
       accessorKey: "amount",
       header: "Amount",
+      cell: ({ row }) => {
+        const amount = row.original.amount as string;
+        return (
+          <div>
+           R {amount}
+          </div>
+        );
+      }
     },
     {
+      accessorKey: "paymentStatus",
+      header: "Payment Status",
+      cell: ({ row }) => {
+            const status = row.original.paymentStatus as string;
+
+  const colorStatus: Record<string, string> = {
+    paid: "text-green-500",
+    unpaid: "text-yellow-500",
+    hold: "text-gray-500",
+    failed: "text-red-500",
+  };
+   const colorStatusName: Record<string, string> = {
+    paid: "Paid",
+    unpaid: "Unpaid",
+    hold: "On Hold",
+    failed: "Failed",
+   
+  };
+          return (
+            <div  className={colorStatus[status]} >
+              {colorStatusName[status]}
+            </div>
+          );
+        },
+    },
+     {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
