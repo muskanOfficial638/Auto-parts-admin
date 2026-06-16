@@ -44,7 +44,7 @@ export function PayoutTable({ data,onView }: PayoutTableProps) {
       header: "Transfer ID",
     },
     
-     
+  
     {
       accessorKey: "created_at",
       header: "Date",
