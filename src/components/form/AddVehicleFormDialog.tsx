@@ -35,6 +35,7 @@ interface SelectOption {
 export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: { setShowAddVehicleForm: (show: boolean) => void, onSave: () => void }) {
 
   const [data, setData] = useState<Make[]>([]);
+  const [trimExists, setTrimExists] = useState<boolean>(false);
   const [make, setMake] = useState<SelectOption | null>(null);
   const [model, setModel] = useState<SelectOption | null>(null);
   const [modelOptions, setModelOptions] = useState<SelectOption[]>([]);
@@ -45,6 +46,28 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
 
 
 
+useEffect(() => {
+  if (!trim || !make?.value || !model?.value || !data?.length) return;
+
+
+  const selectedMake = data.find(
+    item => item.make_id === make.value
+  );
+  if (!selectedMake) return;
+
+  const selectedModel = selectedMake.models.find(
+    item => item.id === model.value
+  );
+
+  if (!selectedModel) return;
+
+  const existingTrim = selectedModel.trims.find(
+    item => item.trim.trim().toLowerCase() === trim.trim().toLowerCase()
+  );
+
+  setTrimExists(!!existingTrim);
+
+}, [trim, make, model, data]);
 
   useEffect(() => {
     viewVehicleMake()
@@ -145,6 +168,10 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      if(trimExists){
+        toast.error(`This trim already exists for the selected make and model.`);
+        return;
+      }
       if (!make || !model || !yearFrom || !yearTo || !trim) {
         
         toast.error(`Please fill all fields`);
@@ -268,6 +295,9 @@ export default function AddVehicleFormDialog({ setShowAddVehicleForm, onSave }: 
           setTrim(e.target.value)
         }
       />
+        {trimExists && (  <p className="text-red-500 text-sm mt-1">
+          This trim already exists for the selected make and model.
+        </p>)}
       </div>
       <button
         type="submit"

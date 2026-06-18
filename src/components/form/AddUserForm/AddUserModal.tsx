@@ -31,9 +31,12 @@ export default function AddUserModal({ isOpen, closeModal, role, dataChanged }: 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!value) {
       setEmailError("Email is required");
+      return;   
     } else if (!emailRegex.test(value)) {
       setEmailError("Please enter a valid email address");
-    } else {
+      return;
+    } 
+    else {
       setEmailError("");
     }
   };
@@ -79,14 +82,23 @@ export default function AddUserModal({ isOpen, closeModal, role, dataChanged }: 
 
 
     try {
-      if (!formData?.name || !formData.email || !formData.password) {
-        if (!formData?.name) { setError('Name is required'); toast.error('Name is required'); }
-       if (!formData?.password) { setError('Password is required'); toast.error('Password is required'); }
+      if (!formData?.name || !formData.email || !formData.password || (role === 'buyer' && !formData?.company_name) ) {
+
+        if (!formData?.name) {  toast.error('Name is required'); return; }
+        if(formData?.name && (formData.name.length > 25 || formData.name.length < 2)) {  toast.error('Name must be between 2 and 25 characters long'); return; }  
+
+        if (role === 'buyer' && !formData?.company_name) { toast.error('Company name is required'); return; }
+        if (role === 'buyer' && formData?.company_name && (formData.company_name.length > 30 || formData.company_name.length < 2)) {  toast.error('Company name must be between 2 and 30 characters long'); return; }
+        if (!formData?.email) {  toast.error('Email is required'); return; }
+
+       validateEmail(formData.email);
+       if (!formData?.password) {  toast.error('Password is required'); return; }
+       validatePassword(formData.password);
         return
       }
+      
 
-      validateEmail(formData.email);
-      validatePassword(formData.password);
+      
 
       if (!formData.email || emailError ) {
         setError("Please enter a valid email address");
