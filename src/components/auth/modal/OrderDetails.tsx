@@ -91,7 +91,11 @@ export default function OrderDetails({ OrderID, onOpen, setOpen }: { OrderID: st
 
             {(onOpen && orderDetails ) && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-                    <div className="bg-white w-full max-w-5xl mx-4 rounded-2xl shadow-2xl p-6 text-gray-800 relative animate-fadeIn">
+                    <div className="[&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-[#FFFFFF00]
+  [&::-webkit-scrollbar-thumb]:bg-[#C1C1C1]
+  dark:[&::-webkit-scrollbar-track]:bg-[#FFFFFF00] 
+  dark:[&::-webkit-scrollbar-thumb]:bg-[#C1C1C1] flxed top-5 max-h-[calc(100vh-50px)] overflow-y-auto bg-white w-full max-w-5xl mx-4 rounded-2xl shadow-2xl p-6 text-gray-800 relative animate-fadeIn">
                         <button
                             onClick={() => setOpen(false)}
                             className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl"

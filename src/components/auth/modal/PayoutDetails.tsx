@@ -50,7 +50,11 @@ export default function PayoutDetails({ PayoutID, onOpen, setOpen }: { PayoutID:
 
            {onOpen && orderDetails && (
   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-    <div className="bg-white w-full max-w-4xl mx-4 rounded-2xl shadow-2xl p-6 text-gray-800 relative">
+    <div className="[&::-webkit-scrollbar]:w-2
+  [&::-webkit-scrollbar-track]:bg-[#FFFFFF00]
+  [&::-webkit-scrollbar-thumb]:bg-[#C1C1C1]
+  dark:[&::-webkit-scrollbar-track]:bg-[#FFFFFF00] 
+  dark:[&::-webkit-scrollbar-thumb]:bg-[#C1C1C1] flxed top-5 max-h-[calc(100vh-50px)] overflow-y-auto bg-white w-full max-w-4xl mx-4 rounded-2xl shadow-2xl p-6 text-gray-800 relative">
       
       <button
         onClick={() => setOpen(false)}
