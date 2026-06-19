@@ -15,6 +15,8 @@ type PayoutsType = {
     payout_updated_at: string,
     id: string,
     user_name: string,
+    payout_amount: string,
+    platform_fee: string,
 }
 
 
@@ -57,7 +59,9 @@ const PayoutHistory = () => {
             amount: order.total_amount,
             id: order.id,
             user_name: order.user_name,
-            unique_id: order.unique_id
+            unique_id: order.unique_id,
+            payout_amount: order.payout_amount,
+            platform_fee: order.platform_fee
         }));
     }, [data]);
 

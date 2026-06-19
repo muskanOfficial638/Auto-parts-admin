@@ -11,6 +11,8 @@ export type PayoutRow = {
   transfer_id:string;
   id: string;
   user_name: string;
+  payout_amount: string;
+  platform_fee: string;
 };
 
 interface PayoutTableProps {
@@ -55,6 +57,30 @@ export function PayoutTable({ data,onView }: PayoutTableProps) {
       header: "Amount",
       cell: ({ row }) => {
         const amount = row.original.amount as string;
+        return (
+          <div>
+           R {amount}
+          </div>
+        );
+      }
+    },
+       {
+      accessorKey: "platform_fee",
+      header: "Platform Fee",
+      cell: ({ row }) => {
+        const amount = row.original.platform_fee as string;
+        return (
+          <div>
+           R {amount}
+          </div>
+        );
+      }
+    },
+       {
+      accessorKey: "payout_amount",
+      header: "Payout Amount",
+      cell: ({ row }) => {
+        const amount = row.original.payout_amount as string;
         return (
           <div>
            R {amount}
