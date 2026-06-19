@@ -162,6 +162,7 @@ export default function SignInForm() {
                   </Label>
                   <Input placeholder="info@gmail.com" type="email"
                     name="email"
+                    required={true}
                     onChange={handleEmailChange}
                   />
                 </div>
@@ -175,6 +176,7 @@ export default function SignInForm() {
                       type={showPassword ? "text" : "password"}
                       placeholder="Enter your password"
                       name="password"
+                      required={true}
                       onChange={handlePasswordChange}
                     />
                     <span
