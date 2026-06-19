@@ -117,6 +117,28 @@ export async function updateOrderStatus( data: any) {
     });
 }
 
+
+// Cancel Order
+export async function cancelOrder( orderId: any) {
+  return axios.put(
+    `${adminApiPath}/orders/cancel/${orderId}`,
+    {},
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  )
+    .then((response) => {
+      return response;
+    })
+    .catch((error) => {
+      console.error("unable to cancel order", error);
+      throw error;
+    });
+}
+
+
 // Get orders Details
 export async function getOrdersDetails(orderId:string) {
   const res = await fetch(`${adminApiPath}/view-order-details?order_id=${orderId}`, {

@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/Alert-dialog";
 
 
-import { getAllOrders, updateOrderStatus } from "@/app/utils/api";
+import { cancelOrder, getAllOrders, updateOrderStatus } from "@/app/utils/api";
 import { OrdersTable, OrderRow } from "@/components/tables/OrdersTable";
 import OrderDetails from "@/components/auth/modal/OrderDetails";
 
@@ -44,6 +44,8 @@ const CmsPages = () => {
 
     const handleSubmit = () => {
 
+
+        if (status !== "refunded") {
     
         updateOrderStatus( { order_id: changeStatusData, status }).then((res) => {
             if (res.data.status === true) {
@@ -58,7 +60,21 @@ const CmsPages = () => {
         }).catch((err) => {
             console.error("API Error:", err);
         });
-
+    }else {
+         cancelOrder(changeStatusData).then((res) => {
+            if (res.data.status === true) {
+                toast.success("Order cancelled successfully!");
+                setChangeStatus(false);
+                setPageUpdateValue(true);
+            } else {
+                toast.error("Failed to cancel order.");
+            }
+          
+          
+        }).catch((err) => {
+            console.error("API Error:", err);
+        });
+    }
         
     };
 
@@ -142,8 +158,9 @@ const CmsPages = () => {
                                     <option value="pending">Pending</option>
                                     <option value="in_process">In Progress</option>
                                     <option value="in_transit">In Transit</option>
-                                    <option value="completed">Completed</option>                                   
-                                    <option value="cancelled">Cancelled</option>
+                                    <option value="completed">Complete</option>                                   
+                                    <option value="cancelled">Cancel</option>
+                                    <option value="refunded">Refund</option>
                                 </select>
                             </div>
                         </div>
