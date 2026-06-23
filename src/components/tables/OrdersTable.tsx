@@ -80,12 +80,14 @@ export function OrdersTable({ data, onEdit,onView }: OrdersTableProps) {
     unpaid: "text-yellow-500",
     hold: "text-gray-500",
     failed: "text-red-500",
+    refunded: "text-blue-500",
   };
    const colorStatusName: Record<string, string> = {
     paid: "Paid",
     unpaid: "Unpaid",
     hold: "On Hold",
     failed: "Failed",
+    refunded: "Refunded",
    
   };
           return (
@@ -107,13 +109,15 @@ export function OrdersTable({ data, onEdit,onView }: OrdersTableProps) {
     in_transit: "text-blue-500",
     completed: "text-green-500",
     cancelled: "text-red-500",
+    refunded: "text-purple-500",
   };
    const colorStatusName: Record<string, string> = {
     pending: "Active",
     in_process: "In Process",
     in_transit: "In Transit",
     completed: "Completed",
-    cancelled:"Cancelled"
+    cancelled:"Cancelled",
+    refunded: "Refunded",
     
    
   };

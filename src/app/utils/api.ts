@@ -11,10 +11,23 @@ export const imagePath = "https://api.autopartsxchange.co.za/8000/image/";
 
 
 
+// get refund history
+export async function getRefundHistory() {
+  const res = await fetch(`${adminApiPath}/refunded-list`, {
+    cache: "no-store",
+    method: "GET",
+   headers: {
+        "Content-Type": "application/json",
+      },
+  });
+  if (!res.ok) throw new Error("Failed to get refund history");
+  return res.json();
+}
+
 
 // get payment history
 export async function getPaymentHistory() {
-  const res = await fetch(`${adminApiPath}/payment-history?page=1&limit=50`, {
+  const res = await fetch(`${adminApiPath}/payment-history`, {
     cache: "no-store",
     method: "GET",
    headers: {
@@ -120,8 +133,8 @@ export async function updateOrderStatus( data: any) {
 
 // Cancel Order
 export async function cancelOrder( orderId: any) {
-  return axios.put(
-    `${adminApiPath}/orders/cancel/${orderId}`,
+  return axios.post(
+    `${adminApiPath}/refund/${orderId}`,
     {},
     {
       headers: {

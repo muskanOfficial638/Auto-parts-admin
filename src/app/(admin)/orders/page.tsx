@@ -42,6 +42,14 @@ const CmsPages = () => {
     const [status, setStatus] = useState<string>("pending");
     const [changeStatus, setChangeStatus] = useState(false);
 
+    useEffect(() => {
+         data.map((item)=>{
+            if(item.id === changeStatusData){
+             setStatus(item.status);
+            }
+         })
+    },[changeStatusData,data]);
+
     const handleSubmit = () => {
 
 

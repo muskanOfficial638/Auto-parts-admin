@@ -77,6 +77,11 @@ const navItems: NavItem[] = [
     icon: <ListIcon />,
     path: "/payout-history",
   },
+   {
+    name: "Refund History",
+    icon: <ListIcon />,
+    path: "/refund-history",
+  },
   {
     name: "CMS",
     icon: <ListIcon />,

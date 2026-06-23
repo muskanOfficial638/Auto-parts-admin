@@ -1,9 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { DataTable } from "@/components/tables/DataTable";
 
-export type PaymentRow = {
+export type RefundHistoryRow = {
     unique_id: string,
-    transactionId: string,
+    refundId: string,
     amount: string,
     paymentStatus: string,
     order_date: string,
@@ -12,19 +12,19 @@ export type PaymentRow = {
     paymentMethod: string
 };
 
-interface PaymentHistoryTableProps {
-  data: PaymentRow[];
+interface RefundHistoryTableProps {
+  data: RefundHistoryRow[];
 
 
 }
 
-export function PaymentHistoryTable({ data }: PaymentHistoryTableProps) {
-  const columns: ColumnDef<PaymentRow>[] = [
+export function RefundHistoryTable({ data }: RefundHistoryTableProps) {
+  const columns: ColumnDef<RefundHistoryRow>[] = [
     
 
     {
       accessorKey: "unique_id",
-      header: "Payment ID",
+      header: "Order ID",
       cell: ({ row }) => {
         const uniqueId = row.original.unique_id as string;
         return (
@@ -39,8 +39,8 @@ export function PaymentHistoryTable({ data }: PaymentHistoryTableProps) {
       header: "Buyer Name",
     },
     {
-      accessorKey: "transactionId",
-      header: "Transaction ID",
+      accessorKey: "refundId",
+      header: "Refund ID",
     },
     
      
